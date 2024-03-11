@@ -1,12 +1,12 @@
 defmodule Growio.Marketplaces do
   import Ecto.Query
+  import Growio.Permissions.PermissionDefs
   alias Ecto.Changeset
   alias Ecto.Multi
   alias Growio.Utils
   alias Growio.Repo
   alias Growio.Accounts.Account
   alias Growio.Permissions
-  alias Growio.Permissions.PermissionDefs
   alias Growio.Marketplaces.Marketplace
   alias Growio.Marketplaces.MarketplaceAccount
   alias Growio.Marketplaces.MarketplaceAccountRole
@@ -103,9 +103,9 @@ defmodule Growio.Marketplaces do
         %MarketplaceAccountRole{} = role
       ) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
-             PermissionDefs.marketplaces__marketplace_account__create()
+             marketplaces__marketplace_account__create()
            ),
          initiator = Repo.preload(initiator, [:role, :marketplace]),
          true <- initiator.role.priority < role.priority do
@@ -135,10 +135,10 @@ defmodule Growio.Marketplaces do
   def block_account(%MarketplaceAccount{} = initiator, %MarketplaceAccount{} = account) do
     with true <- initiator.marketplace_id === account.marketplace_id,
          true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              account,
-             PermissionDefs.marketplaces__marketplace_account__delete()
+             marketplaces__marketplace_account__delete()
            ),
          false <- blocked_account?(account) do
       block_account(account)
@@ -157,10 +157,10 @@ defmodule Growio.Marketplaces do
 
   def undo_block_account(%MarketplaceAccount{} = initiator, %MarketplaceAccount{} = account) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              account,
-             PermissionDefs.marketplaces__marketplace_account__delete()
+             marketplaces__marketplace_account__delete()
            ),
          true <- blocked_account?(account) do
       undo_block_account(account)
@@ -199,7 +199,10 @@ defmodule Growio.Marketplaces do
 
   def create_account_role(%MarketplaceAccount{} = initiator, %{} = params) do
     with true <-
-           can_act?(initiator, PermissionDefs.marketplaces__marketplace_account_role__create()),
+           Permissions.ok?(
+             initiator,
+             marketplaces__marketplace_account_role__create()
+           ),
          initiator = Repo.preload(initiator, [:marketplace]) do
       create_account_role(initiator.marketplace, params)
     else
@@ -255,16 +258,16 @@ defmodule Growio.Marketplaces do
         %MarketplaceAccountRole{} = role
       ) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              role,
-             PermissionDefs.marketplaces__marketplace_account_role__create()
+             marketplaces__marketplace_account_role__create()
            ),
          true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              account,
-             PermissionDefs.marketplaces__marketplace_account_role__create()
+             marketplaces__marketplace_account_role__create()
            ) do
       assign_account_role(account, role)
     else
@@ -289,10 +292,10 @@ defmodule Growio.Marketplaces do
         %{} = params
       ) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              role,
-             PermissionDefs.marketplaces__marketplace_account_role__update()
+             marketplaces__marketplace_account_role__update()
            ) do
       update_account_role(role, params)
     else
@@ -313,10 +316,10 @@ defmodule Growio.Marketplaces do
 
   def delete_account_role(%MarketplaceAccount{} = initiator, %MarketplaceAccountRole{} = role) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              role,
-             PermissionDefs.marketplaces__marketplace_account_role__delete()
+             marketplaces__marketplace_account_role__delete()
            ) do
       delete_account_role(role)
     else
@@ -346,10 +349,10 @@ defmodule Growio.Marketplaces do
         %MarketplaceAccountRole{} = role
       ) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              role,
-             PermissionDefs.marketplaces__marketplace_account_role__delete()
+             marketplaces__marketplace_account_role__delete()
            ) do
       undo_delete_account_role(role)
     else
@@ -380,10 +383,10 @@ defmodule Growio.Marketplaces do
       )
       when is_bitstring(permission_name) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              role,
-             PermissionDefs.marketplaces__marketplace_account_role__update()
+             marketplaces__marketplace_account_role__update()
            ) do
       set_account_role_permissions(role, permission_names)
     else
@@ -455,9 +458,9 @@ defmodule Growio.Marketplaces do
       )
       when is_bitstring(role_name) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
-             PermissionDefs.marketplaces__marketplace_account_role__update()
+             marketplaces__marketplace_account_role__update()
            ),
          initiator = Repo.preload(initiator, [:marketplace]) do
       update_account_role_priorities(initiator.marketplace, role_names)
@@ -506,7 +509,10 @@ defmodule Growio.Marketplaces do
 
   def all_item_categories(%MarketplaceAccount{} = initiator, opts) do
     with true <-
-           can_act?(initiator, PermissionDefs.marketplaces__marketplace_item_category__read()),
+           Permissions.ok?(
+             initiator,
+             marketplaces__marketplace_item_category__read()
+           ),
          initiator = Repo.preload(initiator, [:marketplace]) do
       all_item_categories(initiator.marketplace, opts)
     else
@@ -534,7 +540,10 @@ defmodule Growio.Marketplaces do
 
   def create_item_category(%MarketplaceAccount{} = initiator, %{} = params) do
     with true <-
-           can_act?(initiator, PermissionDefs.marketplaces__marketplace_item_category__create()),
+           Permissions.ok?(
+             initiator,
+             marketplaces__marketplace_item_category__create()
+           ),
          initiator = Repo.preload(initiator, [:marketplace]) do
       create_item_category(initiator.marketplace, params)
     else
@@ -560,10 +569,10 @@ defmodule Growio.Marketplaces do
         %{} = params
       ) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              item_category,
-             PermissionDefs.marketplaces__marketplace_item_category__update()
+             marketplaces__marketplace_item_category__update()
            ) do
       update_item_category(item_category, params)
     else
@@ -587,10 +596,10 @@ defmodule Growio.Marketplaces do
         %MarketplaceItemCategory{} = item_category
       ) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              item_category,
-             PermissionDefs.marketplaces__marketplace_item_category__delete()
+             marketplaces__marketplace_item_category__delete()
            ) do
       delete_item_category(item_category)
     else
@@ -643,12 +652,13 @@ defmodule Growio.Marketplaces do
         opts
       ) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              item_category,
-             PermissionDefs.marketplaces__marketplace_item_category__read()
+             marketplaces__marketplace_item_category__read()
            ),
-         true <- can_act?(initiator, PermissionDefs.marketplaces__marketplace_item__read()) do
+         true <-
+           Permissions.ok?(initiator, marketplaces__marketplace_item__read()) do
       all_items(item_category, opts)
     else
       _ -> {:error, "cannot get all items"}
@@ -662,12 +672,13 @@ defmodule Growio.Marketplaces do
       )
       when is_integer(item_id) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              item_category,
-             PermissionDefs.marketplaces__marketplace_item_category__read()
+             marketplaces__marketplace_item_category__read()
            ),
-         true <- can_act?(initiator, PermissionDefs.marketplaces__marketplace_item__read()) do
+         true <-
+           Permissions.ok?(initiator, marketplaces__marketplace_item__read()) do
       get_item(item_category, item_id)
     else
       _ -> {:error, "cannot get an item"}
@@ -689,12 +700,16 @@ defmodule Growio.Marketplaces do
         %{} = params
       ) do
     with true <-
-           can_act?(
+           Permissions.ok?(
              initiator,
              item_category,
-             PermissionDefs.marketplaces__marketplace_item_category__read()
+             marketplaces__marketplace_item_category__read()
            ),
-         true <- can_act?(initiator, PermissionDefs.marketplaces__marketplace_item__create()) do
+         true <-
+           Permissions.ok?(
+             initiator,
+             marketplaces__marketplace_item__create()
+           ) do
       create_item(item_category, params)
     else
       _ -> {:error, "cannot create an item"}
@@ -733,7 +748,11 @@ defmodule Growio.Marketplaces do
 
   def update_item(%MarketplaceAccount{} = initiator, %MarketplaceItem{} = item, %{} = params) do
     with true <-
-           can_act?(initiator, item, PermissionDefs.marketplaces__marketplace_item__update()) do
+           Permissions.ok?(
+             initiator,
+             item,
+             marketplaces__marketplace_item__update()
+           ) do
       update_item(item, params)
     else
       _ -> {:error, "cannot update an item"}
@@ -748,7 +767,11 @@ defmodule Growio.Marketplaces do
 
   def delete_item(%MarketplaceAccount{} = initiator, %MarketplaceItem{} = item) do
     with true <-
-           can_act?(initiator, item, PermissionDefs.marketplaces__marketplace_item__delete()) do
+           Permissions.ok?(
+             initiator,
+             item,
+             marketplaces__marketplace_item__delete()
+           ) do
       delete_item(item)
     else
       _ -> {:error, "cannot delete an item"}
@@ -769,92 +792,5 @@ defmodule Growio.Marketplaces do
 
   def deleted_item?(%MarketplaceItem{} = item) do
     not is_nil(item.deleted_at)
-  end
-
-  defp can_act?(
-         %MarketplaceAccount{} = initiator,
-         permission
-       ) do
-    with initiator = Repo.preload(initiator, role: [:permissions]),
-         true <-
-           Enum.any?(initiator.role.permissions, fn p ->
-             p.name === permission
-           end) do
-      true
-    else
-      _ -> false
-    end
-  end
-
-  defp can_act?(
-         %MarketplaceAccount{} = initiator,
-         %MarketplaceAccountRole{} = role,
-         permission
-       ) do
-    with initiator = Repo.preload(initiator, role: [:permissions]),
-         true <- initiator.marketplace_id === role.marketplace_id,
-         true <-
-           Enum.any?(initiator.role.permissions, fn p ->
-             p.name === permission
-           end),
-         true <- initiator.role.priority <= role.priority do
-      true
-    else
-      _ -> false
-    end
-  end
-
-  defp can_act?(
-         %MarketplaceAccount{} = initiator,
-         %MarketplaceAccount{} = account,
-         permission
-       ) do
-    with true <- initiator.marketplace_id === account.marketplace_id,
-         initiator = Repo.preload(initiator, role: [:permissions]),
-         account = Repo.preload(account, :role),
-         true <-
-           Enum.any?(initiator.role.permissions, fn p ->
-             p.name === permission
-           end),
-         true <- initiator.role.priority < account.role.priority do
-      true
-    else
-      _ -> false
-    end
-  end
-
-  defp can_act?(
-         %MarketplaceAccount{} = initiator,
-         %MarketplaceItemCategory{} = category,
-         permission
-       ) do
-    with true <- initiator.marketplace_id === category.marketplace_id,
-         initiator = Repo.preload(initiator, role: [:permissions]),
-         true <-
-           Enum.any?(initiator.role.permissions, fn p ->
-             p.name === permission
-           end) do
-      true
-    else
-      _ -> false
-    end
-  end
-
-  defp can_act?(
-         %MarketplaceAccount{} = initiator,
-         %MarketplaceItem{} = item,
-         permission
-       ) do
-    with item = Repo.preload(item, [:category]),
-         true <- initiator.marketplace_id === item.category.marketplace_id,
-         initiator = Repo.preload(initiator, role: [:permissions]),
-         true <-
-           Enum.any?(initiator.role.permissions, fn p ->
-             p.name === permission
-           end) do
-      true
-    else
-      _ -> false
-    end
   end
 end
