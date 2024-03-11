@@ -14,18 +14,16 @@ defmodule Growio.Marketplaces do
   end
 
   def create_marketplace(%Account{} = account, %{} = params) do
-    with marketplace_changeset = %Changeset{valid?: true} <- Marketplace.changeset(params),
-         role_changeset = %Changeset{valid?: true} <-
-           MarketplaceAccountRole.changeset(%{
-             name: "owner",
-             locked: true,
-             priority: 1
-           }) do
+    marketplace_changeset = Marketplace.changeset(params)
+    owner_role_changeset = MarketplaceAccountRole.owner_changeset()
+
+    with %Changeset{valid?: true} <- marketplace_changeset,
+         %Changeset{valid?: true} <- owner_role_changeset do
       result =
         Multi.new()
         |> Multi.insert(:marketplace, marketplace_changeset)
         |> Multi.insert(:role, fn %{marketplace: marketplace} ->
-          Changeset.put_assoc(role_changeset, :marketplace, marketplace)
+          Changeset.put_assoc(owner_role_changeset, :marketplace, marketplace)
         end)
         |> Multi.insert(:marketplace_account, fn %{marketplace: marketplace, role: role} ->
           %MarketplaceAccount{}
@@ -37,22 +35,21 @@ defmodule Growio.Marketplaces do
         |> Repo.transaction()
 
       case result do
-        {:ok, %{role: role}} = v ->
-          tasks =
-            Enum.map(Permissions.all(), fn permission ->
-              c =
-                Changeset.change(%MarketplaceAccountRolePermission{})
-                |> Changeset.put_assoc(:role, role)
-                |> Changeset.put_assoc(:permission, permission)
-
-              Task.async(fn -> Repo.insert!(c) end)
+        {:ok, %{role: role}} ->
+          Enum.map(Permissions.all(), fn permission ->
+            Task.async(fn ->
+              Changeset.change(%MarketplaceAccountRolePermission{})
+              |> Changeset.put_assoc(:role, role)
+              |> Changeset.put_assoc(:permission, permission)
+              |> Repo.insert!()
             end)
+          end)
+          |> Task.await_many()
 
-          Task.await_many(tasks)
-          v
+          result
 
-        v ->
-          v
+        _ ->
+          result
       end
     end
   end

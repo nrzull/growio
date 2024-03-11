@@ -42,7 +42,8 @@ defmodule Growio.MixProject do
       {:postgrex, "0.17.4"},
       {:jason, "1.4.1"},
       {:swoosh, "1.15.2"},
-      {:finch, "0.18.0"}
+      {:finch, "0.18.0"},
+      {:cachex, "3.6.0"}
     ]
   end
 

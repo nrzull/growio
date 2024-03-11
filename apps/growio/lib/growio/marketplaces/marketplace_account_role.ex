@@ -34,4 +34,7 @@ defmodule Growio.Marketplaces.MarketplaceAccountRole do
     |> cast(params, @required ++ @optional)
     |> validate_required(@required)
   end
+
+  def owner_changeset(),
+    do: changeset(%{name: "owner", locked: true, priority: 1})
 end
