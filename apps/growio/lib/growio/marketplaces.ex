@@ -51,15 +51,18 @@ defmodule Growio.Marketplaces do
   end
 
   def all_accounts(%Marketplace{} = marketplace, opts \\ []) do
-    blocked_at = Keyword.get(opts, :blocked_at, false)
-
     MarketplaceAccount
     |> where([account], account.marketplace_id == ^marketplace.id)
     |> then(fn query ->
-      if blocked_at do
-        where(query, [account], not is_nil(account.blocked_at))
-      else
-        where(query, [account], is_nil(account.blocked_at))
+      case Keyword.get(opts, :blocked_at) do
+        true ->
+          where(query, [account], not is_nil(account.blocked_at))
+
+        false ->
+          where(query, [account], is_nil(account.blocked_at))
+
+        _ ->
+          query
       end
     end)
     |> Repo.all()
@@ -89,7 +92,19 @@ defmodule Growio.Marketplaces do
       |> Repo.update()
     else
       _ ->
-        {:ok, account}
+        {:error, "the account is already_blocked"}
+    end
+  end
+
+  def undo_block_account(%MarketplaceAccount{} = account) do
+    with true <- blocked_account?(account) do
+      account
+      |> Changeset.change()
+      |> Changeset.force_change(:blocked_at, nil)
+      |> Repo.update()
+    else
+      _ ->
+        {:error, "the account is not blocked"}
     end
   end
 
@@ -174,13 +189,19 @@ defmodule Growio.Marketplaces do
       Repo.exists?(where(MarketplaceAccount, [acc], acc.role_id == ^role.id)) ->
         {:error, "there are accounts that use current role"}
 
+      not is_nil(role.deleted_at) ->
+        {:error, "the role is already deleted"}
+
       true ->
         update_account_role(role, %{deleted_at: Utils.naive_utc_now()})
     end
   end
 
   def undo_delete_account_role(%MarketplaceAccountRole{} = role) do
-    update_account_role(role, %{deleted_at: nil})
+    role
+    |> Changeset.change()
+    |> Changeset.force_change(:deleted_at, nil)
+    |> Repo.update()
   end
 
   def get_account_role(%Marketplace{} = marketplace, name) do

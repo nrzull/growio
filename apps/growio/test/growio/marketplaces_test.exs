@@ -111,6 +111,15 @@ defmodule Growio.MarketplacesTest do
                  role.name == "role1"
                end
              )
+
+      Marketplaces.undo_delete_account_role(role)
+
+      assert Enum.any?(
+               Marketplaces.all_account_roles(marketplace, deleted_at: false),
+               fn role ->
+                 role.name == "role1"
+               end
+             )
     end
 
     test "assign new role" do
@@ -141,6 +150,61 @@ defmodule Growio.MarketplacesTest do
 
       assert updated_role.id == role2.id
       assert updated_role.name == updated_name
+    end
+
+    test "block and then unblock an account" do
+      %{marketplace_account: marketplace_account, marketplace: marketplace} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      {:ok, marketplace_account} = Marketplaces.block_account(marketplace_account)
+
+      {:error, _} = Marketplaces.block_account(marketplace_account)
+
+      assert Enum.any?(
+               Marketplaces.all_accounts(marketplace),
+               fn account ->
+                 account.id == marketplace_account.id
+               end
+             )
+
+      assert Enum.any?(
+               Marketplaces.all_accounts(marketplace, blocked_at: true),
+               fn account ->
+                 account.id == marketplace_account.id
+               end
+             )
+
+      refute Enum.any?(
+               Marketplaces.all_accounts(marketplace, blocked_at: false),
+               fn account ->
+                 account.id == marketplace_account.id
+               end
+             )
+
+      {:ok, marketplace_account} = Marketplaces.undo_block_account(marketplace_account)
+
+      {:error, _} = Marketplaces.undo_block_account(marketplace_account)
+
+      assert Enum.any?(
+               Marketplaces.all_accounts(marketplace),
+               fn account ->
+                 account.id == marketplace_account.id
+               end
+             )
+
+      refute Enum.any?(
+               Marketplaces.all_accounts(marketplace, blocked_at: true),
+               fn account ->
+                 account.id == marketplace_account.id
+               end
+             )
+
+      assert Enum.any?(
+               Marketplaces.all_accounts(marketplace, blocked_at: false),
+               fn account ->
+                 account.id == marketplace_account.id
+               end
+             )
     end
   end
 
