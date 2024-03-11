@@ -1,18 +1,18 @@
-defmodule Growio.Warehouses.WarehouseItem do
+defmodule Growio.Marketplaces.MarketplaceWarehouseItem do
   use Ecto.Schema
   import Ecto.Changeset
   alias Growio.Marketplaces.MarketplaceItem
-  alias Growio.Warehouses.Warehouse
+  alias Growio.Marketplaces.MarketplaceWarehouse
 
   @type t :: %__MODULE__{}
   @required ~w()a
   @optional ~w(infinity quantity)a
 
-  schema "warehouse_items" do
+  schema "marketplace_warehouse_items" do
     field(:infinity, :boolean)
     field(:quantity, :integer)
     belongs_to(:marketplace_item, MarketplaceItem)
-    belongs_to(:warehouse, Warehouse)
+    belongs_to(:warehouse, MarketplaceWarehouse)
     timestamps()
   end
 

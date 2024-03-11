@@ -1,12 +1,12 @@
-defmodule Growio.Repo.Migrations.CreateWarehouseItems do
+defmodule Growio.Repo.Migrations.CreateMarketplaceWarehouseItems do
   use Ecto.Migration
 
   def change do
-    create table(:warehouse_items) do
+    create table(:marketplace_warehouse_items) do
       add(:infinity, :boolean)
       add(:quantity, :integer)
       add(:marketplace_item_id, references(:marketplace_items))
-      add(:warehouse_id, references(:warehouses))
+      add(:warehouse_id, references(:marketplace_warehouses))
       timestamps()
     end
   end

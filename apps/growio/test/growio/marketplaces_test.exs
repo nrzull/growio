@@ -11,6 +11,8 @@ defmodule Growio.MarketplacesTest do
   alias Growio.Marketplaces.MarketplaceItemVariant
   alias Growio.Marketplaces.MarketplaceItemAsset
   alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
+  alias Growio.Marketplaces.MarketplaceWarehouse
+  alias Growio.Marketplaces.MarketplaceWarehouseItem
 
   describe "Growio.Marketplaces" do
     test "get marketplace accounts of a marketplace" do
@@ -560,6 +562,112 @@ defmodule Growio.MarketplacesTest do
         Marketplaces.use_account_email_invitation(password)
 
       nil = Marketplaces.get_account_email_invitation(:email, email)
+    end
+
+    test "create a warehouse" do
+      valid_name = "warehouse"
+
+      %{marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      {:ok, %MarketplaceWarehouse{} = warehouse} =
+        Marketplaces.create_warehouse(marketplace_account, %{name: valid_name})
+
+      assert warehouse.name == valid_name
+    end
+
+    test "get all warehouses" do
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      MarketplacesFixture.warehouse!(marketplace)
+      MarketplacesFixture.warehouse!(marketplace)
+
+      [%MarketplaceWarehouse{}, %MarketplaceWarehouse{}] =
+        Marketplaces.all_warehouses(marketplace_account)
+    end
+
+    test "update a warehouse" do
+      updated_name = "updated name"
+
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      warehouse = MarketplacesFixture.warehouse!(marketplace)
+
+      {:ok, warehouse} =
+        Marketplaces.update_warehouse(marketplace_account, warehouse, %{name: updated_name})
+
+      assert warehouse.name == updated_name
+    end
+
+    test "create a warehouse item" do
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      warehouse = MarketplacesFixture.warehouse!(marketplace)
+      category = MarketplacesFixture.item_category!(marketplace)
+      %{item: item} = MarketplacesFixture.item!(category)
+
+      {:ok, %MarketplaceWarehouseItem{}} =
+        Marketplaces.create_warehouse_item(marketplace_account, warehouse, item, %{
+          quantity: 1,
+          infinity: true
+        })
+    end
+
+    test "all warehouse items" do
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      warehouse = MarketplacesFixture.warehouse!(marketplace)
+      category = MarketplacesFixture.item_category!(marketplace)
+      %{item: item1} = MarketplacesFixture.item!(category)
+      %{item: item2} = MarketplacesFixture.item!(category)
+
+      {:ok, warehouse_item1} =
+        Marketplaces.create_warehouse_item(marketplace_account, warehouse, item1, %{
+          quantity: 1,
+          infinity: true
+        })
+
+      {:ok, warehouse_item2} =
+        Marketplaces.create_warehouse_item(marketplace_account, warehouse, item2, %{
+          quantity: 1,
+          infinity: true
+        })
+
+      [
+        %MarketplaceWarehouseItem{id: warehouse_item1_id},
+        %MarketplaceWarehouseItem{id: warehouse_item2_id}
+      ] =
+        Marketplaces.all_warehouse_items(marketplace_account, warehouse)
+
+      assert warehouse_item1.id == warehouse_item1_id
+      assert warehouse_item2.id == warehouse_item2_id
+    end
+
+    test "update warehouse item" do
+      updated_params = %{infinity: false, quantity: 2}
+
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      warehouse = MarketplacesFixture.warehouse!(marketplace)
+      category = MarketplacesFixture.item_category!(marketplace)
+      %{item: item1} = MarketplacesFixture.item!(category)
+
+      {:ok, warehouse_item} =
+        Marketplaces.create_warehouse_item(marketplace_account, warehouse, item1, %{
+          quantity: 1,
+          infinity: true
+        })
+
+      {:ok, warehouse_item} =
+        Marketplaces.update_warehouse_item(marketplace_account, warehouse_item, updated_params)
+
+      assert warehouse_item.infinity == updated_params.infinity
+      assert warehouse_item.quantity == updated_params.quantity
     end
   end
 
