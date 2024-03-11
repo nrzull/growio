@@ -43,7 +43,9 @@ defmodule GrowioWeb.MixProject do
       {:gettext, "0.24.0"},
       {:growio, in_umbrella: true},
       {:jason, "1.4.1"},
-      {:plug_cowboy, "2.7.0"}
+      {:plug_cowboy, "2.7.0"},
+      {:open_api_spex, "3.18.2"},
+      {:corsica, "2.1.3"}
     ]
   end
 

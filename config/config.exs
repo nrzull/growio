@@ -24,14 +24,16 @@ config :growio, Growio.Mailer, adapter: Swoosh.Adapters.Local
 
 config :growio_web,
   ecto_repos: [Growio.Repo],
-  generators: [context_app: :growio]
+  generators: [context_app: :growio],
+  jwt_secret: "jwt_secret"
 
 # Configures the endpoint
 config :growio_web, GrowioWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Phoenix.Endpoint.Cowboy2Adapter,
   render_errors: [
-    formats: [json: GrowioWeb.ErrorJSON],
+    view: GrowioWeb.Views.JSON,
+    accepts: ~w(json),
     layout: false
   ],
   pubsub_server: Growio.PubSub,
