@@ -1,6 +1,7 @@
 defmodule GrowioWeb.Router do
   use GrowioWeb, :router
   alias GrowioWeb.Controllers.AuthController
+  alias GrowioWeb.Controllers.AccountController
   alias GrowioWeb.Plugs.AuthPlug
 
   pipeline :guest do
@@ -14,6 +15,7 @@ defmodule GrowioWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
+    plug(OpenApiSpex.Plug.PutApiSpec, module: GrowioWeb.ApiSpec)
     plug(AuthPlug)
   end
 
@@ -24,6 +26,11 @@ defmodule GrowioWeb.Router do
 
     pipe_through([:api])
     get("/healthcheck", AuthController, :healthcheck)
+  end
+
+  scope "/api/accounts" do
+    pipe_through([:api])
+    get("/me", AccountController, :me)
   end
 
   if Application.compile_env(:growio_web, :dev_routes) do

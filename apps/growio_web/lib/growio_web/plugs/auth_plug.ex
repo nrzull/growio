@@ -57,8 +57,7 @@ defmodule GrowioWeb.Plugs.AuthPlug do
           Conn.unauthorized(conn)
         end
 
-      error ->
-        IO.inspect([:error, error])
+      _ ->
         Conn.unauthorized(conn)
     end
   end
