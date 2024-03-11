@@ -47,6 +47,9 @@ defmodule Growio.Permissions.Definitions do
   import Growio.Permissions.Macro
 
   permissions("bots", "telegram_bot")
+  permissions("marketplaces", "marketplace", ["update"])
+  permissions("marketplaces", "marketplace_account")
+  permissions("marketplaces", "marketplace_account_role")
   permissions("marketplaces", "marketplace_item")
   permissions("marketplaces", "marketplace_item_category")
   permissions("marketplaces", "marketplace_item_asset")

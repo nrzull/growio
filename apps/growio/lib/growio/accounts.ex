@@ -39,14 +39,9 @@ defmodule Growio.Accounts do
   def get_active_account_email_confirmation(email) when is_bitstring(email) do
     now = Utils.naive_utc_now()
 
-    Repo.one(
-      from(a in AccountEmailConfirmation,
-        where:
-          a.email == ^email and
-            is_nil(a.used) and
-            a.expired_at > ^now,
-        order_by: [desc: :id]
-      )
-    )
+    AccountEmailConfirmation
+    |> where([a], a.email == ^email and is_nil(a.used) and a.expired_at > ^now)
+    |> order_by(desc: :id)
+    |> Repo.one()
   end
 end
