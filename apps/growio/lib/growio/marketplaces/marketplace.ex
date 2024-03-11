@@ -10,10 +10,11 @@ defmodule Growio.Marketplaces.Marketplace do
 
   @type t :: %__MODULE__{}
   @required ~w(name)a
-  @optional ~w()a
+  @optional ~w(currency)a
 
   schema "marketplaces" do
     field(:name, :string)
+    field(:currency, :string)
 
     has_many(:telegram_bots, TelegramBot)
     has_many(:account_roles, MarketplaceAccountRole)

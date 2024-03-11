@@ -44,7 +44,8 @@ defmodule Growio.MixProject do
       {:swoosh, "1.15.2"},
       {:finch, "0.18.0"},
       {:nebulex, "2.6.1"},
-      {:shards, "1.1.0"}
+      {:shards, "1.1.0"},
+      {:decimal, "2.1.1"}
     ]
   end
 
