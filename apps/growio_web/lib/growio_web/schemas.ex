@@ -20,4 +20,24 @@ defmodule GrowioWeb.Schemas do
       }
     })
   end
+
+  defmodule AuthResponse do
+    schema(%{
+      type: :object,
+      properties: %{
+        email: %Schema{type: :string},
+        code: %Schema{type: :string, nullable: true}
+      }
+    })
+  end
+
+  defmodule AuthEmailConfirmationRequest do
+    schema(%{
+      type: :object,
+      properties: %{
+        email: %Schema{type: :string},
+        code: %Schema{type: :string}
+      }
+    })
+  end
 end

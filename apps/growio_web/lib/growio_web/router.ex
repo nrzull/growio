@@ -14,6 +14,7 @@ defmodule GrowioWeb.Router do
   scope "/api" do
     pipe_through(:api)
     post("/auth", AuthController, :email)
+    post("/auth/confirm", AuthController, :email_confirmation)
   end
 
   if Application.compile_env(:growio_web, :dev_routes) do

@@ -47,6 +47,11 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :growio_web, :cors,
+  origins: ["http://localhost:3000", "http://127.0.0.1:3000"],
+  allow_credentials: true,
+  allow_headers: :all
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

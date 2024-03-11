@@ -67,8 +67,3 @@ config :phoenix, :stacktrace_depth, 20
 
 config :open_api_spex, :cache_adapter, OpenApiSpex.Plug.NoneCache
 config :growio_web, swaggerui_routes: true
-
-config :growio_web, :cors,
-  origins: ["http://localhost:3000", "http://127.0.0.1:3000"],
-  allow_credentials: true,
-  allow_headers: :all

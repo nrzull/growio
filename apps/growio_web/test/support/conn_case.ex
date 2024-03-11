@@ -28,11 +28,17 @@ defmodule GrowioWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
       import GrowioWeb.ConnCase
+      import OpenApiSpex.TestAssertions
     end
   end
 
   setup tags do
     Growio.DataCase.setup_sandbox(tags)
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+
+    {:ok,
+     api_spec: GrowioWeb.ApiSpec.spec(),
+     conn:
+       Phoenix.ConnTest.build_conn()
+       |> Plug.Conn.put_req_header("content-type", "application/json")}
   end
 end

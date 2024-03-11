@@ -18,16 +18,17 @@ defmodule Growio.Accounts.Account do
     timestamps()
   end
 
-  def changeset(%{} = params), do: changeset(%__MODULE__{}, params)
+  def insert_changeset(%{} = params),
+    do: insert_changeset(%__MODULE__{}, params)
 
-  def changeset(%__MODULE__{} = struct, %{} = params) do
+  def insert_changeset(%__MODULE__{} = struct, %{} = params) do
     struct
     |> cast(params, @required ++ @optional)
     |> validate_required(@required)
     |> validate_email()
   end
 
-  defp validate_email(changeset) do
+  def validate_email(changeset) do
     changeset
     |> validate_format(
       :email,
