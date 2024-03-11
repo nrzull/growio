@@ -301,87 +301,101 @@ defmodule Growio.MarketplacesTest do
     test "create item categories" do
       valid_name = "category1"
 
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+      %{marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
       {:ok, %MarketplaceItemCategory{marketplace_id: marketplace_id, name: name}} =
-        Marketplaces.create_item_category(marketplace, %{name: valid_name})
+        Marketplaces.create_item_category(marketplace_account, %{name: valid_name})
 
-      assert marketplace.id == marketplace_id
+      assert marketplace_account.marketplace_id == marketplace_id
       assert valid_name == name
     end
 
     test "delete item categories" do
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
-
-      {:ok, _} =
-        MarketplacesFixture.item_category!(marketplace)
-        |> Marketplaces.delete_item_category()
-    end
-
-    test "update item categories" do
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
       c1 = MarketplacesFixture.item_category!(marketplace)
 
-      {:ok, updated_c1} = Marketplaces.update_item_category(c1, %{name: "other name"})
+      {:ok, _} = Marketplaces.delete_item_category(marketplace_account, c1)
+    end
+
+    test "update item categories" do
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
+
+      {:ok, updated_c1} =
+        Marketplaces.update_item_category(marketplace_account, c1, %{name: "other name"})
 
       assert c1.id == updated_c1.id
       refute c1.name == updated_c1.name
     end
 
     test "get all item categories" do
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
       c1 = MarketplacesFixture.item_category!(marketplace)
       c2 = MarketplacesFixture.item_category!(marketplace)
 
       [%MarketplaceItemCategory{id: c1_id}, %MarketplaceItemCategory{id: c2_id}] =
-        Marketplaces.all_item_categories(marketplace)
+        Marketplaces.all_item_categories(marketplace_account)
 
       assert c1.id == c1_id
       assert c2.id == c2_id
     end
 
     test "create an item" do
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
       c1 = MarketplacesFixture.item_category!(marketplace)
       c2 = MarketplacesFixture.item_category!(marketplace)
 
       {:ok, %{item: %MarketplaceItem{} = item1}} =
-        Marketplaces.create_item(c1, %{name: "item1"})
+        Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
       {:ok,
        %{
          item: %MarketplaceItem{} = _,
          variant: %MarketplaceItemVariant{} = _
        }} =
-        Marketplaces.create_item(c1, %{name: "item2", variant_of: item1.id})
+        Marketplaces.create_item(marketplace_account, c1, %{name: "item2", variant_of: item1.id})
 
-      {:error, _} = Marketplaces.create_item(c2, %{name: "name3", variant_of: item1.id})
+      {:error, _} =
+        Marketplaces.create_item(marketplace_account, c2, %{name: "name3", variant_of: item1.id})
     end
 
     test "update an item" do
       updated_name = "item11"
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
 
       {:ok, %{item: %MarketplaceItem{} = item1}} =
-        MarketplacesFixture.item_category!(marketplace)
-        |> Marketplaces.create_item(%{name: "item1"})
+        Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
-      {:ok, updated_item} = Marketplaces.update_item(item1, %{name: updated_name})
+      {:ok, updated_item} =
+        Marketplaces.update_item(marketplace_account, item1, %{name: updated_name})
 
       assert updated_item.name == updated_name
     end
 
     test "delete an item" do
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
 
       {:ok, %{item: %MarketplaceItem{} = item1}} =
-        MarketplacesFixture.item_category!(marketplace)
-        |> Marketplaces.create_item(%{name: "item1"})
+        Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
-      {:ok, %MarketplaceItem{deleted_at: deleted_at}} = Marketplaces.delete_item(item1)
+      {:ok, %MarketplaceItem{deleted_at: deleted_at}} =
+        Marketplaces.delete_item(marketplace_account, item1)
 
       refute is_nil(deleted_at)
     end

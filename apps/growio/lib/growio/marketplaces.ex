@@ -502,7 +502,19 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def all_item_categories(%Marketplace{} = marketplace, opts \\ []) do
+  def all_item_categories(a, b \\ [])
+
+  def all_item_categories(%MarketplaceAccount{} = initiator, opts) do
+    with true <-
+           can_act?(initiator, PermissionDefs.marketplaces__marketplace_item_category__read()),
+         initiator = Repo.preload(initiator, [:marketplace]) do
+      all_item_categories(initiator.marketplace, opts)
+    else
+      _ -> {:error, "cannot get all item categories"}
+    end
+  end
+
+  def all_item_categories(%Marketplace{} = marketplace, opts) do
     MarketplaceItemCategory
     |> where([category], category.marketplace_id == ^marketplace.id)
     |> then(fn query ->
@@ -520,6 +532,17 @@ defmodule Growio.Marketplaces do
     |> Repo.all()
   end
 
+  def create_item_category(%MarketplaceAccount{} = initiator, %{} = params) do
+    with true <-
+           can_act?(initiator, PermissionDefs.marketplaces__marketplace_item_category__create()),
+         initiator = Repo.preload(initiator, [:marketplace]) do
+      create_item_category(initiator.marketplace, params)
+    else
+      {:error, _} = v -> v
+      _ -> {:error, "cannot create item category"}
+    end
+  end
+
   def create_item_category(%Marketplace{} = marketplace, %{} = params) do
     with changeset = %Changeset{valid?: true} <- MarketplaceItemCategory.changeset(params) do
       changeset
@@ -531,6 +554,24 @@ defmodule Growio.Marketplaces do
     end
   end
 
+  def update_item_category(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceItemCategory{} = item_category,
+        %{} = params
+      ) do
+    with true <-
+           can_act?(
+             initiator,
+             item_category,
+             PermissionDefs.marketplaces__marketplace_item_category__update()
+           ) do
+      update_item_category(item_category, params)
+    else
+      {:error, _} = v -> v
+      _ -> {:error, "cannot update item category"}
+    end
+  end
+
   def update_item_category(%MarketplaceItemCategory{} = item_category, %{} = params) do
     with changeset = %Changeset{valid?: true} <-
            MarketplaceItemCategory.changeset(item_category, params) do
@@ -538,6 +579,23 @@ defmodule Growio.Marketplaces do
     else
       {:error, _} = v -> v
       _ -> {:error, "cannot update item category"}
+    end
+  end
+
+  def delete_item_category(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceItemCategory{} = item_category
+      ) do
+    with true <-
+           can_act?(
+             initiator,
+             item_category,
+             PermissionDefs.marketplaces__marketplace_item_category__delete()
+           ) do
+      delete_item_category(item_category)
+    else
+      {:error, _} = v -> v
+      _ -> {:error, "cannot delete item category"}
     end
   end
 
@@ -559,7 +617,9 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def all_items(%MarketplaceItemCategory{} = item_category, opts \\ []) do
+  def all_items(a, b \\ [])
+
+  def all_items(%MarketplaceItemCategory{} = item_category, opts) do
     MarketplaceItem
     |> where([item], item.category_id == ^item_category.id)
     |> then(fn query ->
@@ -577,6 +637,43 @@ defmodule Growio.Marketplaces do
     |> Repo.all()
   end
 
+  def all_items(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceItemCategory{} = item_category,
+        opts
+      ) do
+    with true <-
+           can_act?(
+             initiator,
+             item_category,
+             PermissionDefs.marketplaces__marketplace_item_category__read()
+           ),
+         true <- can_act?(initiator, PermissionDefs.marketplaces__marketplace_item__read()) do
+      all_items(item_category, opts)
+    else
+      _ -> {:error, "cannot get all items"}
+    end
+  end
+
+  def get_item(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceItemCategory{} = item_category,
+        item_id
+      )
+      when is_integer(item_id) do
+    with true <-
+           can_act?(
+             initiator,
+             item_category,
+             PermissionDefs.marketplaces__marketplace_item_category__read()
+           ),
+         true <- can_act?(initiator, PermissionDefs.marketplaces__marketplace_item__read()) do
+      get_item(item_category, item_id)
+    else
+      _ -> {:error, "cannot get an item"}
+    end
+  end
+
   def get_item(%MarketplaceItemCategory{} = item_category, item_id) when is_integer(item_id) do
     MarketplaceItem
     |> where(
@@ -584,6 +681,24 @@ defmodule Growio.Marketplaces do
       item.id == ^item_id and item.category_id == ^item_category.id
     )
     |> Repo.one()
+  end
+
+  def create_item(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceItemCategory{} = item_category,
+        %{} = params
+      ) do
+    with true <-
+           can_act?(
+             initiator,
+             item_category,
+             PermissionDefs.marketplaces__marketplace_item_category__read()
+           ),
+         true <- can_act?(initiator, PermissionDefs.marketplaces__marketplace_item__create()) do
+      create_item(item_category, params)
+    else
+      _ -> {:error, "cannot create an item"}
+    end
   end
 
   def create_item(%MarketplaceItemCategory{} = item_category, %{} = params) do
@@ -616,10 +731,28 @@ defmodule Growio.Marketplaces do
     end
   end
 
+  def update_item(%MarketplaceAccount{} = initiator, %MarketplaceItem{} = item, %{} = params) do
+    with true <-
+           can_act?(initiator, item, PermissionDefs.marketplaces__marketplace_item__update()) do
+      update_item(item, params)
+    else
+      _ -> {:error, "cannot update an item"}
+    end
+  end
+
   def update_item(%MarketplaceItem{} = item, %{} = params) do
     MarketplaceItem.changeset(item, params)
     |> Changeset.delete_change(:deleted_at)
     |> Repo.update()
+  end
+
+  def delete_item(%MarketplaceAccount{} = initiator, %MarketplaceItem{} = item) do
+    with true <-
+           can_act?(initiator, item, PermissionDefs.marketplaces__marketplace_item__delete()) do
+      delete_item(item)
+    else
+      _ -> {:error, "cannot delete an item"}
+    end
   end
 
   def delete_item(%MarketplaceItem{} = item) do
@@ -684,6 +817,41 @@ defmodule Growio.Marketplaces do
              p.name === permission
            end),
          true <- initiator.role.priority < account.role.priority do
+      true
+    else
+      _ -> false
+    end
+  end
+
+  defp can_act?(
+         %MarketplaceAccount{} = initiator,
+         %MarketplaceItemCategory{} = category,
+         permission
+       ) do
+    with true <- initiator.marketplace_id === category.marketplace_id,
+         initiator = Repo.preload(initiator, role: [:permissions]),
+         true <-
+           Enum.any?(initiator.role.permissions, fn p ->
+             p.name === permission
+           end) do
+      true
+    else
+      _ -> false
+    end
+  end
+
+  defp can_act?(
+         %MarketplaceAccount{} = initiator,
+         %MarketplaceItem{} = item,
+         permission
+       ) do
+    with item = Repo.preload(item, [:category]),
+         true <- initiator.marketplace_id === item.category.marketplace_id,
+         initiator = Repo.preload(initiator, role: [:permissions]),
+         true <-
+           Enum.any?(initiator.role.permissions, fn p ->
+             p.name === permission
+           end) do
       true
     else
       _ -> false
