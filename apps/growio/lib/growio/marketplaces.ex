@@ -43,15 +43,58 @@ defmodule Growio.Marketplaces do
           end)
         end
       )
-      |> Multi.insert(:marketplace_account, fn %{marketplace: marketplace, role: role} ->
-        %MarketplaceAccount{}
-        |> Changeset.change()
-        |> Changeset.put_assoc(:account, account)
-        |> Changeset.put_assoc(:marketplace, marketplace)
-        |> Changeset.put_assoc(:role, role)
+      |> Multi.run(:marketplace_account, fn repo, %{marketplace: marketplace, role: role} ->
+        add_account_to_marketplace(account, marketplace, role, repo: repo)
       end)
       |> Repo.transaction()
     end
+  end
+
+  def all_accounts(%Marketplace{} = marketplace, opts \\ []) do
+    blocked_at = Keyword.get(opts, :blocked_at, false)
+
+    MarketplaceAccount
+    |> where([account], account.marketplace_id == ^marketplace.id)
+    |> then(fn query ->
+      if blocked_at do
+        where(query, [account], not is_nil(account.blocked_at))
+      else
+        where(query, [account], is_nil(account.blocked_at))
+      end
+    end)
+    |> Repo.all()
+  end
+
+  def add_account_to_marketplace(
+        %Account{} = account,
+        %Marketplace{} = marketplace,
+        %MarketplaceAccountRole{} = role,
+        opts \\ []
+      ) do
+    repo = Keyword.get(opts, :repo, Repo)
+
+    %MarketplaceAccount{}
+    |> Changeset.change()
+    |> Changeset.put_assoc(:account, account)
+    |> Changeset.put_assoc(:marketplace, marketplace)
+    |> Changeset.put_assoc(:role, role)
+    |> repo.insert()
+  end
+
+  def block_account(%MarketplaceAccount{} = account) do
+    with false <- blocked_account?(account) do
+      account
+      |> Changeset.change()
+      |> Changeset.put_change(:blocked_at, Utils.naive_utc_now())
+      |> Repo.update()
+    else
+      _ ->
+        {:ok, account}
+    end
+  end
+
+  def blocked_account?(%MarketplaceAccount{} = account) do
+    not is_nil(account.blocked_at)
   end
 
   def create_account_role(%Marketplace{} = marketplace, %{} = params) do
@@ -67,12 +110,25 @@ defmodule Growio.Marketplaces do
     MarketplaceAccountRole
     |> where([role], role.marketplace_id == ^marketplace.id)
     |> order_by(asc: :priority)
-    |> preload([:permissions])
     |> then(fn query ->
-      if Keyword.get(opts, :deleted_at) do
-        where(query, [role], not is_nil(role.deleted_at))
-      else
-        where(query, [role], is_nil(role.deleted_at))
+      case Keyword.get(opts, :permissions) do
+        true ->
+          preload(query, [:permissions])
+
+        _ ->
+          query
+      end
+    end)
+    |> then(fn query ->
+      case Keyword.get(opts, :deleted_at) do
+        true ->
+          where(query, [role], not is_nil(role.deleted_at))
+
+        false ->
+          where(query, [role], is_nil(role.deleted_at))
+
+        _ ->
+          query
       end
     end)
     |> Repo.all()
@@ -115,15 +171,16 @@ defmodule Growio.Marketplaces do
       primary_account_role?(role) ->
         {:error, "cannot delete primary role"}
 
-      Repo.exists?(from(acc in MarketplaceAccount, where: acc.role_id == ^role.id)) ->
-        {:error, "there are accounts that use current rule"}
+      Repo.exists?(where(MarketplaceAccount, [acc], acc.role_id == ^role.id)) ->
+        {:error, "there are accounts that use current role"}
 
       true ->
-        role
-        |> Changeset.change()
-        |> Changeset.put_change(:deleted_at, Utils.naive_utc_now())
-        |> Repo.update()
+        update_account_role(role, %{deleted_at: Utils.naive_utc_now()})
     end
+  end
+
+  def undo_delete_account_role(%MarketplaceAccountRole{} = role) do
+    update_account_role(role, %{deleted_at: nil})
   end
 
   def get_account_role(%Marketplace{} = marketplace, name) do

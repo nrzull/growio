@@ -8,7 +8,7 @@ defmodule Growio.Marketplaces.MarketplaceAccountRole do
 
   @type t :: %__MODULE__{}
   @required ~w(name)a
-  @optional ~w(description priority)a
+  @optional ~w(description priority deleted_at)a
 
   schema "marketplace_account_roles" do
     field(:name, :string)

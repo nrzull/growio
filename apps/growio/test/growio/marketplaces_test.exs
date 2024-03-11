@@ -91,13 +91,26 @@ defmodule Growio.MarketplacesTest do
 
       {:ok, _} = Marketplaces.delete_account_role(role)
 
-      refute Enum.any?(Marketplaces.all_account_roles(marketplace), fn role ->
-               role.name == "role1"
-             end)
+      refute Enum.any?(
+               Marketplaces.all_account_roles(marketplace, deleted_at: false),
+               fn role ->
+                 role.name == "role1"
+               end
+             )
 
-      assert Enum.any?(Marketplaces.all_account_roles(marketplace, deleted_at: true), fn role ->
-               role.name == "role1"
-             end)
+      assert Enum.any?(
+               Marketplaces.all_account_roles(marketplace, deleted_at: true),
+               fn role ->
+                 role.name == "role1"
+               end
+             )
+
+      assert Enum.any?(
+               Marketplaces.all_account_roles(marketplace),
+               fn role ->
+                 role.name == "role1"
+               end
+             )
     end
 
     test "assign new role" do

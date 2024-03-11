@@ -11,6 +11,7 @@ defmodule Growio.Marketplaces.MarketplaceAccount do
     belongs_to(:marketplace, Marketplace)
     belongs_to(:role, MarketplaceAccountRole)
 
+    field(:blocked_at, :naive_datetime)
     timestamps()
   end
 end
