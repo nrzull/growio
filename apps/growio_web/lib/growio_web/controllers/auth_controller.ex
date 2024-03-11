@@ -63,4 +63,15 @@ defmodule GrowioWeb.Controllers.AuthController do
   def healthcheck(conn, _params) do
     Conn.ok(conn)
   end
+
+  operation(:signout,
+    summary: "remove auth cookies",
+    responses: [ok: ""]
+  )
+
+  def signout(conn, _params) do
+    conn
+    |> Conn.delete_auth_cookies()
+    |> Conn.ok()
+  end
 end

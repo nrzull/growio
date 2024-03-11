@@ -26,6 +26,7 @@ defmodule GrowioWeb.Router do
 
     pipe_through([:api])
     get("/healthcheck", AuthController, :healthcheck)
+    get("/signout", AuthController, :signout)
   end
 
   scope "/api/accounts" do

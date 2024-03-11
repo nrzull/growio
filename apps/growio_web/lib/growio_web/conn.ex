@@ -4,7 +4,8 @@ defmodule GrowioWeb.Conn do
       put_status: 2,
       put_resp_cookie: 4,
       send_resp: 3,
-      halt: 1
+      halt: 1,
+      delete_resp_cookie: 3
     ]
 
   import Phoenix.Controller, only: [render: 3, put_view: 2]
@@ -54,6 +55,18 @@ defmodule GrowioWeb.Conn do
     conn
     |> put_access_cookie(access_token)
     |> put_refresh_cookie(refresh_token)
+  end
+
+  def delete_auth_cookies(conn) do
+    conn
+    |> delete_resp_cookie(access_cookie_name(),
+      same_site: "None",
+      secure: true
+    )
+    |> delete_resp_cookie(refresh_cookie_name(),
+      same_site: "None",
+      secure: true
+    )
   end
 
   defp put_access_cookie(conn, token) do
