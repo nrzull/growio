@@ -4,6 +4,13 @@ defmodule Growio.Permissions do
 
   @all_cache_ttl :timer.minutes(10)
 
+  def definitions do
+    Growio.Permissions.Definitions.__info__(:functions)
+    |> Enum.map(fn {name, _} ->
+      apply(Growio.Permissions.Definitions, name, [])
+    end)
+  end
+
   def all() do
     case Cachex.get(Growio.Cache, "Growio.Permissions.all") do
       {:ok, values} when is_list(values) ->
@@ -11,15 +18,9 @@ defmodule Growio.Permissions do
 
       _ ->
         values =
-          for {name, _} <- Growio.Permissions.Definitions.__info__(:functions) do
-            Task.async(fn ->
-              Repo.get_by(
-                Permission,
-                name: apply(Growio.Permissions.Definitions, name, [])
-              )
-            end)
-          end
-          |> Task.await_many()
+          Enum.map(definitions(), fn name ->
+            Repo.get_by(Permission, name: name)
+          end)
 
         Cachex.put(Growio.Cache, "Growio.Permissions.all", values, ttl: @all_cache_ttl)
 

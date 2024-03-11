@@ -19,38 +19,36 @@ defmodule Growio.Marketplaces do
 
     with %Changeset{valid?: true} <- marketplace_changeset,
          %Changeset{valid?: true} <- owner_role_changeset do
-      result =
-        Multi.new()
-        |> Multi.insert(:marketplace, marketplace_changeset)
-        |> Multi.insert(:role, fn %{marketplace: marketplace} ->
-          Changeset.put_assoc(owner_role_changeset, :marketplace, marketplace)
-        end)
-        |> Multi.insert(:marketplace_account, fn %{marketplace: marketplace, role: role} ->
-          %MarketplaceAccount{}
-          |> Changeset.change()
-          |> Changeset.put_assoc(:account, account)
-          |> Changeset.put_assoc(:marketplace, marketplace)
-          |> Changeset.put_assoc(:role, role)
-        end)
-        |> Repo.transaction()
-
-      case result do
-        {:ok, %{role: role}} ->
-          Enum.map(Permissions.all(), fn permission ->
-            Task.async(fn ->
-              Changeset.change(%MarketplaceAccountRolePermission{})
-              |> Changeset.put_assoc(:role, role)
-              |> Changeset.put_assoc(:permission, permission)
-              |> Repo.insert!()
-            end)
+      Multi.new()
+      |> Multi.insert(:marketplace, marketplace_changeset)
+      |> Multi.insert(:role, fn %{marketplace: marketplace} ->
+        Changeset.put_assoc(owner_role_changeset, :marketplace, marketplace)
+      end)
+      |> Multi.run(:permissions, fn _repo, %{} ->
+        {:ok, Permissions.all()}
+      end)
+      |> Multi.insert_all(
+        :insert_all,
+        MarketplaceAccountRolePermission,
+        fn %{role: role, permissions: permissions} ->
+          Enum.map(permissions, fn permission ->
+            %{
+              role_id: role.id,
+              permission_id: permission.id,
+              inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
+              updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
+            }
           end)
-          |> Task.await_many()
-
-          result
-
-        _ ->
-          result
-      end
+        end
+      )
+      |> Multi.insert(:marketplace_account, fn %{marketplace: marketplace, role: role} ->
+        %MarketplaceAccount{}
+        |> Changeset.change()
+        |> Changeset.put_assoc(:account, account)
+        |> Changeset.put_assoc(:marketplace, marketplace)
+        |> Changeset.put_assoc(:role, role)
+      end)
+      |> Repo.transaction()
     end
   end
 end
