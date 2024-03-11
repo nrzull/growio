@@ -6,7 +6,5 @@ defmodule Growio.Repo.Migrations.CreateMarketplaces do
       add(:name, :string, size: 64, null: false)
       timestamps()
     end
-
-    create(unique_index(:marketplaces, [:name]))
   end
 end

@@ -16,7 +16,7 @@ defmodule GrowioWeb.Controllers.AccountController do
   tags(["accounts"])
 
   operation(:me,
-    summary: "qwe",
+    summary: "get self information",
     responses: [ok: {"", "application/json", Schemas.Account}]
   )
 

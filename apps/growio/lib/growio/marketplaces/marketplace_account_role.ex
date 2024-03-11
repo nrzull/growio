@@ -18,7 +18,11 @@ defmodule Growio.Marketplaces.MarketplaceAccountRole do
 
     belongs_to(:marketplace, Marketplace)
     has_many(:accounts, MarketplaceAccount, foreign_key: :role_id)
-    many_to_many(:permissions, Permission, join_through: MarketplaceAccountRolePermission)
+
+    many_to_many(:permissions, Permission,
+      join_through: MarketplaceAccountRolePermission,
+      join_keys: [role_id: :id, permission_id: :id]
+    )
 
     timestamps()
   end

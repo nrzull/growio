@@ -12,7 +12,8 @@ defmodule Growio.Permissions.Permission do
     field(:name, :string)
 
     many_to_many(:marketplace_account_roles, MarketplaceAccountRole,
-      join_through: MarketplaceAccountRolePermission
+      join_through: MarketplaceAccountRolePermission,
+      join_keys: [permission_id: :id, role_id: :id]
     )
 
     timestamps()

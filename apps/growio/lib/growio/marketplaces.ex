@@ -1,19 +1,59 @@
 defmodule Growio.Marketplaces do
-  import Ecto.Query
+  alias Ecto.Changeset
+  alias Ecto.Multi
   alias Growio.Repo
+  alias Growio.Accounts.Account
+  alias Growio.Permissions
   alias Growio.Marketplaces.Marketplace
   alias Growio.Marketplaces.MarketplaceAccount
   alias Growio.Marketplaces.MarketplaceAccountRole
+  alias Growio.Marketplaces.MarketplaceAccountRolePermission
 
-  def get_marketplace_by(:id, id) when is_integer(id) do
+  def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
   end
 
-  def get_marketplace_by(:name, name) when is_bitstring(name) do
-    Repo.one(from(m in Marketplace, where: m.name == ^name))
-  end
+  def create_marketplace(%Account{} = account, %{} = params) do
+    with marketplace_changeset = %Changeset{valid?: true} <- Marketplace.changeset(params),
+         role_changeset = %Changeset{valid?: true} <-
+           MarketplaceAccountRole.changeset(%{
+             name: "owner",
+             locked: true,
+             priority: 1
+           }) do
+      result =
+        Multi.new()
+        |> Multi.insert(:marketplace, marketplace_changeset)
+        |> Multi.insert(:role, fn %{marketplace: marketplace} ->
+          Changeset.put_assoc(role_changeset, :marketplace, marketplace)
+        end)
+        |> Multi.insert(:marketplace_account, fn %{marketplace: marketplace, role: role} ->
+          %MarketplaceAccount{}
+          |> Changeset.change()
+          |> Changeset.put_assoc(:account, account)
+          |> Changeset.put_assoc(:marketplace, marketplace)
+          |> Changeset.put_assoc(:role, role)
+        end)
+        |> Repo.transaction()
 
-  def create_marketplace(%{} = params) do
-    Repo.insert(Marketplace.changeset(params))
+      case result do
+        {:ok, %{role: role}} = v ->
+          tasks =
+            Enum.map(Permissions.all(), fn permission ->
+              c =
+                Changeset.change(%MarketplaceAccountRolePermission{})
+                |> Changeset.put_assoc(:role, role)
+                |> Changeset.put_assoc(:permission, permission)
+
+              Task.async(fn -> Repo.insert!(c) end)
+            end)
+
+          Task.await_many(tasks)
+          v
+
+        v ->
+          v
+      end
+    end
   end
 end
