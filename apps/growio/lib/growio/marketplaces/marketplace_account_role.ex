@@ -1,7 +1,10 @@
 defmodule Growio.Marketplaces.MarketplaceAccountRole do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Growio.Marketplaces
+  alias Growio.Marketplaces.Marketplace
+  alias Growio.Marketplaces.MarketplaceAccount
+  alias Growio.Marketplaces.MarketplaceAccountRolePermission
+  alias Growio.Permissions.Permission
 
   @type t :: %__MODULE__{}
   @required ~w(name priority)a
@@ -13,8 +16,9 @@ defmodule Growio.Marketplaces.MarketplaceAccountRole do
     field(:priority, :integer)
     field(:locked, :boolean)
 
-    belongs_to(:marketplace, Marketplaces.Marketplace)
-    has_many(:accounts, Marketplaces.MarketplaceAccount, foreign_key: :role_id)
+    belongs_to(:marketplace, Marketplace)
+    has_many(:accounts, MarketplaceAccount, foreign_key: :role_id)
+    many_to_many(:permissions, Permission, join_through: MarketplaceAccountRolePermission)
 
     timestamps()
   end

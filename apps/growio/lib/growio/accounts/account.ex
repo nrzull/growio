@@ -1,7 +1,9 @@
 defmodule Growio.Accounts.Account do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Growio.Marketplaces
+  alias Growio.Marketplaces.Marketplace
+  alias Growio.Marketplaces.MarketplaceAccount
+  alias Growio.Bots.TelegramBot
 
   @type t :: %__MODULE__{}
   @required ~w(phone)a
@@ -10,9 +12,8 @@ defmodule Growio.Accounts.Account do
   schema "accounts" do
     field(:phone, :string)
 
-    many_to_many(:marketplaces, Marketplaces.Marketplace,
-      join_through: Marketplaces.MarketplaceAccount
-    )
+    has_many(:telegram_bots, TelegramBot)
+    many_to_many(:marketplaces, Marketplace, join_through: MarketplaceAccount)
 
     timestamps()
   end

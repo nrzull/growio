@@ -1,8 +1,11 @@
 defmodule Growio.Marketplaces.Marketplace do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Growio.Accounts
-  alias Growio.Marketplaces
+  alias Growio.Accounts.Account
+  alias Growio.Marketplaces.MarketplaceAccountRole
+  alias Growio.Marketplaces.MarketplaceAccount
+  alias Growio.Bots.TelegramBot
+  alias Growio.Marketplaces.MarketplaceItemCategory
 
   @type t :: %__MODULE__{}
   @required ~w(name)a
@@ -11,9 +14,10 @@ defmodule Growio.Marketplaces.Marketplace do
   schema "marketplaces" do
     field(:name, :string)
 
-    has_many(:account_roles, Marketplaces.MarketplaceAccountRole)
-
-    many_to_many(:accounts, Accounts.Account, join_through: Marketplaces.MarketplaceAccount)
+    has_many(:telegram_bots, TelegramBot)
+    has_many(:account_roles, MarketplaceAccountRole)
+    has_many(:item_categories, MarketplaceItemCategory)
+    many_to_many(:accounts, Account, join_through: MarketplaceAccount)
 
     timestamps()
   end
