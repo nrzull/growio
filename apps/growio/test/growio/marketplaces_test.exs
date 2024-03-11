@@ -97,12 +97,12 @@ defmodule Growio.MarketplacesTest do
 
       role = Marketplaces.get_account_role(marketplace, "owner")
 
-      {:error, _} = Marketplaces.delete_account_role(role)
+      {:error, _} = Marketplaces.delete_account_role(marketplace_account, role)
 
       {:ok, role} =
         Marketplaces.create_account_role(marketplace_account, %{name: "role1"})
 
-      {:ok, _} = Marketplaces.delete_account_role(role)
+      {:ok, _} = Marketplaces.delete_account_role(marketplace_account, role)
 
       refute Enum.any?(
                Marketplaces.all_account_roles(marketplace, deleted_at: false),
@@ -125,7 +125,7 @@ defmodule Growio.MarketplacesTest do
                end
              )
 
-      Marketplaces.undo_delete_account_role(role)
+      Marketplaces.undo_delete_account_role(marketplace_account, role)
 
       assert Enum.any?(
                Marketplaces.all_account_roles(marketplace, deleted_at: false),
@@ -178,9 +178,10 @@ defmodule Growio.MarketplacesTest do
       {:ok, role2} =
         Marketplaces.create_account_role(marketplace_account, %{name: "role2"})
 
-      {:error, _} = Marketplaces.update_account_role(role, %{name: "test"})
+      {:error, _} = Marketplaces.update_account_role(marketplace_account, role, %{name: "test"})
 
-      {:ok, updated_role} = Marketplaces.update_account_role(role2, %{name: updated_name})
+      {:ok, updated_role} =
+        Marketplaces.update_account_role(marketplace_account, role2, %{name: updated_name})
 
       assert updated_role.id == role2.id
       assert updated_role.name == updated_name

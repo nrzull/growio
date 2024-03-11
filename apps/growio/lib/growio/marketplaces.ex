@@ -128,8 +128,7 @@ defmodule Growio.Marketplaces do
   end
 
   def undo_block_account(%MarketplaceAccount{} = initiator, %MarketplaceAccount{} = account) do
-    with true <- initiator.marketplace_id == account.marketplace_id,
-         true <-
+    with true <-
            can_act?(
              initiator,
              account,
@@ -240,6 +239,24 @@ defmodule Growio.Marketplaces do
     |> Repo.update()
   end
 
+  def update_account_role(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceAccountRole{} = role,
+        %{} = params
+      ) do
+    with true <-
+           can_act?(
+             initiator,
+             role,
+             PermissionDefs.marketplaces__marketplace_account_role__update()
+           ) do
+      update_account_role(role, params)
+    else
+      _ ->
+        {:error, "cannot update an account role"}
+    end
+  end
+
   def update_account_role(%MarketplaceAccountRole{} = role, %{} = params) do
     if primary_account_role?(role) do
       {:error, "cannot update primary role"}
@@ -247,6 +264,20 @@ defmodule Growio.Marketplaces do
       role
       |> MarketplaceAccountRole.changeset(params)
       |> Repo.update()
+    end
+  end
+
+  def delete_account_role(%MarketplaceAccount{} = initiator, %MarketplaceAccountRole{} = role) do
+    with true <-
+           can_act?(
+             initiator,
+             role,
+             PermissionDefs.marketplaces__marketplace_account_role__delete()
+           ) do
+      delete_account_role(role)
+    else
+      _ ->
+        {:error, "cannot delete an account role"}
     end
   end
 
@@ -263,6 +294,23 @@ defmodule Growio.Marketplaces do
 
       true ->
         update_account_role(role, %{deleted_at: Utils.naive_utc_now()})
+    end
+  end
+
+  def undo_delete_account_role(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceAccountRole{} = role
+      ) do
+    with true <-
+           can_act?(
+             initiator,
+             role,
+             PermissionDefs.marketplaces__marketplace_account_role__delete()
+           ) do
+      undo_delete_account_role(role)
+    else
+      _ ->
+        {:error, "cannot undo an account role deletion"}
     end
   end
 
@@ -302,9 +350,9 @@ defmodule Growio.Marketplaces do
 
   def set_account_role_permissions(
         %MarketplaceAccountRole{} = role,
-        permission_names
+        [permission_name | _] = permission_names
       )
-      when is_list(permission_names) do
+      when is_bitstring(permission_name) do
     all_permissions = Permissions.all()
 
     is_valid_permissions =
@@ -431,6 +479,7 @@ defmodule Growio.Marketplaces do
          permission
        ) do
     with initiator = Repo.preload(initiator, role: [:permissions]),
+         true <- initiator.marketplace_id === role.marketplace_id,
          true <-
            Enum.any?(initiator.role.permissions, fn p ->
              p.name === permission
@@ -447,8 +496,9 @@ defmodule Growio.Marketplaces do
          %MarketplaceAccount{} = account,
          permission
        ) do
-    with initiator = Repo.preload(initiator, role: [:permissions]),
-         account = Repo.preload(account, role: [:permissions]),
+    with true <- initiator.marketplace_id === account.marketplace_id,
+         initiator = Repo.preload(initiator, role: [:permissions]),
+         account = Repo.preload(account, :role),
          true <-
            Enum.any?(initiator.role.permissions, fn p ->
              p.name === permission
