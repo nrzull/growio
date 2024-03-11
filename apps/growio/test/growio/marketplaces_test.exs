@@ -9,6 +9,7 @@ defmodule Growio.MarketplacesTest do
   alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Marketplaces.MarketplaceItem
   alias Growio.Marketplaces.MarketplaceItemVariant
+  alias Growio.Marketplaces.MarketplaceItemAsset
 
   @valid_name "marketplace name"
 
@@ -398,6 +399,121 @@ defmodule Growio.MarketplacesTest do
         Marketplaces.delete_item(marketplace_account, item1)
 
       refute is_nil(deleted_at)
+    end
+
+    test "create an item asset" do
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      %{marketplace_account: other_marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
+
+      {:ok, %{item: %MarketplaceItem{} = item1}} =
+        Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
+
+      {:ok, %MarketplaceItemAsset{}} =
+        Marketplaces.create_item_asset(marketplace_account, item1, %{
+          src: "src",
+          mimetype: "mimetype"
+        })
+
+      {:error, _} =
+        Marketplaces.create_item_asset(other_marketplace_account, item1, %{
+          src: "src",
+          mimetype: "mimetype"
+        })
+    end
+
+    test "all item assets" do
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
+
+      {:ok, %{item: %MarketplaceItem{} = item1}} =
+        Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
+
+      {:ok, _} =
+        Marketplaces.create_item_asset(marketplace_account, item1, %{
+          src: "src",
+          mimetype: "mimetype"
+        })
+
+      {:ok, _} =
+        Marketplaces.create_item_asset(marketplace_account, item1, %{
+          src: "src",
+          mimetype: "mimetype"
+        })
+
+      [_, _] = Marketplaces.all_item_assets(marketplace_account, item1)
+    end
+
+    test "get an item asset" do
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
+
+      {:ok, %{item: %MarketplaceItem{} = item1}} =
+        Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
+
+      {:ok, asset} =
+        Marketplaces.create_item_asset(marketplace_account, item1, %{
+          src: "src",
+          mimetype: "mimetype"
+        })
+
+      fetched_asset =
+        Marketplaces.get_item_asset(marketplace_account, item1, asset.id)
+
+      assert asset.id == fetched_asset.id
+    end
+
+    test "update an item asset" do
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
+
+      {:ok, %{item: %MarketplaceItem{} = item1}} =
+        Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
+
+      {:ok, asset} =
+        Marketplaces.create_item_asset(marketplace_account, item1, %{
+          src: "src",
+          mimetype: "mimetype"
+        })
+
+      {:ok, updated_asset} =
+        Marketplaces.update_item_asset(marketplace_account, asset, %{
+          src: "src2",
+          mimetype: "mimetype2"
+        })
+
+      assert updated_asset.src == "src2"
+      assert updated_asset.mimetype == "mimetype2"
+    end
+
+    test "delete an item asset" do
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
+
+      {:ok, %{item: %MarketplaceItem{} = item1}} =
+        Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
+
+      {:ok, asset} =
+        Marketplaces.create_item_asset(marketplace_account, item1, %{
+          src: "src",
+          mimetype: "mimetype"
+        })
+
+      {:ok, deleted_asset} = Marketplaces.delete_item_asset(marketplace_account, asset)
+
+      assert asset.id == deleted_asset.id
     end
   end
 

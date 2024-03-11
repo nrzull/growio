@@ -7,6 +7,7 @@ defmodule Growio.Permissions do
   alias Growio.Marketplaces.MarketplaceAccountRole
   alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Marketplaces.MarketplaceItem
+  alias Growio.Marketplaces.MarketplaceItemAsset
   alias Growio.Warehouses.Warehouse
   alias Growio.Warehouses.WarehouseItem
 
@@ -35,6 +36,13 @@ defmodule Growio.Permissions do
         Cache.put("Growio.Permissions.all", values, ttl: @all_cache_ttl)
 
         values
+    end
+  end
+
+  def ok?(%MarketplaceAccount{} = initiator, %MarketplaceItemAsset{} = asset) do
+    with asset = Repo.preload(asset, item: [:category]),
+         true <- initiator.marketplace_id == asset.item.category.marketplace_id do
+      true
     end
   end
 

@@ -14,6 +14,7 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Marketplaces.MarketplaceItem
   alias Growio.Marketplaces.MarketplaceItemVariant
+  alias Growio.Marketplaces.MarketplaceItemAsset
 
   def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
@@ -792,5 +793,83 @@ defmodule Growio.Marketplaces do
 
   def deleted_item?(%MarketplaceItem{} = item) do
     not is_nil(item.deleted_at)
+  end
+
+  def create_item_asset(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceItem{} = item,
+        %{} = params
+      ) do
+    with true <- Permissions.ok?(initiator, item, marketplaces__marketplace_item_asset__create()) do
+      create_item_asset(item, params)
+    else
+      _ -> {:error, "cannot create an item asset"}
+    end
+  end
+
+  def create_item_asset(%MarketplaceItem{} = item, %{} = params) do
+    MarketplaceItemAsset.changeset(params)
+    |> Changeset.put_assoc(:item, item)
+    |> Repo.insert()
+  end
+
+  def all_item_assets(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceItem{} = item
+      ) do
+    with true <- Permissions.ok?(initiator, item, marketplaces__marketplace_item_asset__read()) do
+      all_item_assets(item)
+    else
+      _ -> {:error, "cannot get all item assets"}
+    end
+  end
+
+  def all_item_assets(%MarketplaceItem{} = item) do
+    MarketplaceItemAsset
+    |> where([asset], asset.item_id == ^item.id)
+    |> Repo.all()
+  end
+
+  def get_item_asset(%MarketplaceAccount{} = initiator, %MarketplaceItem{} = item, id)
+      when is_integer(id) do
+    with true <- Permissions.ok?(initiator, item, marketplaces__marketplace_item_asset__read()) do
+      get_item_asset(item, id)
+    else
+      _ -> {:error, "cannot get an item asset"}
+    end
+  end
+
+  def get_item_asset(%MarketplaceItem{} = item, id) when is_integer(id) do
+    MarketplaceItemAsset
+    |> where([asset], asset.item_id == ^item.id)
+    |> where([asset], asset.id == ^id)
+    |> Repo.one()
+  end
+
+  def update_item_asset(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceItemAsset{} = asset,
+        %{} = params
+      ) do
+    with true <- Permissions.ok?(initiator, asset, marketplaces__marketplace_item_asset__update()) do
+      update_item_asset(asset, params)
+    else
+      _ -> {:error, "cannot update an item asset"}
+    end
+  end
+
+  def update_item_asset(%MarketplaceItemAsset{} = asset, %{} = params) do
+    MarketplaceItemAsset.changeset(asset, params)
+    |> Repo.update()
+  end
+
+  def delete_item_asset(%MarketplaceAccount{} = initiator, %MarketplaceItemAsset{} = asset) do
+    with true <- Permissions.ok?(initiator, asset, marketplaces__marketplace_item_asset__delete()) do
+      delete_item_asset(asset)
+    end
+  end
+
+  def delete_item_asset(%MarketplaceItemAsset{} = asset) do
+    Repo.delete(asset)
   end
 end
