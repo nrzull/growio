@@ -37,6 +37,8 @@ defmodule GrowioWeb.Plugs.AuthPlug do
 
     with {:has_pair, [true, true]} <-
            {:has_pair, [is_bitstring(access_cookie), is_bitstring(refresh_cookie)]},
+         {:invalidated, false} <-
+           {:invalidated, Conn.invalidated_refresh_cookie?(refresh_cookie)},
          {:decode_refresh, {:ok, decoded_refresh_token}} <-
            {:decode_refresh, JWT.decode_jwt(refresh_cookie, refresh_token_age)},
          {:decode_access, {:ok, decoded_access_token}} <-
@@ -58,6 +60,7 @@ defmodule GrowioWeb.Plugs.AuthPlug do
         end
 
       _ ->
+        Conn.invalidate_refresh_cookie(refresh_cookie)
         Conn.unauthorized(conn)
     end
   end

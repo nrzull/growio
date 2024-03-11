@@ -17,6 +17,7 @@ defmodule GrowioWeb.Conn do
 
   def refresh_cookie_name, do: "growio-refresh-token"
   def refresh_token_max_age, do: 60 * 60 * 24
+  def refresh_token_cache_ttl, do: :timer.hours(48)
 
   def ok(conn, payload \\ nil) do
     conn
@@ -73,5 +74,18 @@ defmodule GrowioWeb.Conn do
       same_site: "None",
       secure: true
     )
+  end
+
+  def invalidated_refresh_cookie?(name) do
+    {:ok, v} = Cachex.get(Growio.Cache, "refresh_cookie_#{name}")
+    not is_nil(v)
+  end
+
+  def invalidate_refresh_cookie(name) do
+    if invalidated_refresh_cookie?(name) do
+      {:ok, true}
+    else
+      Cachex.put(Growio.Cache, "refresh_cookie_#{name}", true, ttl: refresh_token_cache_ttl())
+    end
   end
 end
