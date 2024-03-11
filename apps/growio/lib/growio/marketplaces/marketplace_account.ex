@@ -9,7 +9,7 @@ defmodule Growio.Marketplaces.MarketplaceAccount do
   schema "marketplace_accounts" do
     belongs_to(:account, Account)
     belongs_to(:marketplace, Marketplace)
-    belongs_to(:role, MarketplaceAccountRole, on_replace: :nilify)
+    belongs_to(:role, MarketplaceAccountRole)
 
     timestamps()
   end

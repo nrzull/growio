@@ -23,6 +23,7 @@ defmodule Growio.Marketplaces.MarketplaceAccountRole do
       join_keys: [role_id: :id, permission_id: :id]
     )
 
+    field(:deleted_at, :naive_datetime)
     timestamps()
   end
 

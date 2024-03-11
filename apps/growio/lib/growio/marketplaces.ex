@@ -2,6 +2,7 @@ defmodule Growio.Marketplaces do
   import Ecto.Query
   alias Ecto.Changeset
   alias Ecto.Multi
+  alias Growio.Utils
   alias Growio.Repo
   alias Growio.Accounts.Account
   alias Growio.Permissions
@@ -36,8 +37,8 @@ defmodule Growio.Marketplaces do
             %{
               role_id: role.id,
               permission_id: permission.id,
-              inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
-              updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
+              inserted_at: Utils.naive_utc_now(),
+              updated_at: Utils.naive_utc_now()
             }
           end)
         end
@@ -62,15 +63,67 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def all_account_roles(%Marketplace{} = marketplace) do
-    Repo.all(
-      from(
-        role in MarketplaceAccountRole,
-        where: role.marketplace_id == ^marketplace.id,
-        order_by: [asc: :priority],
-        preload: [:permissions]
-      )
-    )
+  def all_account_roles(%Marketplace{} = marketplace, opts \\ []) do
+    MarketplaceAccountRole
+    |> where([role], role.marketplace_id == ^marketplace.id)
+    |> order_by(asc: :priority)
+    |> preload([:permissions])
+    |> then(fn query ->
+      if Keyword.get(opts, :deleted_at) do
+        where(query, [role], not is_nil(role.deleted_at))
+      else
+        where(query, [role], is_nil(role.deleted_at))
+      end
+    end)
+    |> Repo.all()
+  end
+
+  def primary_account_role?(%MarketplaceAccountRole{} = role) do
+    role.priority === 0
+  end
+
+  def assign_account_role(
+        %MarketplaceAccount{} = account,
+        %MarketplaceAccountRole{} = role,
+        opts \\ []
+      ) do
+    account = Repo.preload(account, [:role])
+    force = Keyword.get(opts, :force, false)
+
+    if primary_account_role?(account.role) and not force do
+      {:error, "cannot change primary role"}
+    else
+      account
+      |> Changeset.change()
+      |> Changeset.put_change(:role_id, role.id)
+      |> Repo.update()
+    end
+  end
+
+  def update_account_role(%MarketplaceAccountRole{} = role, %{} = params) do
+    if primary_account_role?(role) do
+      {:error, "cannot update primary role"}
+    else
+      role
+      |> MarketplaceAccountRole.changeset(params)
+      |> Repo.update()
+    end
+  end
+
+  def delete_account_role(%MarketplaceAccountRole{} = role) do
+    cond do
+      primary_account_role?(role) ->
+        {:error, "cannot delete primary role"}
+
+      Repo.exists?(from(acc in MarketplaceAccount, where: acc.role_id == ^role.id)) ->
+        {:error, "there are accounts that use current rule"}
+
+      true ->
+        role
+        |> Changeset.change()
+        |> Changeset.put_change(:deleted_at, Utils.naive_utc_now())
+        |> Repo.update()
+    end
   end
 
   def get_account_role(%Marketplace{} = marketplace, name) do
@@ -123,8 +176,8 @@ defmodule Growio.Marketplaces do
               %{
                 role_id: role.id,
                 permission_id: permission.id,
-                inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
-                updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
+                inserted_at: Utils.naive_utc_now(),
+                updated_at: Utils.naive_utc_now()
               }
             end)
           end
@@ -135,7 +188,8 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def update_priorities(%Marketplace{} = marketplace, role_names) when is_list(role_names) do
+  def update_account_role_priorities(%Marketplace{} = marketplace, role_names)
+      when is_list(role_names) do
     all = all_account_roles(marketplace)
 
     all_names =

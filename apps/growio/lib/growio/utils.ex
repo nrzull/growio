@@ -5,4 +5,8 @@ defmodule Growio.Utils do
     |> Enum.join()
     |> String.to_integer()
   end
+
+  def naive_utc_now() do
+    NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
+  end
 end

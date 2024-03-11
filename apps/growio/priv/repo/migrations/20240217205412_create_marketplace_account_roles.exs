@@ -7,6 +7,7 @@ defmodule Growio.Repo.Migrations.CreateMarketplaceAccountRoles do
       add(:description, :string)
       add(:priority, :integer, null: false)
       add(:marketplace_id, references(:marketplaces), null: false)
+      add(:deleted_at, :naive_datetime)
       timestamps()
     end
 

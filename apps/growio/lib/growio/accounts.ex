@@ -1,6 +1,7 @@
 defmodule Growio.Accounts do
   import Ecto.Query
   alias Ecto.Changeset
+  alias Growio.Utils
   alias Growio.Repo
   alias Growio.Accounts.Account
   alias Growio.Accounts.AccountEmailConfirmation
@@ -36,7 +37,7 @@ defmodule Growio.Accounts do
   end
 
   def get_active_account_email_confirmation(email) when is_bitstring(email) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    now = Utils.naive_utc_now()
 
     Repo.one(
       from(a in AccountEmailConfirmation,
