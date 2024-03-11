@@ -1,6 +1,12 @@
 defmodule GrowioWeb.Router do
   use GrowioWeb, :router
   alias GrowioWeb.Controllers.AuthController
+  alias GrowioWeb.Plugs.AuthPlug
+
+  pipeline :guest do
+    plug(:accepts, ["json"])
+    plug(OpenApiSpex.Plug.PutApiSpec, module: GrowioWeb.ApiSpec)
+  end
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -8,13 +14,16 @@ defmodule GrowioWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
-    plug(OpenApiSpex.Plug.PutApiSpec, module: GrowioWeb.ApiSpec)
+    plug(AuthPlug)
   end
 
-  scope "/api" do
-    pipe_through(:api)
-    post("/auth", AuthController, :email)
-    post("/auth/confirm", AuthController, :email_confirmation)
+  scope "/api/auth" do
+    pipe_through([:guest])
+    post("/", AuthController, :email)
+    post("/confirm", AuthController, :email_confirmation)
+
+    pipe_through([:api])
+    get("/healthcheck", AuthController, :healthcheck)
   end
 
   if Application.compile_env(:growio_web, :dev_routes) do
@@ -26,13 +35,13 @@ defmodule GrowioWeb.Router do
 
   if Application.compile_env(:growio_web, :swaggerui_routes) do
     scope "/swaggerui" do
-      pipe_through(:browser)
+      pipe_through([:browser])
       get("/", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi")
     end
 
-    scope "/api" do
-      pipe_through(:api)
-      get("/openapi", OpenApiSpex.Plug.RenderSpec, [])
+    scope "/api/openapi" do
+      pipe_through([:guest])
+      get("/", OpenApiSpex.Plug.RenderSpec, [])
     end
   end
 end

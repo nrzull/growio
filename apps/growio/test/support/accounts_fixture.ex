@@ -2,9 +2,11 @@ defmodule Growio.AccountsFixture do
   alias Growio.Accounts
 
   def account!(opts \\ []) do
+    email = Keyword.get(opts, :email, gen_account_email())
+
     {:ok, account} =
       Accounts.create_account(%{
-        email: Keyword.get(opts, :email, gen_account_email())
+        email: Keyword.get(opts, :email, email)
       })
 
     account

@@ -1,7 +1,6 @@
 defmodule GrowioWeb.Controllers.AuthController do
   use GrowioWeb, :controller
   use OpenApiSpex.ControllerSpecs
-  alias GrowioWeb.JWT
   alias GrowioWeb.Conn
   alias GrowioWeb.Schemas
   alias Growio.Accounts
@@ -46,20 +45,22 @@ defmodule GrowioWeb.Controllers.AuthController do
          {:ok, _} <-
            Accounts.update_account_email_confirmation(account_email_confirmation, %{used: true}),
          {:ok, %Account{id: id}} <- Accounts.create_account(%{email: input_email}) do
-      token = JWT.encode_jwt(%{account_id: id})
-
-      put_resp_cookie(conn, JWT.access_token_name(), token,
-        domain: Map.get(conn, :host),
-        path: "/",
-        http_only: true,
-        same_site: "None",
-        secure: true
-      )
+      conn
+      |> Conn.setup_auth_cookies(%{account_id: id})
       |> Conn.ok()
     else
       [_, _] -> Conn.bad_request(conn)
       nil -> Conn.bad_request(conn)
       error -> raise error
     end
+  end
+
+  operation(:healthcheck,
+    summary: "check authentication health",
+    responses: [ok: ""]
+  )
+
+  def healthcheck(conn, _params) do
+    Conn.ok(conn)
   end
 end

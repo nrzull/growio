@@ -1,5 +1,4 @@
 defmodule GrowioWeb.Plugs.ErrorPlug do
-  alias Plug.Conn
   alias OpenApiSpex.OpenApi
 
   @behaviour Plug
@@ -20,7 +19,7 @@ defmodule GrowioWeb.Plugs.ErrorPlug do
     response = OpenApi.json_encoder().encode!(%{errors: errors})
 
     conn
-    |> Conn.put_resp_content_type("application/json")
-    |> Conn.send_resp(400, response)
+    |> Plug.Conn.put_resp_content_type("application/json")
+    |> Plug.Conn.send_resp(400, response)
   end
 end
