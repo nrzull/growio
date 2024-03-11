@@ -13,7 +13,6 @@ defmodule Growio.Marketplaces.MarketplaceItem do
     field(:name, :string)
     field(:description, :string)
     field(:deleted_at, :naive_datetime)
-
     belongs_to(:category, MarketplaceItemCategory)
     has_many(:assets, MarketplaceItemAsset, foreign_key: :item_id)
     many_to_many(:variants, __MODULE__, join_through: MarketplaceItemVariant)

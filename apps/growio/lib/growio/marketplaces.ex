@@ -13,6 +13,7 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceAccountRolePermission
   alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Marketplaces.MarketplaceItem
+  alias Growio.Marketplaces.MarketplaceItemVariant
 
   def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
@@ -110,8 +111,8 @@ defmodule Growio.Marketplaces do
          true <- initiator.role.priority < role.priority do
       add_account_to_marketplace(account, initiator.marketplace, role)
     else
-      _ ->
-        {:error, "cannot add an account to marketplace"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot add an account to marketplace"}
     end
   end
 
@@ -142,8 +143,8 @@ defmodule Growio.Marketplaces do
          false <- blocked_account?(account) do
       block_account(account)
     else
-      _ ->
-        {:error, "cannot block an account"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot block an account"}
     end
   end
 
@@ -164,8 +165,8 @@ defmodule Growio.Marketplaces do
          true <- blocked_account?(account) do
       undo_block_account(account)
     else
-      _ ->
-        {:error, "cannot unblock an account"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot unblock an account"}
     end
   end
 
@@ -202,8 +203,8 @@ defmodule Growio.Marketplaces do
          initiator = Repo.preload(initiator, [:marketplace]) do
       create_account_role(initiator.marketplace, params)
     else
-      _ ->
-        {:error, "cannot create an account role"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot create an account role"}
     end
   end
 
@@ -267,8 +268,8 @@ defmodule Growio.Marketplaces do
            ) do
       assign_account_role(account, role)
     else
-      _ ->
-        {:error, "cannot assign an account role"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot assign an account role"}
     end
   end
 
@@ -295,8 +296,8 @@ defmodule Growio.Marketplaces do
            ) do
       update_account_role(role, params)
     else
-      _ ->
-        {:error, "cannot update an account role"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot update an account role"}
     end
   end
 
@@ -319,8 +320,8 @@ defmodule Growio.Marketplaces do
            ) do
       delete_account_role(role)
     else
-      _ ->
-        {:error, "cannot delete an account role"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot delete an account role"}
     end
   end
 
@@ -352,8 +353,8 @@ defmodule Growio.Marketplaces do
            ) do
       undo_delete_account_role(role)
     else
-      _ ->
-        {:error, "cannot undo an account role deletion"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot undo an account role deletion"}
     end
   end
 
@@ -386,8 +387,8 @@ defmodule Growio.Marketplaces do
            ) do
       set_account_role_permissions(role, permission_names)
     else
-      _ ->
-        {:error, "cannot set account role permissions"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot set account role permissions"}
     end
   end
 
@@ -443,8 +444,8 @@ defmodule Growio.Marketplaces do
 
       {:ok, nil}
     else
-      _ ->
-        {:error, "cannot set account role permissions"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot set account role permissions"}
     end
   end
 
@@ -461,8 +462,8 @@ defmodule Growio.Marketplaces do
          initiator = Repo.preload(initiator, [:marketplace]) do
       update_account_role_priorities(initiator.marketplace, role_names)
     else
-      _ ->
-        {:error, "cannot update account role priorities"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot update account role priorities"}
     end
   end
 
@@ -496,8 +497,8 @@ defmodule Growio.Marketplaces do
 
       {:ok, result}
     else
-      _ ->
-        {:error, "cannot update account role priorities"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot update account role priorities"}
     end
   end
 
@@ -525,8 +526,8 @@ defmodule Growio.Marketplaces do
       |> Changeset.put_assoc(:marketplace, marketplace)
       |> Repo.insert()
     else
-      _ ->
-        {:error, "cannot create item category"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot create item category"}
     end
   end
 
@@ -535,8 +536,8 @@ defmodule Growio.Marketplaces do
            MarketplaceItemCategory.changeset(item_category, params) do
       Repo.update(changeset)
     else
-      _ ->
-        {:error, "cannot update item category"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot update item category"}
     end
   end
 
@@ -553,9 +554,88 @@ defmodule Growio.Marketplaces do
       |> Changeset.put_change(:deleted_at, Utils.naive_utc_now())
       |> Repo.update()
     else
-      _ ->
-        {:error, "cannot delete item category"}
+      {:error, _} = v -> v
+      _ -> {:error, "cannot delete item category"}
     end
+  end
+
+  def all_items(%MarketplaceItemCategory{} = item_category, opts \\ []) do
+    MarketplaceItem
+    |> where([item], item.category_id == ^item_category.id)
+    |> then(fn query ->
+      case Keyword.get(opts, :deleted_at) do
+        true ->
+          where(query, [item], not is_nil(item.deleted_at))
+
+        false ->
+          where(query, [item], is_nil(item.deleted_at))
+
+        _ ->
+          query
+      end
+    end)
+    |> Repo.all()
+  end
+
+  def get_item(%MarketplaceItemCategory{} = item_category, item_id) when is_integer(item_id) do
+    MarketplaceItem
+    |> where(
+      [item],
+      item.id == ^item_id and item.category_id == ^item_category.id
+    )
+    |> Repo.one()
+  end
+
+  def create_item(%MarketplaceItemCategory{} = item_category, %{} = params) do
+    with changeset = %Changeset{valid?: true} <- MarketplaceItem.changeset(params),
+         changeset = Changeset.put_assoc(changeset, :category, item_category) do
+      Multi.new()
+      |> Multi.insert(:item, changeset)
+      |> Multi.run(:variant, fn repo, %{item: item} ->
+        with {:variant_of, variant_of} when is_integer(variant_of) <-
+               {:variant_of, Map.get(params, :variant_of)},
+             original_item = %MarketplaceItem{} <- get_item(item_category, variant_of) do
+          %MarketplaceItemVariant{}
+          |> Changeset.change()
+          |> Changeset.put_assoc(:item, original_item)
+          |> Changeset.put_assoc(:variant, item)
+          |> repo.insert()
+        else
+          {:variant_of, nil} -> {:ok, nil}
+          _ -> {:error, "invalid variant"}
+        end
+      end)
+      |> Repo.transaction()
+      |> case do
+        {:ok, _} = v -> v
+        _ -> {:error, "cannot create an item"}
+      end
+    else
+      {:error, _} = v -> v
+      _ -> {:error, "cannot create an item"}
+    end
+  end
+
+  def update_item(%MarketplaceItem{} = item, %{} = params) do
+    MarketplaceItem.changeset(item, params)
+    |> Changeset.delete_change(:deleted_at)
+    |> Repo.update()
+  end
+
+  def delete_item(%MarketplaceItem{} = item) do
+    with false <- deleted_item?(item) do
+      item
+      |> Changeset.change()
+      |> Changeset.put_change(:deleted_at, Utils.naive_utc_now())
+      |> Repo.update()
+    else
+      {:error, _} = v -> v
+      _ -> {:error, "cannot delete an item"}
+    end
+  end
+
+  def deleted_item?(%MarketplaceItem{} = item) do
+    not is_nil(item.deleted_at)
   end
 
   defp can_act?(

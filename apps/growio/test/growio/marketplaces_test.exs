@@ -1,12 +1,14 @@
 defmodule Growio.MarketplacesTest do
   use Growio.DataCase
   alias Growio.AccountsFixture
+  alias Growio.Permissions.PermissionDefs
   alias Growio.MarketplacesFixture
   alias Growio.Marketplaces
   alias Growio.Marketplaces.MarketplaceAccount
   alias Growio.Marketplaces.MarketplaceAccountRole
   alias Growio.Marketplaces.MarketplaceItemCategory
-  alias Growio.Permissions.PermissionDefs
+  alias Growio.Marketplaces.MarketplaceItem
+  alias Growio.Marketplaces.MarketplaceItemVariant
 
   @valid_name "marketplace name"
 
@@ -338,6 +340,50 @@ defmodule Growio.MarketplacesTest do
 
       assert c1.id == c1_id
       assert c2.id == c2_id
+    end
+
+    test "create an item" do
+      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
+      c2 = MarketplacesFixture.item_category!(marketplace)
+
+      {:ok, %{item: %MarketplaceItem{} = item1}} =
+        Marketplaces.create_item(c1, %{name: "item1"})
+
+      {:ok,
+       %{
+         item: %MarketplaceItem{} = _,
+         variant: %MarketplaceItemVariant{} = _
+       }} =
+        Marketplaces.create_item(c1, %{name: "item2", variant_of: item1.id})
+
+      {:error, _} = Marketplaces.create_item(c2, %{name: "name3", variant_of: item1.id})
+    end
+
+    test "update an item" do
+      updated_name = "item11"
+      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      {:ok, %{item: %MarketplaceItem{} = item1}} =
+        MarketplacesFixture.item_category!(marketplace)
+        |> Marketplaces.create_item(%{name: "item1"})
+
+      {:ok, updated_item} = Marketplaces.update_item(item1, %{name: updated_name})
+
+      assert updated_item.name == updated_name
+    end
+
+    test "delete an item" do
+      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      {:ok, %{item: %MarketplaceItem{} = item1}} =
+        MarketplacesFixture.item_category!(marketplace)
+        |> Marketplaces.create_item(%{name: "item1"})
+
+      {:ok, %MarketplaceItem{deleted_at: deleted_at}} = Marketplaces.delete_item(item1)
+
+      refute is_nil(deleted_at)
     end
   end
 
