@@ -5,7 +5,7 @@ defmodule Growio.Repo.Migrations.CreateMarketplaceItemsAndVariants do
     create table(:marketplace_items) do
       add(:name, :string, null: false)
       add(:description, :text)
-      add(:quantity, :integer)
+      add(:deleted_at, :naive_datetime)
       add(:category_id, references(:marketplace_item_categories), null: false)
       timestamps()
     end

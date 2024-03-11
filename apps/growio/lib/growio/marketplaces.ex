@@ -11,6 +11,8 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceAccount
   alias Growio.Marketplaces.MarketplaceAccountRole
   alias Growio.Marketplaces.MarketplaceAccountRolePermission
+  alias Growio.Marketplaces.MarketplaceItemCategory
+  alias Growio.Marketplaces.MarketplaceItem
 
   def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
@@ -496,6 +498,63 @@ defmodule Growio.Marketplaces do
     else
       _ ->
         {:error, "cannot update account role priorities"}
+    end
+  end
+
+  def all_item_categories(%Marketplace{} = marketplace, opts \\ []) do
+    MarketplaceItemCategory
+    |> where([category], category.marketplace_id == ^marketplace.id)
+    |> then(fn query ->
+      case Keyword.get(opts, :deleted_at) do
+        true ->
+          where(query, [category], not is_nil(category.deleted_at))
+
+        false ->
+          where(query, [category], is_nil(category.deleted_at))
+
+        _ ->
+          query
+      end
+    end)
+    |> Repo.all()
+  end
+
+  def create_item_category(%Marketplace{} = marketplace, %{} = params) do
+    with changeset = %Changeset{valid?: true} <- MarketplaceItemCategory.changeset(params) do
+      changeset
+      |> Changeset.put_assoc(:marketplace, marketplace)
+      |> Repo.insert()
+    else
+      _ ->
+        {:error, "cannot create item category"}
+    end
+  end
+
+  def update_item_category(%MarketplaceItemCategory{} = item_category, %{} = params) do
+    with changeset = %Changeset{valid?: true} <-
+           MarketplaceItemCategory.changeset(item_category, params) do
+      Repo.update(changeset)
+    else
+      _ ->
+        {:error, "cannot update item category"}
+    end
+  end
+
+  def delete_item_category(%MarketplaceItemCategory{} = item_category) do
+    used? =
+      MarketplaceItem
+      |> where([item], item.category_id == ^item_category.id)
+      |> where([item], is_nil(item.deleted_at))
+      |> Repo.exists?()
+
+    with false <- used? do
+      item_category
+      |> Changeset.change()
+      |> Changeset.put_change(:deleted_at, Utils.naive_utc_now())
+      |> Repo.update()
+    else
+      _ ->
+        {:error, "cannot delete item category"}
     end
   end
 

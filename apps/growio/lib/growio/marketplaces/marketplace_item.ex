@@ -7,12 +7,13 @@ defmodule Growio.Marketplaces.MarketplaceItem do
 
   @type t :: %__MODULE__{}
   @required ~w(name)a
-  @optional ~w(quantity description)a
+  @optional ~w(description deleted_at)a
 
   schema "marketplace_items" do
     field(:name, :string)
     field(:description, :string)
-    field(:quantity, :integer)
+    field(:deleted_at, :naive_datetime)
+
     belongs_to(:category, MarketplaceItemCategory)
     has_many(:assets, MarketplaceItemAsset, foreign_key: :item_id)
     many_to_many(:variants, __MODULE__, join_through: MarketplaceItemVariant)

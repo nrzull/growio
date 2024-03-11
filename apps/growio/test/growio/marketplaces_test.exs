@@ -5,6 +5,7 @@ defmodule Growio.MarketplacesTest do
   alias Growio.Marketplaces
   alias Growio.Marketplaces.MarketplaceAccount
   alias Growio.Marketplaces.MarketplaceAccountRole
+  alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Permissions.PermissionDefs
 
   @valid_name "marketplace name"
@@ -293,6 +294,50 @@ defmodule Growio.MarketplacesTest do
                  account.id == target_marketplace_account.id
                end
              )
+    end
+
+    test "create item categories" do
+      valid_name = "category1"
+
+      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      {:ok, %MarketplaceItemCategory{marketplace_id: marketplace_id, name: name}} =
+        Marketplaces.create_item_category(marketplace, %{name: valid_name})
+
+      assert marketplace.id == marketplace_id
+      assert valid_name == name
+    end
+
+    test "delete item categories" do
+      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      {:ok, _} =
+        MarketplacesFixture.item_category!(marketplace)
+        |> Marketplaces.delete_item_category()
+    end
+
+    test "update item categories" do
+      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
+
+      {:ok, updated_c1} = Marketplaces.update_item_category(c1, %{name: "other name"})
+
+      assert c1.id == updated_c1.id
+      refute c1.name == updated_c1.name
+    end
+
+    test "get all item categories" do
+      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      c1 = MarketplacesFixture.item_category!(marketplace)
+      c2 = MarketplacesFixture.item_category!(marketplace)
+
+      [%MarketplaceItemCategory{id: c1_id}, %MarketplaceItemCategory{id: c2_id}] =
+        Marketplaces.all_item_categories(marketplace)
+
+      assert c1.id == c1_id
+      assert c2.id == c2_id
     end
   end
 

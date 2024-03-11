@@ -19,4 +19,13 @@ defmodule Growio.MarketplacesFixture do
 
     result
   end
+
+  def item_category!(%Marketplace{} = marketplace) do
+    {:ok, result} =
+      Marketplaces.create_item_category(marketplace, %{
+        name: "category #{Utils.gen_integer(1..6)}"
+      })
+
+    result
+  end
 end
