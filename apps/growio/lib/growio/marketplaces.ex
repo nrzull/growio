@@ -51,7 +51,32 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def all_accounts(%Marketplace{} = marketplace, opts \\ []) do
+  def all_accounts(initiator, opts \\ [])
+
+  def all_accounts(%Account{} = initiator, opts) do
+    MarketplaceAccount
+    |> where([account], account.account_id == ^initiator.id)
+    |> then(fn query ->
+      case Keyword.get(opts, :blocked_at) do
+        true ->
+          where(query, [account], not is_nil(account.blocked_at))
+
+        false ->
+          where(query, [account], is_nil(account.blocked_at))
+
+        _ ->
+          query
+      end
+    end)
+    |> Repo.all()
+  end
+
+  def all_accounts(%MarketplaceAccount{} = initiator, opts) do
+    Map.get(Repo.preload(initiator, [:marketplace]), :marketplace)
+    |> all_accounts(opts)
+  end
+
+  def all_accounts(%Marketplace{} = marketplace, opts) do
     MarketplaceAccount
     |> where([account], account.marketplace_id == ^marketplace.id)
     |> then(fn query ->
@@ -151,6 +176,22 @@ defmodule Growio.Marketplaces do
 
   def blocked_account?(%MarketplaceAccount{} = account) do
     not is_nil(account.blocked_at)
+  end
+
+  def get_account(%Marketplace{} = marketplace, id) when is_integer(id) do
+    MarketplaceAccount
+    |> where([account], account.marketplace_id == ^marketplace.id and account.id == ^id)
+    |> Repo.one()
+  end
+
+  def get_account(%Account{} = initiator, id) when is_integer(id) do
+    MarketplaceAccount
+    |> where([account], account.account_id == ^initiator.id and account.id == ^id)
+    |> Repo.one()
+  end
+
+  def get_account_role(%MarketplaceAccount{} = initiator) do
+    {:ok, Map.get(Repo.preload(initiator, role: [:permissions]), :role)}
   end
 
   def create_account_role(%MarketplaceAccount{} = initiator, %{} = params) do

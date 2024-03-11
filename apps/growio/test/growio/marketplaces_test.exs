@@ -3,12 +3,46 @@ defmodule Growio.MarketplacesTest do
   alias Growio.AccountsFixture
   alias Growio.MarketplacesFixture
   alias Growio.Marketplaces
+  alias Growio.Marketplaces.MarketplaceAccount
   alias Growio.Marketplaces.MarketplaceAccountRole
   alias Growio.Permissions.PermissionDefs
 
   @valid_name "marketplace name"
 
   describe "Growio.Marketplaces" do
+    test "get marketplace accounts of a marketplace" do
+      account = AccountsFixture.account!()
+      account2 = AccountsFixture.account!()
+
+      %{marketplace_account: marketplace_account, marketplace: marketplace} =
+        MarketplacesFixture.marketplace!(account)
+
+      role1 = MarketplacesFixture.role!(marketplace)
+
+      Marketplaces.add_account_to_marketplace(
+        marketplace_account,
+        account2,
+        role1
+      )
+
+      [%MarketplaceAccount{account_id: account_id}, %MarketplaceAccount{account_id: account2_id}] =
+        Marketplaces.all_accounts(marketplace_account)
+
+      assert account.id == account_id
+      assert account2.id == account2_id
+    end
+
+    test "get marketplace accounts of an account" do
+      account = AccountsFixture.account!()
+
+      %{marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(account)
+
+      [%MarketplaceAccount{id: id}] = Marketplaces.all_accounts(account)
+
+      assert marketplace_account.id == id
+    end
+
     test "it should create role, marketplace and marketplace account" do
       account = AccountsFixture.account!()
 
@@ -91,6 +125,13 @@ defmodule Growio.MarketplacesTest do
         )
     end
 
+    test "get an account role" do
+      %{marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      {:ok, %MarketplaceAccountRole{}} = Marketplaces.get_account_role(marketplace_account)
+    end
+
     test "delete account role" do
       %{marketplace: marketplace, marketplace_account: marketplace_account} =
         MarketplacesFixture.marketplace!(AccountsFixture.account!())
@@ -136,11 +177,10 @@ defmodule Growio.MarketplacesTest do
     end
 
     test "assign new role" do
-      %{marketplace_account: marketplace_account} =
+      %{marketplace_account: marketplace_account, marketplace: marketplace} =
         MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
-      {:ok, role1} =
-        Marketplaces.create_account_role(marketplace_account, %{name: "role1"})
+      role1 = MarketplacesFixture.role!(marketplace)
 
       {:ok, target_marketplace_account} =
         Marketplaces.add_account_to_marketplace(
@@ -191,8 +231,7 @@ defmodule Growio.MarketplacesTest do
       %{marketplace_account: marketplace_account, marketplace: marketplace} =
         MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
-      {:ok, role1} =
-        Marketplaces.create_account_role(marketplace_account, %{name: "role1"})
+      role1 = MarketplacesFixture.role!(marketplace)
 
       {:ok, target_marketplace_account} =
         Marketplaces.add_account_to_marketplace(
