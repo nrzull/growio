@@ -11,7 +11,9 @@ defmodule Growio.Permissions do
     end)
   end
 
-  def all() do
+  def all(opts \\ []) do
+    repo = Keyword.get(opts, :repo, Repo)
+
     case Cachex.get(Growio.Cache, "Growio.Permissions.all") do
       {:ok, values} when is_list(values) ->
         values
@@ -19,7 +21,7 @@ defmodule Growio.Permissions do
       _ ->
         values =
           Enum.map(definitions(), fn name ->
-            Repo.get_by(Permission, name: name)
+            repo.get_by(Permission, name: name)
           end)
 
         Cachex.put(Growio.Cache, "Growio.Permissions.all", values, ttl: @all_cache_ttl)

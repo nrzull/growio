@@ -2,6 +2,7 @@ defmodule Growio.Accounts.AccountEmailConfirmation do
   use Ecto.Schema
   import Ecto.Changeset
   alias Growio.Accounts.Account
+  alias Growio.Utils
 
   @type t :: %__MODULE__{}
   @required ~w(email)a
@@ -40,9 +41,7 @@ defmodule Growio.Accounts.AccountEmailConfirmation do
   end
 
   def generate_code() do
-    1..6
-    |> Enum.map(fn _ -> Enum.take_random(1..9, 1) |> List.first() |> Integer.to_string() end)
-    |> Enum.join()
+    Utils.gen_integer(1..6) |> Integer.to_string()
   end
 
   def generate_expired_at() do

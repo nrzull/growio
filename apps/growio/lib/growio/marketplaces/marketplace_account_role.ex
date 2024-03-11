@@ -7,14 +7,13 @@ defmodule Growio.Marketplaces.MarketplaceAccountRole do
   alias Growio.Permissions.Permission
 
   @type t :: %__MODULE__{}
-  @required ~w(name priority)a
-  @optional ~w(locked description)a
+  @required ~w(name)a
+  @optional ~w(description priority)a
 
   schema "marketplace_account_roles" do
     field(:name, :string)
     field(:description, :string)
     field(:priority, :integer)
-    field(:locked, :boolean)
 
     belongs_to(:marketplace, Marketplace)
     has_many(:accounts, MarketplaceAccount, foreign_key: :role_id)
@@ -36,5 +35,5 @@ defmodule Growio.Marketplaces.MarketplaceAccountRole do
   end
 
   def owner_changeset(),
-    do: changeset(%{name: "owner", locked: true, priority: 1})
+    do: changeset(%{name: "owner", priority: 0})
 end

@@ -6,7 +6,6 @@ defmodule Growio.Repo.Migrations.CreateMarketplaceAccountRoles do
       add(:name, :string, size: 32, null: false)
       add(:description, :string)
       add(:priority, :integer, null: false)
-      add(:locked, :bool, default: false)
       add(:marketplace_id, references(:marketplaces), null: false)
       timestamps()
     end
