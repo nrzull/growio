@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  database:
+    image: postgres:15.6
+    volumes:
+      - database:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - common
+    restart: unless-stopped
+    environment:
+      PGDATA: /data/postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+
+networks:
+  common:
+    driver: bridge
+
+volumes:
+  database:
