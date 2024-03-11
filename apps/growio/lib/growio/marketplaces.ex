@@ -44,7 +44,7 @@ defmodule Growio.Marketplaces do
         end
       )
       |> Multi.run(:marketplace_account, fn repo, %{marketplace: marketplace, role: role} ->
-        add_account_to_marketplace(account, marketplace, role, repo: repo)
+        unsafe_add_account_to_marketplace(account, marketplace, role, repo: repo)
       end)
       |> Repo.transaction()
     end
@@ -68,7 +68,32 @@ defmodule Growio.Marketplaces do
     |> Repo.all()
   end
 
-  def add_account_to_marketplace(
+  @spec add_account_to_marketplace(
+          initiator: MarketplaceAccount.t(),
+          marketplace: Marketplace.t(),
+          target: Account.t(),
+          role: MarketplaceAccountRole.t()
+        ) :: any()
+  def add_account_to_marketplace(opts \\ []) do
+    with initiator = %MarketplaceAccount{} <- Keyword.get(opts, :initiator),
+         marketplace = %Marketplace{} <- Keyword.get(opts, :marketplace),
+         target = %Account{} <- Keyword.get(opts, :target),
+         role = %MarketplaceAccountRole{} <- Keyword.get(opts, :role),
+         initiator = Repo.preload(initiator, [role: [:permissions]], force: true),
+         true <- initiator.marketplace_id === marketplace.id,
+         true <-
+           Enum.any?(initiator.role.permissions, fn p ->
+             p.name === Permissions.Definitions.marketplaces__marketplace_account__create()
+           end),
+         true <- initiator.role.priority < role.priority do
+      unsafe_add_account_to_marketplace(target, marketplace, role)
+    else
+      _ ->
+        {:error, "cannot add an account to marketplace"}
+    end
+  end
+
+  def unsafe_add_account_to_marketplace(
         %Account{} = account,
         %Marketplace{} = marketplace,
         %MarketplaceAccountRole{} = role,
@@ -84,16 +109,34 @@ defmodule Growio.Marketplaces do
     |> repo.insert()
   end
 
-  def block_account(%MarketplaceAccount{} = account) do
-    with false <- blocked_account?(account) do
-      account
-      |> Changeset.change()
-      |> Changeset.put_change(:blocked_at, Utils.naive_utc_now())
-      |> Repo.update()
+  @spec block_account(
+          initiator: MarketplaceAccount.t(),
+          target: MarketplaceAccount.t()
+        ) :: any()
+  def block_account(opts \\ []) do
+    with initiator = %MarketplaceAccount{} <- Keyword.get(opts, :initiator),
+         target = %MarketplaceAccount{} <- Keyword.get(opts, :target),
+         initiator = Repo.preload(initiator, [:role, role: [:permissions]], force: true),
+         target = Repo.preload(target, [:role, role: [:permissions]], force: true),
+         true <- initiator.marketplace_id === target.marketplace_id,
+         true <-
+           Enum.any?(initiator.role.permissions, fn p ->
+             p.name === Permissions.Definitions.marketplaces__marketplace_account__delete()
+           end),
+         true <- initiator.role.priority < target.role.priority,
+         false <- blocked_account?(target) do
+      unsafe_block_account(target)
     else
       _ ->
-        {:error, "the account is already_blocked"}
+        {:error, "cannot block an account"}
     end
+  end
+
+  def unsafe_block_account(%MarketplaceAccount{} = account) do
+    account
+    |> Changeset.change()
+    |> Changeset.put_change(:blocked_at, Utils.naive_utc_now())
+    |> Repo.update()
   end
 
   def undo_block_account(%MarketplaceAccount{} = account) do

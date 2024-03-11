@@ -156,53 +156,73 @@ defmodule Growio.MarketplacesTest do
       %{marketplace_account: marketplace_account, marketplace: marketplace} =
         MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
-      {:ok, marketplace_account} = Marketplaces.block_account(marketplace_account)
+      {:ok, role1} =
+        Marketplaces.create_account_role(marketplace, %{name: "role1"})
 
-      {:error, _} = Marketplaces.block_account(marketplace_account)
+      {:ok, target_marketplace_account} =
+        Marketplaces.add_account_to_marketplace(
+          initiator: marketplace_account,
+          target: AccountsFixture.account!(),
+          marketplace: marketplace,
+          role: role1
+        )
+
+      {:ok, target_marketplace_account} =
+        Marketplaces.block_account(
+          initiator: marketplace_account,
+          target: target_marketplace_account
+        )
+
+      {:error, _} =
+        Marketplaces.block_account(
+          initiator: marketplace_account,
+          target: target_marketplace_account
+        )
 
       assert Enum.any?(
                Marketplaces.all_accounts(marketplace),
                fn account ->
-                 account.id == marketplace_account.id
+                 account.id == target_marketplace_account.id
                end
              )
 
       assert Enum.any?(
                Marketplaces.all_accounts(marketplace, blocked_at: true),
                fn account ->
-                 account.id == marketplace_account.id
+                 account.id == target_marketplace_account.id
                end
              )
 
       refute Enum.any?(
                Marketplaces.all_accounts(marketplace, blocked_at: false),
                fn account ->
-                 account.id == marketplace_account.id
+                 account.id == target_marketplace_account.id
                end
              )
 
-      {:ok, marketplace_account} = Marketplaces.undo_block_account(marketplace_account)
+      {:ok, target_marketplace_account} =
+        Marketplaces.undo_block_account(target_marketplace_account)
 
-      {:error, _} = Marketplaces.undo_block_account(marketplace_account)
+      {:error, _} = Marketplaces.undo_block_account(target_marketplace_account)
 
       assert Enum.any?(
                Marketplaces.all_accounts(marketplace),
                fn account ->
-                 account.id == marketplace_account.id
+                 account.id == target_marketplace_account.id
                end
              )
 
       refute Enum.any?(
                Marketplaces.all_accounts(marketplace, blocked_at: true),
                fn account ->
-                 account.id == marketplace_account.id
+                 account.id == target_marketplace_account.id
                end
              )
 
       assert Enum.any?(
                Marketplaces.all_accounts(marketplace, blocked_at: false),
                fn account ->
-                 account.id == marketplace_account.id
+                 account.id == target_marketplace_account.id
                end
              )
     end
