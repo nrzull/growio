@@ -1,6 +1,6 @@
-defmodule GrowioWeb.Jwt do
+defmodule GrowioWeb.JWT do
   alias Phoenix.Token
-  alias MothershipWeb.Endpoint
+  alias GrowioWeb.Endpoint
 
   @jwt_max_age_in_seconds 3600
   @jwt_secret Application.compile_env!(:growio_web, :jwt_secret)

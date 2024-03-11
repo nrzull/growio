@@ -9,6 +9,13 @@ defmodule GrowioWeb.Controllers.FallbackController do
     |> render(:error, %{errors: Error.prepare(error)})
   end
 
+  def call(conn, {atom, error}) when is_atom(atom) do
+    conn
+    |> put_status(400)
+    |> put_view(json: GrowioWeb.Views.JSON)
+    |> render(:error, %{errors: Error.prepare(Map.put(%{}, atom, error))})
+  end
+
   def call(conn, {%Ecto.Changeset{}, _} = {changeset, _}) do
     conn
     |> put_status(400)

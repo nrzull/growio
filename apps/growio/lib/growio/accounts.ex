@@ -30,6 +30,11 @@ defmodule Growio.Accounts do
     end
   end
 
+  def update_account_email_confirmation(%AccountEmailConfirmation{} = struct, %{} = params) do
+    AccountEmailConfirmation.update_changeset(struct, params)
+    |> Repo.update()
+  end
+
   def get_active_account_email_confirmation(email) when is_bitstring(email) do
     now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
