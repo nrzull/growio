@@ -1,4 +1,5 @@
 defmodule Growio.Permissions do
+  alias Growio.Cache
   alias Growio.Repo
   alias Growio.Permissions.Permission
   alias Growio.Permissions.PermissionDefs
@@ -21,8 +22,8 @@ defmodule Growio.Permissions do
   def all(opts \\ []) do
     repo = Keyword.get(opts, :repo, Repo)
 
-    case Cachex.get(Growio.Cache, "Growio.Permissions.all") do
-      {:ok, values} when is_list(values) ->
+    case Cache.get("Growio.Permissions.all") do
+      values when is_list(values) ->
         values
 
       _ ->
@@ -31,7 +32,7 @@ defmodule Growio.Permissions do
             repo.get_by(Permission, name: name)
           end)
 
-        Cachex.put(Growio.Cache, "Growio.Permissions.all", values, ttl: @all_cache_ttl)
+        Cache.put("Growio.Permissions.all", values, ttl: @all_cache_ttl)
 
         values
     end

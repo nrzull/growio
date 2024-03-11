@@ -43,7 +43,8 @@ defmodule Growio.MixProject do
       {:jason, "1.4.1"},
       {:swoosh, "1.15.2"},
       {:finch, "0.18.0"},
-      {:cachex, "3.6.0"}
+      {:nebulex, "2.6.1"},
+      {:shards, "1.1.0"}
     ]
   end
 

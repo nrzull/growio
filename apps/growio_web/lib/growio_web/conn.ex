@@ -8,6 +8,8 @@ defmodule GrowioWeb.Conn do
     ]
 
   import Phoenix.Controller, only: [render: 3, put_view: 2]
+
+  alias Growio.Cache
   alias GrowioWeb.Views.JSON
   alias Growio.Error
   alias GrowioWeb.JWT
@@ -77,15 +79,14 @@ defmodule GrowioWeb.Conn do
   end
 
   def invalidated_refresh_cookie?(name) do
-    {:ok, v} = Cachex.get(Growio.Cache, "refresh_cookie_#{name}")
-    not is_nil(v)
+    not is_nil(Cache.get("refresh_cookie_#{name}"))
   end
 
   def invalidate_refresh_cookie(name) do
     if invalidated_refresh_cookie?(name) do
       {:ok, true}
     else
-      Cachex.put(Growio.Cache, "refresh_cookie_#{name}", true, ttl: refresh_token_cache_ttl())
+      Cache.put("refresh_cookie_#{name}", true, ttl: refresh_token_cache_ttl())
     end
   end
 end

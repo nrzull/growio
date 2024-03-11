@@ -8,7 +8,7 @@ defmodule Growio.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {Cachex, name: Growio.Cache},
+      Growio.Cache,
       Growio.Repo,
       {DNSCluster, query: Application.get_env(:growio, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Growio.PubSub},
