@@ -1,0 +1,12 @@
+{
+  "name": "@growio/marketplace",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "lint:ts": "vue-tsc",
+    "lint:eslint": "eslint",
+    "lint:stylelint": "stylelint"
+  }
+}

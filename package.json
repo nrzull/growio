@@ -1,0 +1,38 @@
+{
+  "name": "@growio/umbrella",
+  "type": "module",
+  "scripts": {
+    "prepare": "husky",
+    "dev": "concurrently npm:apps:dev npm:marketplace:dev",
+    "apps:dev": "mix phx.server",
+    "marketplace:dev": "npm run dev -w @growio/marketplace"
+  },
+  "dependencies": {
+    "remeda": "1.47.1",
+    "vue": "3.4.21",
+    "vue-router": "4.3.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.0.3",
+    "@commitlint/config-conventional": "19.0.3",
+    "@typescript-eslint/eslint-plugin": "7.1.1",
+    "@typescript-eslint/parser": "7.1.1",
+    "@vitejs/plugin-vue": "5.0.4",
+    "browserslist": "4.23.0",
+    "concurrently": "8.2.2",
+    "eslint": "8.57.0",
+    "eslint-plugin-vue": "9.22.0",
+    "husky": "9.0.11",
+    "lightningcss": "1.24.0",
+    "lint-staged": "15.2.2",
+    "postcss-html": "1.6.0",
+    "stylelint": "16.2.1",
+    "stylelint-config-recommended-vue": "1.5.0",
+    "typescript": "5.4.2",
+    "vite": "5.1.5",
+    "vue-tsc": "2.0.6"
+  },
+  "workspaces": [
+    "frontend/marketplace"
+  ]
+}
