@@ -81,7 +81,61 @@ defmodule Growio.Marketplaces do
     )
   end
 
-  def update_priorities(%Marketplace{} = marketplace, [_ | _] = role_names) do
+  def set_account_role_permissions(
+        %MarketplaceAccountRole{} = role,
+        permission_names
+      )
+      when is_list(permission_names) do
+    all_permissions = Permissions.all()
+
+    is_valid_permissions =
+      Enum.all?(permission_names, fn name ->
+        Enum.any?(all_permissions, fn permission -> permission.name == name end)
+      end)
+
+    with true <- is_valid_permissions do
+      role = Repo.preload(role, [:permissions])
+
+      role_permissions =
+        Enum.map(role.permissions, fn permission ->
+          Repo.one(
+            from(role_permission in MarketplaceAccountRolePermission,
+              where:
+                role_permission.role_id == ^role.id and
+                  role_permission.permission_id == ^permission.id
+            )
+          )
+        end)
+
+      {:ok, _} =
+        Multi.new()
+        |> Multi.run(:delete_all, fn repo, %{} ->
+          {:ok,
+           Enum.map(role_permissions, fn role_permission -> repo.delete!(role_permission) end)}
+        end)
+        |> Multi.insert_all(
+          :insert_all,
+          MarketplaceAccountRolePermission,
+          fn %{} ->
+            Enum.map(permission_names, fn name ->
+              permission = Enum.find(all_permissions, fn p -> p.name == name end)
+
+              %{
+                role_id: role.id,
+                permission_id: permission.id,
+                inserted_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second),
+                updated_at: NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
+              }
+            end)
+          end
+        )
+        |> Repo.transaction()
+
+      {:ok, nil}
+    end
+  end
+
+  def update_priorities(%Marketplace{} = marketplace, role_names) when is_list(role_names) do
     all = all_account_roles(marketplace)
 
     all_names =
@@ -102,17 +156,14 @@ defmodule Growio.Marketplaces do
           |> Changeset.put_change(:priority, index)
         end)
 
-      {:ok, %{update_all: keywords}} =
+      {:ok, %{update_all: result}} =
         Multi.new()
         |> Multi.run(:update_all, fn repo, %{} ->
-          {:ok, Enum.map(changesets, fn changeset -> repo.update(changeset) end)}
+          {:ok, Enum.map(changesets, fn changeset -> repo.update!(changeset) end)}
         end)
         |> Repo.transaction()
 
-      {:ok,
-       keywords
-       |> Enum.filter(fn {status, _} -> status === :ok end)
-       |> Enum.map(fn {_, value} -> value end)}
+      {:ok, result}
     end
   end
 end

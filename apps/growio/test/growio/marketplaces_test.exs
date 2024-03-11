@@ -34,8 +34,7 @@ defmodule Growio.MarketplacesTest do
     end
 
     test "it should update role priorities" do
-      account = AccountsFixture.account!()
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(account)
+      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
       {:ok, _} = Marketplaces.create_account_role(marketplace, %{name: "role1"})
       {:ok, _} = Marketplaces.create_account_role(marketplace, %{name: "role2"})
@@ -58,6 +57,17 @@ defmodule Growio.MarketplacesTest do
          %MarketplaceAccountRole{name: "role1", priority: 3}
        ]} =
         Marketplaces.update_priorities(marketplace, ["owner", "role2", "role3", "role1"])
+    end
+
+    test "it should set new role permissions" do
+      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      role = Marketplaces.get_account_role(marketplace, "owner")
+
+      {:ok, _} =
+        Marketplaces.set_account_role_permissions(role, [
+          Growio.Permissions.Definitions.marketplaces__marketplace_item__create()
+        ])
     end
   end
 
