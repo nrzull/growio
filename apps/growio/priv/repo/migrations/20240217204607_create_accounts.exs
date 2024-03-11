@@ -3,10 +3,10 @@ defmodule Growio.Repo.Migrations.CreateAccounts do
 
   def change do
     create table(:accounts) do
-      add(:phone, :string, size: 16, null: false)
+      add(:email, :string, size: 128, null: false)
       timestamps()
     end
 
-    create(unique_index(:accounts, [:phone]))
+    create(unique_index(:accounts, [:email]))
   end
 end

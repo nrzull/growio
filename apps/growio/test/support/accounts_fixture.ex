@@ -4,24 +4,24 @@ defmodule Growio.AccountsFixture do
   def account!(opts \\ []) do
     {:ok, account} =
       Accounts.create_account(%{
-        phone: Keyword.get(opts, :phone, gen_account_phone())
+        email: Keyword.get(opts, :email, gen_account_email())
       })
 
     account
   end
 
-  def gen_account_phone() do
-    result = "+#{do_gen_account_phone(1..6)}"
+  def gen_account_email() do
+    result = "#{gen_number(1..6)}@example.com"
 
-    if is_nil(Accounts.get_account_by(:phone, result)) do
+    if is_nil(Accounts.get_account_by(:email, result)) do
       result
     else
-      gen_account_phone()
+      gen_account_email()
     end
   end
 
-  defp do_gen_account_phone(range) do
-    range
+  defp gen_number(length_range) do
+    length_range
     |> Enum.map(fn _ -> Enum.take_random(1..9, 1) |> List.first() |> Integer.to_string() end)
     |> Enum.join()
   end

@@ -7,8 +7,8 @@ defmodule Growio.Accounts do
     Repo.get(Account, id)
   end
 
-  def get_account_by(:phone, phone) when is_bitstring(phone) do
-    Repo.one(from(a in Account, where: a.phone == ^phone))
+  def get_account_by(:email, email) when is_bitstring(email) do
+    Repo.one(from(a in Account, where: a.email == ^email))
   end
 
   def create_account(%{} = params) do

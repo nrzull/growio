@@ -4,29 +4,29 @@ defmodule Growio.AccountsTest do
   alias Growio.Accounts.Account
   alias Growio.AccountsFixture
 
-  @valid_phone "+1234567"
+  @valid_email "user@example.com"
 
   describe "Account" do
-    test "should create an account with phone #{@valid_phone}" do
-      valid_phone = @valid_phone
+    test "should create an account with email #{@valid_email}" do
+      valid_email = @valid_email
 
       assert match?(
-               {:ok, %Accounts.Account{phone: ^valid_phone}},
-               Accounts.create_account(%{phone: valid_phone})
+               {:ok, %Accounts.Account{email: ^valid_email}},
+               Accounts.create_account(%{email: valid_email})
              )
     end
 
-    test "should get an account by phone #{@valid_phone}" do
-      %Account{phone: phone} = AccountsFixture.account!(phone: @valid_phone)
+    test "should get an account by email #{@valid_email}" do
+      %Account{email: email} = AccountsFixture.account!(email: @valid_email)
 
       assert match?(
-               %Account{phone: ^phone},
-               Accounts.get_account_by(:phone, phone)
+               %Account{email: ^email},
+               Accounts.get_account_by(:email, email)
              )
     end
 
     test "should get an account by id" do
-      %Account{id: id} = AccountsFixture.account!(phone: @valid_phone)
+      %Account{id: id} = AccountsFixture.account!(email: @valid_email)
 
       assert match?(
                %Account{id: ^id},

@@ -6,11 +6,11 @@ defmodule Growio.Accounts.Account do
   alias Growio.Bots.TelegramBot
 
   @type t :: %__MODULE__{}
-  @required ~w(phone)a
+  @required ~w(email)a
   @optional ~w()a
 
   schema "accounts" do
-    field(:phone, :string)
+    field(:email, :string)
 
     has_many(:telegram_bots, TelegramBot)
     many_to_many(:marketplaces, Marketplace, join_through: MarketplaceAccount)
@@ -24,12 +24,15 @@ defmodule Growio.Accounts.Account do
     struct
     |> cast(params, @required ++ @optional)
     |> validate_required(@required)
-    |> validate_phone()
+    |> validate_email()
   end
 
-  defp validate_phone(changeset) do
+  defp validate_email(changeset) do
     changeset
-    |> validate_format(:phone, ~r/^\+\d{6,12}$/)
-    |> unique_constraint(:phone)
+    |> validate_format(
+      :email,
+      ~r/^[a-z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)*$/
+    )
+    |> unique_constraint(:email)
   end
 end
