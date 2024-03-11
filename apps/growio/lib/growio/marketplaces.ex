@@ -8,6 +8,8 @@ defmodule Growio.Marketplaces do
   alias Growio.Accounts
   alias Growio.Accounts.Account
   alias Growio.Permissions
+  alias Growio.Subscriptions
+  alias Growio.Subscriptions.Subscription
   alias Growio.Marketplaces.Marketplace
   alias Growio.Marketplaces.MarketplaceAccount
   alias Growio.Marketplaces.MarketplaceAccountRole
@@ -19,6 +21,7 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
   alias Growio.Marketplaces.MarketplaceWarehouse
   alias Growio.Marketplaces.MarketplaceWarehouseItem
+  alias Growio.Marketplaces.MarketplaceSubscription
 
   def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
@@ -54,6 +57,19 @@ defmodule Growio.Marketplaces do
       )
       |> Multi.run(:marketplace_account, fn repo, %{marketplace: marketplace, role: role} ->
         add_account_to_marketplace(account, marketplace, role, repo: repo)
+      end)
+      |> Multi.run(:subscription, fn repo, %{marketplace: marketplace} ->
+        create_subscription(
+          marketplace,
+          Subscriptions.get_default_subscription(),
+          %{
+            expired_at:
+              Utils.naive_utc_now()
+              |> NaiveDateTime.add(365, :day)
+              |> NaiveDateTime.truncate(:second)
+          },
+          repo: repo
+        )
       end)
       |> Repo.transaction()
     end
@@ -1087,5 +1103,19 @@ defmodule Growio.Marketplaces do
   def update_warehouse_item(%MarketplaceWarehouseItem{} = item, %{} = params) do
     MarketplaceWarehouseItem.changeset(item, params)
     |> Repo.update()
+  end
+
+  def create_subscription(
+        %Marketplace{} = marketplace,
+        %Subscription{} = subscription,
+        %{} = params,
+        opts \\ []
+      ) do
+    repo = Keyword.get(opts, :repo, Repo)
+
+    MarketplaceSubscription.changeset(params)
+    |> Changeset.put_assoc(:marketplace, marketplace)
+    |> Changeset.put_assoc(:subscription, subscription)
+    |> repo.insert()
   end
 end
