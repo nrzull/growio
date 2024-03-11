@@ -12,7 +12,7 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule AuthRequest do
+  defmodule AuthEmailRequest do
     schema(%{
       type: :object,
       properties: %{
@@ -21,22 +21,22 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule AuthResponse do
+  defmodule AuthEmailResponse do
     schema(%{
       type: :object,
       properties: %{
         email: %Schema{type: :string},
-        code: %Schema{type: :string, nullable: true}
+        password: %Schema{type: :string, nullable: true}
       }
     })
   end
 
-  defmodule AuthEmailConfirmationRequest do
+  defmodule AuthEmailOTPRequest do
     schema(%{
       type: :object,
       properties: %{
         email: %Schema{type: :string},
-        code: %Schema{type: :string}
+        password: %Schema{type: :string}
       }
     })
   end

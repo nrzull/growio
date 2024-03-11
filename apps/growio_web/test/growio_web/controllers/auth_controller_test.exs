@@ -6,47 +6,47 @@ defmodule GrowioWeb.Controllers.AuthControllerTest do
 
   @invalid_email "a"
 
-  describe "POST /api/auth" do
+  describe "POST /api/auth/email" do
     test "it should fail", %{conn: conn} do
-      post(conn, ~p"/api/auth", %{email: @invalid_email})
+      post(conn, ~p"/api/auth/email", %{email: @invalid_email})
       |> json_response(400)
     end
 
     test "it should success", %{conn: conn, api_spec: api_spec} do
       email = AccountsFixture.gen_account_email()
 
-      post(conn, ~p"/api/auth", %{email: email})
+      post(conn, ~p"/api/auth/email", %{email: email})
       |> json_response(200)
-      |> assert_schema("AuthResponse", api_spec)
+      |> assert_schema("AuthEmailResponse", api_spec)
     end
   end
 
-  describe "POST /api/auth/confirm" do
+  describe "POST /api/auth/email/otp" do
     test "it should fail", %{conn: conn} do
       email = AccountsFixture.gen_account_email()
 
-      %{"code" => code} =
-        post(conn, ~p"/api/auth", %{email: email})
+      %{"password" => password} =
+        post(conn, ~p"/api/auth/email", %{email: email})
         |> json_response(200)
 
-      post(conn, ~p"/api/auth/confirm", %{email: email, code: "123456"})
+      post(conn, ~p"/api/auth/email/otp", %{email: email, password: "123456"})
       |> json_response(400)
 
-      post(conn, ~p"/api/auth/confirm", %{email: "qwe@gma.com", code: code})
+      post(conn, ~p"/api/auth/email/otp", %{email: "qwe@gma.com", password: password})
       |> json_response(400)
 
-      post(conn, ~p"/api/auth/confirm", %{email: "qwe@gma.com", code: "123456"})
+      post(conn, ~p"/api/auth/email/otp", %{email: "qwe@gma.com", password: "123456"})
       |> json_response(400)
     end
 
     test "it should success", %{conn: conn} do
       email = AccountsFixture.gen_account_email()
 
-      %{"code" => code} =
-        post(conn, ~p"/api/auth", %{email: email})
+      %{"password" => password} =
+        post(conn, ~p"/api/auth/email", %{email: email})
         |> json_response(200)
 
-      post(conn, ~p"/api/auth/confirm", %{email: email, code: code})
+      post(conn, ~p"/api/auth/email/otp", %{email: email, password: password})
       |> json_response(200)
     end
   end

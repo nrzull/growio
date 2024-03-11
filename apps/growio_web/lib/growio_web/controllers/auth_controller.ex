@@ -5,7 +5,7 @@ defmodule GrowioWeb.Controllers.AuthController do
   alias GrowioWeb.Schemas
   alias Growio.Accounts
   alias Growio.Accounts.Account
-  alias Growio.Accounts.AccountEmailConfirmation
+  alias Growio.Accounts.AccountEmailOTP
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -18,32 +18,32 @@ defmodule GrowioWeb.Controllers.AuthController do
 
   operation(:email,
     summary: "authenticate with email",
-    request_body: {"", "application/json", Schemas.AuthRequest, required: true},
-    responses: [ok: {"", "application/json", Schemas.AuthResponse}]
+    request_body: {"", "application/json", Schemas.AuthEmailRequest, required: true},
+    responses: [ok: {"", "application/json", Schemas.AuthEmailResponse}]
   )
 
   def email(conn, params) do
-    with {:ok, account_email_confirmation} <- Accounts.create_account_email_confirmation(params),
-         %{email: email, code: code} <- Map.from_struct(account_email_confirmation) do
+    with {:ok, account_email_otp} <- Accounts.create_account_email_otp(params),
+         %{email: email, password: password} <- Map.from_struct(account_email_otp) do
       Conn.ok(conn, %{
         email: email,
-        code: (Enum.member?([:dev, :test], Mix.env()) && code) || nil
+        password: (Enum.member?([:dev, :test], Mix.env()) && password) || nil
       })
     end
   end
 
-  operation(:email_confirmation,
+  operation(:email_otp,
     summary: "confirm authentication with email",
-    request_body: {"", "application/json", Schemas.AuthEmailConfirmationRequest, required: true},
+    request_body: {"", "application/json", Schemas.AuthEmailOTPRequest, required: true},
     responses: [ok: ""]
   )
 
-  def email_confirmation(conn, %{"email" => input_email, "code" => input_code}) do
-    with account_email_confirmation = %AccountEmailConfirmation{email: email, code: code} <-
-           Accounts.get_active_account_email_confirmation(input_email),
-         [true, true] <- [input_email == email, input_code == code],
+  def email_otp(conn, %{"email" => input_email, "password" => input_password}) do
+    with account_email_otp = %AccountEmailOTP{email: email, password: password} <-
+           Accounts.get_active_account_email_otp(input_email),
+         [true, true] <- [input_email == email, input_password == password],
          {:ok, _} <-
-           Accounts.update_account_email_confirmation(account_email_confirmation, %{used: true}),
+           Accounts.delete_account_email_otp(account_email_otp),
          {:ok, %Account{id: id}} <- Accounts.create_account(%{email: input_email}) do
       conn
       |> Conn.setup_auth_cookies(%{account_id: id})

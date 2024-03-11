@@ -1,4 +1,4 @@
-defmodule Growio.Accounts.AccountEmailConfirmation do
+defmodule Growio.Accounts.AccountEmailOTP do
   use Ecto.Schema
   import Ecto.Changeset
   alias Growio.Accounts.Account
@@ -6,12 +6,11 @@ defmodule Growio.Accounts.AccountEmailConfirmation do
 
   @type t :: %__MODULE__{}
   @required ~w(email)a
-  @optional ~w(used code expired_at)a
+  @optional ~w()a
 
-  schema "account_email_confirmations" do
+  schema "account_email_otp" do
     field(:email, :string)
-    field(:code, :string)
-    field(:used, :boolean)
+    field(:password, :string)
     field(:expired_at, :naive_datetime)
     timestamps()
   end
@@ -24,23 +23,17 @@ defmodule Growio.Accounts.AccountEmailConfirmation do
     |> cast(params, @required ++ @optional)
     |> validate_required(@required)
     |> Account.validate_email()
-    |> put_change(:code, generate_code())
+    |> put_change(:password, generate_password())
     |> put_change(:expired_at, generate_expired_at())
   end
 
-  def update_changeset(%__MODULE__{} = struct, %{} = params) do
-    struct
-    |> cast(params, [:used])
-    |> validate_required([:used])
-  end
-
-  def validate_code(changeset) do
+  def validate_password(changeset) do
     changeset
-    |> validate_length(:code, is: 6)
-    |> validate_format(:code, ~r/^[0-9]{6}$/)
+    |> validate_length(:password, is: 6)
+    |> validate_format(:password, ~r/^[0-9]{6}$/)
   end
 
-  def generate_code() do
+  def generate_password() do
     Utils.gen_integer(1..6) |> Integer.to_string()
   end
 

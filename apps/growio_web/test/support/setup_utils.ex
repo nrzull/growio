@@ -5,14 +5,14 @@ defmodule GrowioWeb.SetupUtils do
   def auth(%{conn: conn}) do
     email = AccountsFixture.gen_account_email()
 
-    %{"code" => code} =
+    %{"password" => password} =
       conn
-      |> post(~p"/api/auth", %{"email" => email})
+      |> post(~p"/api/auth/email", %{"email" => email})
       |> json_response(200)
 
     conn =
       conn
-      |> post(~p"/api/auth/confirm", %{"email" => email, "code" => code})
+      |> post(~p"/api/auth/email/otp", %{"email" => email, "password" => password})
       |> recycle()
       |> Plug.Conn.put_req_header("content-type", "application/json")
 

@@ -2,7 +2,7 @@ defmodule Growio.AccountsTest do
   use Growio.DataCase
   alias Growio.Accounts
   alias Growio.Accounts.Account
-  alias Growio.Accounts.AccountEmailConfirmation
+  alias Growio.Accounts.AccountEmailOTP
   alias Growio.AccountsFixture
 
   @valid_email "user@example.com"
@@ -36,18 +36,23 @@ defmodule Growio.AccountsTest do
     end
   end
 
-  describe "AccountEmailConfirmation" do
+  describe "AccountEmailOTP" do
     test "should create with email" do
-      result = Accounts.create_account_email_confirmation(%{email: @valid_email})
+      result = Accounts.create_account_email_otp(%{email: @valid_email})
 
       assert match?(
-               {:ok, %AccountEmailConfirmation{}},
+               {:ok, %AccountEmailOTP{}},
                result
              )
 
-      result2 = Accounts.create_account_email_confirmation(%{email: @valid_email})
+      result2 = Accounts.create_account_email_otp(%{email: @valid_email})
 
-      assert result == result2
+      assert match?(
+               {:ok, %AccountEmailOTP{}},
+               result2
+             )
+
+      assert result !== result2
     end
   end
 end

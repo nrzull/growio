@@ -20,9 +20,7 @@ defmodule GrowioWeb.Controllers.AccountController do
     responses: [ok: {"", "application/json", Schemas.Account}]
   )
 
-  def me(%{assigns: %{auth: %{account_id: account_id}}} = conn, _opts) do
-    with account <- Accounts.get_account_by(:id, account_id) do
-      Conn.ok(conn, AccountJSON.render(account))
-    end
+  def me(%{assigns: %{account: account}} = conn, _opts) do
+    Conn.ok(conn, AccountJSON.render(account))
   end
 end

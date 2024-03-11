@@ -21,8 +21,8 @@ defmodule GrowioWeb.Router do
 
   scope "/api/auth" do
     pipe_through([:guest])
-    post("/", AuthController, :email)
-    post("/confirm", AuthController, :email_confirmation)
+    post("/email", AuthController, :email)
+    post("/email/otp", AuthController, :email_otp)
 
     pipe_through([:api])
     get("/healthcheck", AuthController, :healthcheck)
