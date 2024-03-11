@@ -4,12 +4,12 @@ defmodule Growio.Marketplaces.MarketplaceItemAsset do
   alias Growio.Marketplaces.MarketplaceItem
 
   @type t :: %__MODULE__{}
-  @required ~w(mimetype link)a
+  @required ~w(mimetype src)a
   @optional ~w()a
 
   schema "marketplace_item_assets" do
     field(:mimetype, :string)
-    field(:link, :string)
+    field(:src, :string)
 
     belongs_to(:item, MarketplaceItem)
 

@@ -6,6 +6,7 @@ defmodule Growio.Marketplaces.Marketplace do
   alias Growio.Marketplaces.MarketplaceAccount
   alias Growio.Bots.TelegramBot
   alias Growio.Marketplaces.MarketplaceItemCategory
+  alias Growio.Warehouses.Warehouse
 
   @type t :: %__MODULE__{}
   @required ~w(name)a
@@ -17,6 +18,7 @@ defmodule Growio.Marketplaces.Marketplace do
     has_many(:telegram_bots, TelegramBot)
     has_many(:account_roles, MarketplaceAccountRole)
     has_many(:item_categories, MarketplaceItemCategory)
+    has_many(:warehouses, Warehouse)
     many_to_many(:accounts, Account, join_through: MarketplaceAccount)
 
     timestamps()

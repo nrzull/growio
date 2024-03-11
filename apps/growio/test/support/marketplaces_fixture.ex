@@ -1,6 +1,7 @@
 defmodule Growio.MarketplacesFixture do
   alias Growio.Marketplaces
   alias Growio.Marketplaces.Marketplace
+  alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Accounts.Account
   alias Growio.Utils
 
@@ -25,6 +26,13 @@ defmodule Growio.MarketplacesFixture do
       Marketplaces.create_item_category(marketplace, %{
         name: "category #{Utils.gen_integer(1..6)}"
       })
+
+    result
+  end
+
+  def item!(%MarketplaceItemCategory{} = category) do
+    {:ok, result} =
+      Marketplaces.create_item(category, %{name: "item #{Utils.gen_integer(1..6)}"})
 
     result
   end

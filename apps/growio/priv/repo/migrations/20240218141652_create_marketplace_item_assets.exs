@@ -4,7 +4,7 @@ defmodule Growio.Repo.Migrations.CreateMarketplaceItemAssets do
   def change do
     create table(:marketplace_item_assets) do
       add(:mimetype, :string, null: false)
-      add(:link, :string)
+      add(:src, :string)
       add(:item_id, references(:marketplace_items), null: false)
       timestamps()
     end
