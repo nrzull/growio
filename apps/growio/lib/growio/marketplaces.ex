@@ -6,6 +6,7 @@ defmodule Growio.Marketplaces do
   alias Growio.Repo
   alias Growio.Accounts.Account
   alias Growio.Permissions
+  alias Growio.Permissions.PermissionDefs
   alias Growio.Marketplaces.Marketplace
   alias Growio.Marketplaces.MarketplaceAccount
   alias Growio.Marketplaces.MarketplaceAccountRole
@@ -44,7 +45,7 @@ defmodule Growio.Marketplaces do
         end
       )
       |> Multi.run(:marketplace_account, fn repo, %{marketplace: marketplace, role: role} ->
-        unsafe_add_account_to_marketplace(account, marketplace, role, repo: repo)
+        add_account_to_marketplace(account, marketplace, role, repo: repo)
       end)
       |> Repo.transaction()
     end
@@ -68,32 +69,26 @@ defmodule Growio.Marketplaces do
     |> Repo.all()
   end
 
-  @spec add_account_to_marketplace(
-          initiator: MarketplaceAccount.t(),
-          marketplace: Marketplace.t(),
-          target: Account.t(),
-          role: MarketplaceAccountRole.t()
-        ) :: any()
-  def add_account_to_marketplace(opts \\ []) do
-    with initiator = %MarketplaceAccount{} <- Keyword.get(opts, :initiator),
-         marketplace = %Marketplace{} <- Keyword.get(opts, :marketplace),
-         target = %Account{} <- Keyword.get(opts, :target),
-         role = %MarketplaceAccountRole{} <- Keyword.get(opts, :role),
-         initiator = Repo.preload(initiator, [role: [:permissions]], force: true),
-         true <- initiator.marketplace_id === marketplace.id,
-         true <-
-           Enum.any?(initiator.role.permissions, fn p ->
-             p.name === Permissions.Definitions.marketplaces__marketplace_account__create()
-           end),
+  def add_account_to_marketplace(
+        %MarketplaceAccount{} = initiator,
+        %Account{} = account,
+        %MarketplaceAccountRole{} = role
+      ) do
+    with true <-
+           can_act?(
+             initiator,
+             PermissionDefs.marketplaces__marketplace_account__create()
+           ),
+         initiator = Repo.preload(initiator, [:role, :marketplace]),
          true <- initiator.role.priority < role.priority do
-      unsafe_add_account_to_marketplace(target, marketplace, role)
+      add_account_to_marketplace(account, initiator.marketplace, role)
     else
       _ ->
         {:error, "cannot add an account to marketplace"}
     end
   end
 
-  def unsafe_add_account_to_marketplace(
+  def add_account_to_marketplace(
         %Account{} = account,
         %Marketplace{} = marketplace,
         %MarketplaceAccountRole{} = role,
@@ -109,50 +104,65 @@ defmodule Growio.Marketplaces do
     |> repo.insert()
   end
 
-  @spec block_account(
-          initiator: MarketplaceAccount.t(),
-          target: MarketplaceAccount.t()
-        ) :: any()
-  def block_account(opts \\ []) do
-    with initiator = %MarketplaceAccount{} <- Keyword.get(opts, :initiator),
-         target = %MarketplaceAccount{} <- Keyword.get(opts, :target),
-         initiator = Repo.preload(initiator, [:role, role: [:permissions]], force: true),
-         target = Repo.preload(target, [:role, role: [:permissions]], force: true),
-         true <- initiator.marketplace_id === target.marketplace_id,
+  def block_account(%MarketplaceAccount{} = initiator, %MarketplaceAccount{} = account) do
+    with true <- initiator.marketplace_id === account.marketplace_id,
          true <-
-           Enum.any?(initiator.role.permissions, fn p ->
-             p.name === Permissions.Definitions.marketplaces__marketplace_account__delete()
-           end),
-         true <- initiator.role.priority < target.role.priority,
-         false <- blocked_account?(target) do
-      unsafe_block_account(target)
+           can_act?(
+             initiator,
+             account,
+             PermissionDefs.marketplaces__marketplace_account__delete()
+           ),
+         false <- blocked_account?(account) do
+      block_account(account)
     else
       _ ->
         {:error, "cannot block an account"}
     end
   end
 
-  def unsafe_block_account(%MarketplaceAccount{} = account) do
+  def block_account(%MarketplaceAccount{} = account) do
     account
     |> Changeset.change()
     |> Changeset.put_change(:blocked_at, Utils.naive_utc_now())
     |> Repo.update()
   end
 
-  def undo_block_account(%MarketplaceAccount{} = account) do
-    with true <- blocked_account?(account) do
-      account
-      |> Changeset.change()
-      |> Changeset.force_change(:blocked_at, nil)
-      |> Repo.update()
+  def undo_block_account(%MarketplaceAccount{} = initiator, %MarketplaceAccount{} = account) do
+    with true <- initiator.marketplace_id == account.marketplace_id,
+         true <-
+           can_act?(
+             initiator,
+             account,
+             PermissionDefs.marketplaces__marketplace_account__delete()
+           ),
+         true <- blocked_account?(account) do
+      undo_block_account(account)
     else
       _ ->
-        {:error, "the account is not blocked"}
+        {:error, "cannot unblock an account"}
     end
+  end
+
+  def undo_block_account(%MarketplaceAccount{} = account) do
+    account
+    |> Changeset.change()
+    |> Changeset.force_change(:blocked_at, nil)
+    |> Repo.update()
   end
 
   def blocked_account?(%MarketplaceAccount{} = account) do
     not is_nil(account.blocked_at)
+  end
+
+  def create_account_role(%MarketplaceAccount{} = initiator, %{} = params) do
+    with true <-
+           can_act?(initiator, PermissionDefs.marketplaces__marketplace_account_role__create()),
+         initiator = Repo.preload(initiator, [:marketplace]) do
+      create_account_role(initiator.marketplace, params)
+    else
+      _ ->
+        {:error, "cannot create an account role"}
+    end
   end
 
   def create_account_role(%Marketplace{} = marketplace, %{} = params) do
@@ -197,21 +207,37 @@ defmodule Growio.Marketplaces do
   end
 
   def assign_account_role(
+        %MarketplaceAccount{} = initiator,
         %MarketplaceAccount{} = account,
-        %MarketplaceAccountRole{} = role,
-        opts \\ []
+        %MarketplaceAccountRole{} = role
       ) do
-    account = Repo.preload(account, [:role])
-    force = Keyword.get(opts, :force, false)
-
-    if primary_account_role?(account.role) and not force do
-      {:error, "cannot change primary role"}
+    with true <-
+           can_act?(
+             initiator,
+             role,
+             PermissionDefs.marketplaces__marketplace_account_role__create()
+           ),
+         true <-
+           can_act?(
+             initiator,
+             account,
+             PermissionDefs.marketplaces__marketplace_account_role__create()
+           ) do
+      assign_account_role(account, role)
     else
-      account
-      |> Changeset.change()
-      |> Changeset.put_change(:role_id, role.id)
-      |> Repo.update()
+      _ ->
+        {:error, "cannot assign an account role"}
     end
+  end
+
+  def assign_account_role(
+        %MarketplaceAccount{} = account,
+        %MarketplaceAccountRole{} = role
+      ) do
+    account
+    |> Changeset.change()
+    |> Changeset.put_change(:role_id, role.id)
+    |> Repo.update()
   end
 
   def update_account_role(%MarketplaceAccountRole{} = role, %{} = params) do
@@ -253,6 +279,25 @@ defmodule Growio.Marketplaces do
         where: role.name == ^name and role.marketplace_id == ^marketplace.id
       )
     )
+  end
+
+  def set_account_role_permissions(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceAccountRole{} = role,
+        [permission_name | _] = permission_names
+      )
+      when is_bitstring(permission_name) do
+    with true <-
+           can_act?(
+             initiator,
+             role,
+             PermissionDefs.marketplaces__marketplace_account_role__update()
+           ) do
+      set_account_role_permissions(role, permission_names)
+    else
+      _ ->
+        {:error, "cannot set account role permissions"}
+    end
   end
 
   def set_account_role_permissions(
@@ -306,11 +351,31 @@ defmodule Growio.Marketplaces do
         |> Repo.transaction()
 
       {:ok, nil}
+    else
+      _ ->
+        {:error, "cannot set account role permissions"}
     end
   end
 
-  def update_account_role_priorities(%Marketplace{} = marketplace, role_names)
-      when is_list(role_names) do
+  def update_account_role_priorities(
+        %MarketplaceAccount{} = initiator,
+        [role_name | _] = role_names
+      )
+      when is_bitstring(role_name) do
+    with true <-
+           can_act?(
+             initiator,
+             PermissionDefs.marketplaces__marketplace_account_role__update()
+           ),
+         initiator = Repo.preload(initiator, [:marketplace]) do
+      update_account_role_priorities(initiator.marketplace, role_names)
+    else
+      _ ->
+        {:error, "cannot update account role priorities"}
+    end
+  end
+
+  def update_account_role_priorities(%Marketplace{} = marketplace, [_ | _] = role_names) do
     all = all_account_roles(marketplace)
 
     all_names =
@@ -339,6 +404,59 @@ defmodule Growio.Marketplaces do
         |> Repo.transaction()
 
       {:ok, result}
+    else
+      _ ->
+        {:error, "cannot update account role priorities"}
+    end
+  end
+
+  defp can_act?(
+         %MarketplaceAccount{} = initiator,
+         permission
+       ) do
+    with initiator = Repo.preload(initiator, role: [:permissions]),
+         true <-
+           Enum.any?(initiator.role.permissions, fn p ->
+             p.name === permission
+           end) do
+      true
+    else
+      _ -> false
+    end
+  end
+
+  defp can_act?(
+         %MarketplaceAccount{} = initiator,
+         %MarketplaceAccountRole{} = role,
+         permission
+       ) do
+    with initiator = Repo.preload(initiator, role: [:permissions]),
+         true <-
+           Enum.any?(initiator.role.permissions, fn p ->
+             p.name === permission
+           end),
+         true <- initiator.role.priority <= role.priority do
+      true
+    else
+      _ -> false
+    end
+  end
+
+  defp can_act?(
+         %MarketplaceAccount{} = initiator,
+         %MarketplaceAccount{} = account,
+         permission
+       ) do
+    with initiator = Repo.preload(initiator, role: [:permissions]),
+         account = Repo.preload(account, role: [:permissions]),
+         true <-
+           Enum.any?(initiator.role.permissions, fn p ->
+             p.name === permission
+           end),
+         true <- initiator.role.priority < account.role.priority do
+      true
+    else
+      _ -> false
     end
   end
 end

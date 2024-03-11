@@ -1,13 +1,14 @@
 defmodule Growio.Permissions do
   alias Growio.Repo
   alias Growio.Permissions.Permission
+  alias Growio.Permissions.PermissionDefs
 
   @all_cache_ttl :timer.minutes(10)
 
   def definitions do
-    Growio.Permissions.Definitions.__info__(:functions)
+    PermissionDefs.__info__(:functions)
     |> Enum.map(fn {name, _} ->
-      apply(Growio.Permissions.Definitions, name, [])
+      apply(PermissionDefs, name, [])
     end)
   end
 
@@ -43,7 +44,7 @@ defmodule Growio.Permissions.Macro do
   end
 end
 
-defmodule Growio.Permissions.Definitions do
+defmodule Growio.Permissions.PermissionDefs do
   import Growio.Permissions.Macro
 
   permissions("bots", "telegram_bot")

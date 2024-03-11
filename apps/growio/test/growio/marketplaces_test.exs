@@ -4,6 +4,7 @@ defmodule Growio.MarketplacesTest do
   alias Growio.MarketplacesFixture
   alias Growio.Marketplaces
   alias Growio.Marketplaces.MarketplaceAccountRole
+  alias Growio.Permissions.PermissionDefs
 
   @valid_name "marketplace name"
 
@@ -20,13 +21,18 @@ defmodule Growio.MarketplacesTest do
 
     test "it should create account roles with incremented priorities" do
       account = AccountsFixture.account!()
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(account)
 
-      {:ok, role1} = Marketplaces.create_account_role(marketplace, %{name: "role1"})
+      %{marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(account)
 
-      {:ok, role2} = Marketplaces.create_account_role(marketplace, %{name: "role2"})
+      {:ok, role1} =
+        Marketplaces.create_account_role(marketplace_account, %{name: "role1"})
 
-      {:ok, role3} = Marketplaces.create_account_role(marketplace, %{name: "role3"})
+      {:ok, role2} =
+        Marketplaces.create_account_role(marketplace_account, %{name: "role2"})
+
+      {:ok, role3} =
+        Marketplaces.create_account_role(marketplace_account, %{name: "role3"})
 
       assert role1.priority == 2
       assert role2.priority == 3
@@ -34,11 +40,17 @@ defmodule Growio.MarketplacesTest do
     end
 
     test "it should update role priorities" do
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+      %{marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
-      {:ok, _} = Marketplaces.create_account_role(marketplace, %{name: "role1"})
-      {:ok, _} = Marketplaces.create_account_role(marketplace, %{name: "role2"})
-      {:ok, _} = Marketplaces.create_account_role(marketplace, %{name: "role3"})
+      {:ok, _} =
+        Marketplaces.create_account_role(marketplace_account, %{name: "role1"})
+
+      {:ok, _} =
+        Marketplaces.create_account_role(marketplace_account, %{name: "role2"})
+
+      {:ok, _} =
+        Marketplaces.create_account_role(marketplace_account, %{name: "role3"})
 
       {:ok,
        [
@@ -47,12 +59,10 @@ defmodule Growio.MarketplacesTest do
          %MarketplaceAccountRole{name: "role2", priority: 2},
          %MarketplaceAccountRole{name: "role1", priority: 3}
        ]} =
-        Marketplaces.update_account_role_priorities(marketplace, [
-          "owner",
-          "role3",
-          "role2",
-          "role1"
-        ])
+        Marketplaces.update_account_role_priorities(
+          marketplace_account,
+          ["owner", "role3", "role2", "role1"]
+        )
 
       {:ok,
        [
@@ -61,33 +71,36 @@ defmodule Growio.MarketplacesTest do
          %MarketplaceAccountRole{name: "role3", priority: 2},
          %MarketplaceAccountRole{name: "role1", priority: 3}
        ]} =
-        Marketplaces.update_account_role_priorities(marketplace, [
-          "owner",
-          "role2",
-          "role3",
-          "role1"
-        ])
+        Marketplaces.update_account_role_priorities(
+          marketplace_account,
+          ["owner", "role2", "role3", "role1"]
+        )
     end
 
     test "it should set new role permissions" do
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
       role = Marketplaces.get_account_role(marketplace, "owner")
 
       {:ok, _} =
-        Marketplaces.set_account_role_permissions(role, [
-          Growio.Permissions.Definitions.marketplaces__marketplace_item__create()
-        ])
+        Marketplaces.set_account_role_permissions(
+          marketplace_account,
+          role,
+          [PermissionDefs.marketplaces__marketplace_item__create()]
+        )
     end
 
     test "delete account role" do
-      %{marketplace: marketplace} = MarketplacesFixture.marketplace!(AccountsFixture.account!())
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
       role = Marketplaces.get_account_role(marketplace, "owner")
 
       {:error, _} = Marketplaces.delete_account_role(role)
 
-      {:ok, role} = Marketplaces.create_account_role(marketplace, %{name: "role1"})
+      {:ok, role} =
+        Marketplaces.create_account_role(marketplace_account, %{name: "role1"})
 
       {:ok, _} = Marketplaces.delete_account_role(role)
 
@@ -123,26 +136,47 @@ defmodule Growio.MarketplacesTest do
     end
 
     test "assign new role" do
-      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+      %{marketplace_account: marketplace_account} =
         MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
-      {:ok, role} = Marketplaces.create_account_role(marketplace, %{name: "role1"})
+      {:ok, role1} =
+        Marketplaces.create_account_role(marketplace_account, %{name: "role1"})
 
-      {:error, _} = Marketplaces.assign_account_role(marketplace_account, role)
+      {:ok, target_marketplace_account} =
+        Marketplaces.add_account_to_marketplace(
+          marketplace_account,
+          AccountsFixture.account!(),
+          role1
+        )
 
-      {:ok, updated_account} =
-        Marketplaces.assign_account_role(marketplace_account, role, force: true)
+      {:ok, target_marketplace_account} =
+        Marketplaces.assign_account_role(
+          marketplace_account,
+          target_marketplace_account,
+          role1
+        )
 
-      assert updated_account.role_id == role.id
+      {:error, _} =
+        Marketplaces.assign_account_role(
+          target_marketplace_account,
+          marketplace_account,
+          role1
+        )
+
+      {:ok, marketplace_account} =
+        Marketplaces.assign_account_role(marketplace_account, role1)
+
+      assert marketplace_account.role_id == role1.id
     end
 
     test "update a role" do
       updated_name = "test"
 
-      %{marketplace: marketplace, role: role} =
+      %{role: role, marketplace_account: marketplace_account} =
         MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
-      {:ok, role2} = Marketplaces.create_account_role(marketplace, %{name: "role2"})
+      {:ok, role2} =
+        Marketplaces.create_account_role(marketplace_account, %{name: "role2"})
 
       {:error, _} = Marketplaces.update_account_role(role, %{name: "test"})
 
@@ -157,27 +191,20 @@ defmodule Growio.MarketplacesTest do
         MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
       {:ok, role1} =
-        Marketplaces.create_account_role(marketplace, %{name: "role1"})
+        Marketplaces.create_account_role(marketplace_account, %{name: "role1"})
 
       {:ok, target_marketplace_account} =
         Marketplaces.add_account_to_marketplace(
-          initiator: marketplace_account,
-          target: AccountsFixture.account!(),
-          marketplace: marketplace,
-          role: role1
+          marketplace_account,
+          AccountsFixture.account!(),
+          role1
         )
 
       {:ok, target_marketplace_account} =
-        Marketplaces.block_account(
-          initiator: marketplace_account,
-          target: target_marketplace_account
-        )
+        Marketplaces.block_account(marketplace_account, target_marketplace_account)
 
       {:error, _} =
-        Marketplaces.block_account(
-          initiator: marketplace_account,
-          target: target_marketplace_account
-        )
+        Marketplaces.block_account(marketplace_account, target_marketplace_account)
 
       assert Enum.any?(
                Marketplaces.all_accounts(marketplace),
@@ -201,9 +228,10 @@ defmodule Growio.MarketplacesTest do
              )
 
       {:ok, target_marketplace_account} =
-        Marketplaces.undo_block_account(target_marketplace_account)
+        Marketplaces.undo_block_account(marketplace_account, target_marketplace_account)
 
-      {:error, _} = Marketplaces.undo_block_account(target_marketplace_account)
+      {:error, _} =
+        Marketplaces.undo_block_account(marketplace_account, target_marketplace_account)
 
       assert Enum.any?(
                Marketplaces.all_accounts(marketplace),
