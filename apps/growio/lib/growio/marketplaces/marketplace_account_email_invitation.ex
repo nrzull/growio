@@ -1,17 +1,19 @@
-defmodule Growio.Accounts.AccountEmailOTP do
+defmodule Growio.Marketplaces.MarketplaceAccountEmailInvitation do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Growio.Accounts.Account
   alias Growio.Utils
+  alias Growio.Marketplaces.MarketplaceAccountRole
+  alias Growio.Accounts.Account
 
   @type t :: %__MODULE__{}
   @required ~w(email)a
   @optional ~w()a
 
-  schema "account_email_otp" do
+  schema "marketplace_account_email_invitations" do
     field(:email, :string)
     field(:password, :string)
     field(:expired_at, :naive_datetime)
+    belongs_to(:role, MarketplaceAccountRole)
     timestamps()
   end
 
@@ -33,7 +35,7 @@ defmodule Growio.Accounts.AccountEmailOTP do
 
   defp generate_expired_at() do
     NaiveDateTime.utc_now()
-    |> NaiveDateTime.add(5, :minute)
+    |> NaiveDateTime.add(30, :minute)
     |> NaiveDateTime.truncate(:second)
   end
 end

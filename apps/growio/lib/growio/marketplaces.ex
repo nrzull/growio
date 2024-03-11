@@ -5,6 +5,7 @@ defmodule Growio.Marketplaces do
   alias Ecto.Multi
   alias Growio.Utils
   alias Growio.Repo
+  alias Growio.Accounts
   alias Growio.Accounts.Account
   alias Growio.Permissions
   alias Growio.Marketplaces.Marketplace
@@ -15,6 +16,7 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceItem
   alias Growio.Marketplaces.MarketplaceItemVariant
   alias Growio.Marketplaces.MarketplaceItemAsset
+  alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
 
   def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
@@ -871,5 +873,96 @@ defmodule Growio.Marketplaces do
 
   def delete_item_asset(%MarketplaceItemAsset{} = asset) do
     Repo.delete(asset)
+  end
+
+  def create_account_email_invitation(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceAccountRole{} = role,
+        %{} = params
+      ) do
+    with true <-
+           Permissions.ok?(
+             initiator,
+             role,
+             marketplaces__marketplace_account_email_invitation__create()
+           ) do
+      create_account_email_invitation(role, params)
+    else
+      _ -> {:error, "cannot create an account email invitation"}
+    end
+  end
+
+  def create_account_email_invitation(%MarketplaceAccountRole{} = role, %{} = params) do
+    with changeset = %Changeset{valid?: true} <-
+           MarketplaceAccountEmailInvitation.insert_changeset(params)
+           |> Changeset.put_assoc(:role, role),
+         email = Changeset.fetch_change!(changeset, :email) do
+      if email_validation = get_account_email_invitation(:email, email) do
+        {:ok, _} = delete_account_email_invitation(email_validation)
+      end
+
+      Repo.insert(changeset)
+    end
+  end
+
+  def get_account_email_invitation(:email, email) when is_bitstring(email) do
+    now = Utils.naive_utc_now()
+
+    MarketplaceAccountEmailInvitation
+    |> where([a], a.email == ^email and a.expired_at > ^now)
+    |> order_by(desc: :id)
+    |> Repo.one()
+  end
+
+  def get_account_email_invitation(:password, password) when is_bitstring(password) do
+    now = Utils.naive_utc_now()
+
+    MarketplaceAccountEmailInvitation
+    |> where([a], a.password == ^password and a.expired_at > ^now)
+    |> order_by(desc: :id)
+    |> Repo.one()
+  end
+
+  def delete_account_email_invitation(%MarketplaceAccountEmailInvitation{} = struct) do
+    Repo.delete(struct)
+  end
+
+  def use_account_email_invitation(password) when is_bitstring(password) do
+    with invitation = %MarketplaceAccountEmailInvitation{} <-
+           get_account_email_invitation(:password, password),
+         invitation = Repo.preload(invitation, role: [:marketplace]) do
+      Multi.new()
+      |> Multi.run(:account, fn repo, %{} ->
+        Accounts.create_account(%{email: invitation.email}, repo: repo)
+      end)
+      |> Multi.run(:has_marketplace_account, fn repo, %{account: account} ->
+        exists? =
+          MarketplaceAccount
+          |> where([marketplace_account], marketplace_account.account_id == ^account.id)
+          |> where(
+            [marketplace_account],
+            marketplace_account.marketplace_id == ^invitation.role.marketplace_id
+          )
+          |> repo.exists?()
+
+        (exists? && {:error, "marketplace account already exists"}) || {:ok, false}
+      end)
+      |> Multi.run(:marketplace_account, fn repo, %{account: account} ->
+        add_account_to_marketplace(
+          account,
+          invitation.role.marketplace,
+          invitation.role,
+          repo: repo
+        )
+      end)
+      |> Multi.delete(:delete_invitation, invitation)
+      |> Repo.transaction()
+      |> case do
+        {:ok, _} = v -> v
+        _ -> {:error, "cannot use an account email invitation"}
+      end
+    else
+      _ -> {:error, "cannot use an account email invitation"}
+    end
   end
 end

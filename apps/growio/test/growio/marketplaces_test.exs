@@ -10,8 +10,7 @@ defmodule Growio.MarketplacesTest do
   alias Growio.Marketplaces.MarketplaceItem
   alias Growio.Marketplaces.MarketplaceItemVariant
   alias Growio.Marketplaces.MarketplaceItemAsset
-
-  @valid_name "marketplace name"
+  alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
 
   describe "Growio.Marketplaces" do
     test "get marketplace accounts of a marketplace" do
@@ -49,11 +48,12 @@ defmodule Growio.MarketplacesTest do
 
     test "it should create role, marketplace and marketplace account" do
       account = AccountsFixture.account!()
+      marketplace_name = "marketplace name"
 
       {:ok, %{marketplace: marketplace, marketplace_account: marketplace_account}} =
-        Marketplaces.create_marketplace(account, %{name: @valid_name})
+        Marketplaces.create_marketplace(account, %{name: marketplace_name})
 
-      assert marketplace.name == @valid_name
+      assert marketplace.name == marketplace_name
       assert marketplace_account.account_id == account.id
     end
 
@@ -514,6 +514,52 @@ defmodule Growio.MarketplacesTest do
       {:ok, deleted_asset} = Marketplaces.delete_item_asset(marketplace_account, asset)
 
       assert asset.id == deleted_asset.id
+    end
+
+    test "create an account email invitation" do
+      email = "hello@example.com"
+
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      role = MarketplacesFixture.role!(marketplace)
+
+      Marketplaces.create_account_email_invitation(marketplace_account, role, %{
+        email: email
+      })
+
+      %MarketplaceAccountEmailInvitation{id: id1, email: fetched_email} =
+        Marketplaces.get_account_email_invitation(:email, email)
+
+      assert email == fetched_email
+
+      Marketplaces.create_account_email_invitation(marketplace_account, role, %{
+        email: email
+      })
+
+      %MarketplaceAccountEmailInvitation{id: id2} =
+        Marketplaces.get_account_email_invitation(:email, email)
+
+      refute id1 == id2
+    end
+
+    test "use an account email invitation" do
+      email = "hello@example.com"
+
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      role = MarketplacesFixture.role!(marketplace)
+
+      {:ok, %MarketplaceAccountEmailInvitation{password: password}} =
+        Marketplaces.create_account_email_invitation(marketplace_account, role, %{
+          email: email
+        })
+
+      {:ok, %{marketplace_account: _}} =
+        Marketplaces.use_account_email_invitation(password)
+
+      nil = Marketplaces.get_account_email_invitation(:email, email)
     end
   end
 

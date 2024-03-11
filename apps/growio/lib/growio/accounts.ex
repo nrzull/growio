@@ -14,24 +14,26 @@ defmodule Growio.Accounts do
     Repo.get_by(Account, email: email)
   end
 
-  def create_account(%{} = params) do
+  def create_account(%{} = params, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Repo)
+
     with changeset = %Changeset{valid?: true} <- Account.insert_changeset(params) do
       {:ok,
        get_account_by(:email, Changeset.fetch_field!(changeset, :email)) ||
-         Repo.insert!(changeset)}
+         repo.insert!(changeset)}
     end
   end
 
   def create_account_email_otp(%{} = params) do
     with changeset = %Changeset{valid?: true} <-
            AccountEmailOTP.insert_changeset(params) do
-      email = Ecto.Changeset.fetch_field!(changeset, :email)
+      email = Ecto.Changeset.fetch_change!(changeset, :email)
 
       if active_otp = get_active_account_email_otp(email) do
         {:ok, _} = delete_account_email_otp(active_otp)
       end
 
-      {:ok, Repo.insert!(changeset)}
+      Repo.insert(changeset)
     end
   end
 
