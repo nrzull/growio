@@ -31,7 +31,7 @@ defmodule GrowioWeb.Router do
 
   scope "/api/accounts" do
     pipe_through([:api])
-    get("/me", AccountController, :me)
+    get("/self", AccountController, :self)
   end
 
   if Application.compile_env(:growio_web, :dev_routes) do

@@ -1,1 +1,3 @@
-<template>app</template>
+<template>
+  <RouterView />
+</template>

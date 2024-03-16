@@ -4,6 +4,7 @@ import { browserslistToTargets } from "lightningcss";
 import browserslist from "browserslist";
 
 export default defineConfig({
+  envDir: new URL("../../", import.meta.url).pathname,
   plugins: [vue()],
   resolve: {
     alias: {
@@ -18,5 +19,8 @@ export default defineConfig({
   },
   build: {
     cssMinify: "lightningcss",
+  },
+  server: {
+    port: 3000,
   },
 });

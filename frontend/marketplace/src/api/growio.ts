@@ -1,0 +1,26 @@
+import axios from "axios";
+import { AccountRaw } from "~/api/growio/types";
+
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_GROWIO_API,
+});
+
+export const apiAuthSendEmail = (params: { email: string }) =>
+  api
+    .post<{ email: string; password?: string; expiredAt: string }>(
+      "/auth/email",
+      params
+    )
+    .then((r) => r.data);
+
+export const apiAuthSendEmailOtp = (params: {
+  email: string;
+  password: string;
+}) => api.post("/auth/email/otp", params);
+
+export const apiAuthSignout = () => api.get("/auth/signout");
+
+export const apiAuthHealthcheck = () => api.get("/auth/healthcheck");
+
+export const apiAccountsGetSelf = () =>
+  api.get<AccountRaw>("/accounts/self").then((r) => r.data);
