@@ -6,9 +6,49 @@ defmodule GrowioWeb.Schemas do
     schema(%{
       type: :object,
       properties: %{
-        id: %Schema{type: :integer, minimum: 1},
+        id: %Schema{type: :integer},
         email: %Schema{type: :string}
       }
+    })
+  end
+
+  defmodule Marketplace do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer},
+        name: %Schema{type: :string}
+      }
+    })
+  end
+
+  defmodule MarketplaceAccountRole do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer},
+        name: %Schema{type: :string},
+        description: %Schema{type: :string},
+        priority: %Schema{type: :integer}
+      }
+    })
+  end
+
+  defmodule MarketplaceAccount do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer},
+        role: MarketplaceAccountRole,
+        marketplace: Marketplace
+      }
+    })
+  end
+
+  defmodule MarketplaceAccounts do
+    schema(%{
+      type: :array,
+      items: MarketplaceAccount
     })
   end
 

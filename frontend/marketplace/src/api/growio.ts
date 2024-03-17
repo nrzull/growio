@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AccountRaw } from "~/api/growio/types";
+import { AccountRaw, MarketplaceAccountRaw } from "~/api/growio/types";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_GROWIO_API,
@@ -25,3 +25,8 @@ export const apiAuthHealthcheck = () => api.get("/auth/healthcheck");
 
 export const apiAccountsGetSelf = () =>
   api.get<AccountRaw>("/accounts/self").then((r) => r.data);
+
+export const apiMarketplaceAccountsGetSelf = () =>
+  api
+    .get<MarketplaceAccountRaw[]>("/marketplace_accounts/self")
+    .then((r) => r.data);
