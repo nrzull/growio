@@ -3,6 +3,7 @@ import { AccountRaw } from "~/api/growio/types";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_GROWIO_API,
+  withCredentials: true,
 });
 
 export const apiAuthSendEmail = (params: { email: string }) =>
