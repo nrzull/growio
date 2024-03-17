@@ -7,8 +7,8 @@
     "preview": "vite preview",
     "lint": "vue-tsc && eslint 'src/**/*.+(ts|vue)' && stylelint 'src/**/*.+(css|vue)'",
     "lint:fix": "eslint --fix 'src/**/*.+(ts|vue)' && stylelint --fix 'src/**/*.+(css|vue)'",
-    "lint:ts": "vue-tsc",
-    "lint:eslint": "eslint",
-    "lint:stylelint": "stylelint"
+    "vue-tsc": "vue-tsc",
+    "eslint": "eslint",
+    "stylelint": "stylelint"
   }
 }

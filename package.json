@@ -3,9 +3,9 @@
   "type": "module",
   "scripts": {
     "prepare": "husky",
-    "dev": "concurrently npm:apps:dev npm:marketplace:dev",
-    "apps:dev": "mix phx.server",
-    "marketplace:dev": "npm run dev -w @growio/marketplace"
+    "dev": "concurrently 'mix phx.server' 'npm run dev -w @growio/marketplace'",
+    "lint": "concurrently 'npm run lint -w @growio/marketplace'",
+    "lint:fix": "concurrently 'npm run lint:fix -w @growio/marketplace'"
   },
   "dependencies": {
     "axios": "1.6.8",
