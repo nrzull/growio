@@ -1,4 +1,4 @@
-import { apiAccountsGetSelf } from "~/api/growio";
+import { apiAccountsGetSelf } from "~/api/growio/accounts";
 import { account } from "~/composables/account";
 import { RouteLocationNormalized } from "vue-router";
 

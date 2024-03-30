@@ -1,4 +1,4 @@
 import { ref } from "vue";
-import { AccountRaw } from "~/api/growio/types";
+import { Account } from "~/api/growio/accounts/types";
 
-export const account = ref<AccountRaw>();
+export const account = ref<Account>();

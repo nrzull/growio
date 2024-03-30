@@ -4,7 +4,7 @@
   "scripts": {
     "prepare": "husky",
     "dev": "concurrently 'mix phx.server' 'npm run dev -w @growio/marketplace'",
-    "lint": "concurrently 'npm run lint -w @growio/marketplace'",
+    "lint": "concurrently 'npm run lint -w @growio/marketplace' 'npm run vue-tsc -w @growio/marketplace'",
     "lint:fix": "concurrently 'npm run lint:fix -w @growio/marketplace'"
   },
   "dependencies": {

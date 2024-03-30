@@ -80,4 +80,13 @@ defmodule GrowioWeb.Schemas do
       }
     })
   end
+
+  defmodule MarketplaceCreate do
+    schema(%{
+      type: :object,
+      properties: %{
+        name: %Schema{type: :string}
+      }
+    })
+  end
 end

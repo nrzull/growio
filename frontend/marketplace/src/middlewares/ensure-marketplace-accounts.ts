@@ -1,4 +1,4 @@
-import { apiMarketplaceAccountsGetSelf } from "~/api/growio";
+import { apiMarketplaceAccountsGetSelf } from "~/api/growio/marketplace_accounts";
 import { marketplaceAccounts } from "~/composables/marketplace-accounts";
 import { RouteLocationNormalized } from "vue-router";
 

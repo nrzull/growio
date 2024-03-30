@@ -35,7 +35,7 @@ import TextInput from "~/components/text-input.vue";
 import { useEmailAuth } from "~/composables/use-email-auth";
 import NotificationItem from "~/components/notifications/item.vue";
 import { account } from "~/composables/account";
-import { apiAuthSignout } from "~/api/growio";
+import { apiAuthSignout } from "~/api/growio/auth";
 import { useRoute, useRouter } from "vue-router";
 
 account.value && location.reload();

@@ -1,10 +1,6 @@
 <template>
   <button :class="[$style.button, $style[size], $style[type]]">
-    <img
-      v-if="icon"
-      :class="$style.icon"
-      :src="icon"
-    >
+    <img v-if="icon" :class="$style.icon" :src="icon" />
     <slot />
   </button>
 </template>

@@ -3,6 +3,7 @@ defmodule GrowioWeb.Router do
   alias GrowioWeb.Controllers.AuthController
   alias GrowioWeb.Controllers.AccountController
   alias GrowioWeb.Controllers.MarketplaceAccountController
+  alias GrowioWeb.Controllers.MarketplaceController
   alias GrowioWeb.Plugs.AuthPlug
 
   pipeline :guest do
@@ -38,6 +39,11 @@ defmodule GrowioWeb.Router do
   scope "/api/marketplace_accounts" do
     pipe_through([:api])
     get("/self", MarketplaceAccountController, :self)
+  end
+
+  scope "/api/marketplaces" do
+    pipe_through([:api])
+    post("/", MarketplaceController, :create)
   end
 
   if Application.compile_env(:growio_web, :dev_routes) do

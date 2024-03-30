@@ -31,11 +31,5 @@ defmodule Growio.Marketplaces.Marketplace do
     struct
     |> cast(params, @required ++ @optional)
     |> validate_required(@required)
-    |> validate_name()
-  end
-
-  defp validate_name(changeset) do
-    changeset
-    |> validate_format(:name, ~r/^[a-zA-Zа-яА-ЯёЁ0-9\s]{1,64}$/)
   end
 end

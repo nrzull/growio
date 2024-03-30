@@ -1,4 +1,4 @@
 import { ref } from "vue";
-import { MarketplaceAccountRaw } from "~/api/growio/types";
+import { MarketplaceAccount } from "~/api/growio/marketplace_accounts/types";
 
-export const marketplaceAccounts = ref<MarketplaceAccountRaw[]>([]);
+export const marketplaceAccounts = ref<MarketplaceAccount[]>([]);
