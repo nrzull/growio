@@ -1,17 +1,11 @@
-import { apiAccountsGetSelf } from "~/api/growio/accounts";
 import { account } from "~/composables/account";
 import { RouteLocationNormalized } from "vue-router";
+import { fetchAccount } from "~/composables/account";
 
 export const ensureAccount = async (to: RouteLocationNormalized) => {
-  if (account.value) {
-    return;
-  }
+  await fetchAccount();
 
-  try {
-    account.value = await apiAccountsGetSelf();
-  } catch (e) {
-    console.error(e);
-
+  if (!account.value) {
     return {
       path: "/auth",
       query: { to: to.fullPath },

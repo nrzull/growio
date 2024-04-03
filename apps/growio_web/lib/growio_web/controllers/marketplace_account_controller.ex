@@ -30,4 +30,22 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
 
     Conn.ok(conn, values)
   end
+
+  operation(:self_active,
+    summary: "get self active marketplace account",
+    responses: [ok: {"", "application/json", Schemas.MarketplaceAccount}]
+  )
+
+  def self_active(%{assigns: %{account: account}} = conn, _opts) do
+    # TODO: implement
+
+    value =
+      account
+      |> Marketplaces.all_accounts()
+      |> List.first()
+      |> Repo.preload([:marketplace, :role])
+      |> MarketplaceAccountJSON.render()
+
+    Conn.ok(conn, value)
+  end
 end

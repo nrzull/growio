@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { ensureAccount } from "~/middlewares/ensure-account";
 import { ensureMarketplaceAccounts } from "~/middlewares/ensure-marketplace-accounts";
+import { fetchActiveMarketplaceAccount } from "~/composables/marketplace-accounts";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -19,7 +20,11 @@ export const router = createRouter({
     {
       path: "/",
       component: () => import("~/layouts/default.vue"),
-      beforeEnter: [ensureAccount, ensureMarketplaceAccounts],
+      beforeEnter: [
+        ensureAccount,
+        ensureMarketplaceAccounts,
+        fetchActiveMarketplaceAccount,
+      ],
       children: [
         {
           path: "",

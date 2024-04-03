@@ -1,24 +1,18 @@
-import { apiMarketplaceAccountsGetSelf } from "~/api/growio/marketplace_accounts";
-import { marketplaceAccounts } from "~/composables/marketplace-accounts";
+import {
+  marketplaceAccounts,
+  fetchMarketplaceAccounts,
+} from "~/composables/marketplace-accounts";
 import { RouteLocationNormalized } from "vue-router";
 
 export const ensureMarketplaceAccounts = async (
   to: RouteLocationNormalized
 ) => {
-  if (marketplaceAccounts.value.length) {
-    return;
-  }
+  await fetchMarketplaceAccounts();
 
-  try {
-    marketplaceAccounts.value = await apiMarketplaceAccountsGetSelf();
-
-    if (!marketplaceAccounts.value.length) {
-      return {
-        path: "/setup",
-        query: { to: to.fullPath },
-      };
-    }
-  } catch (e) {
-    console.error(e);
+  if (!marketplaceAccounts.value.length) {
+    return {
+      path: "/setup",
+      query: { to: to.fullPath },
+    };
   }
 };
