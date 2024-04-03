@@ -37,15 +37,35 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
   )
 
   def self_active(%{assigns: %{account: account}} = conn, _opts) do
-    # TODO: implement
+    active_marketplace_account_id = Conn.get_active_marketplace_account_id(conn)
 
-    value =
-      account
-      |> Marketplaces.all_accounts()
-      |> List.first()
-      |> Repo.preload([:marketplace, :role])
-      |> MarketplaceAccountJSON.render()
+    setup_initial_account = fn ->
+      value =
+        account
+        |> Marketplaces.all_accounts()
+        |> List.first()
+        |> Repo.preload([:marketplace, :role])
+        |> MarketplaceAccountJSON.render()
 
-    Conn.ok(conn, value)
+      conn
+      |> Conn.set_active_marketplace_account_id(value.id)
+      |> Conn.ok(value)
+    end
+
+    case active_marketplace_account_id do
+      nil ->
+        setup_initial_account.()
+
+      _ ->
+        case Marketplaces.get_account(account, active_marketplace_account_id) do
+          nil ->
+            setup_initial_account.()
+
+          account ->
+            Repo.preload(account, [:marketplace, :role])
+            |> MarketplaceAccountJSON.render()
+            |> then(&Conn.ok(conn, &1))
+        end
+    end
   end
 end

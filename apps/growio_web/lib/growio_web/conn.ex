@@ -22,6 +22,9 @@ defmodule GrowioWeb.Conn do
   def refresh_token_max_age, do: 60 * 60 * 24
   def refresh_token_cache_ttl, do: :timer.hours(48)
 
+  def active_marketplace_account_cookie_name,
+    do: "growio-active-marketplace-account"
+
   def ok(conn, payload \\ nil) do
     conn
     |> put_status(200)
@@ -101,5 +104,24 @@ defmodule GrowioWeb.Conn do
     else
       Cache.put("refresh_cookie_#{name}", true, ttl: refresh_token_cache_ttl())
     end
+  end
+
+  def get_active_marketplace_account_id(conn) do
+    conn = Plug.Conn.fetch_cookies(conn)
+    result = conn.req_cookies[active_marketplace_account_cookie_name()]
+    if is_nil(result), do: nil, else: String.to_integer(result)
+  end
+
+  def set_active_marketplace_account_id(conn, id) do
+    Plug.Conn.put_resp_cookie(
+      conn,
+      active_marketplace_account_cookie_name(),
+      Integer.to_string(id),
+      domain: Map.get(conn, :host),
+      path: "/",
+      http_only: true,
+      same_site: "None",
+      secure: true
+    )
   end
 end
