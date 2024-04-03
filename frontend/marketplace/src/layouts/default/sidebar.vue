@@ -13,6 +13,7 @@
   flex-flow: column;
   align-items: center;
   gap: 24px;
+  overflow-x: clip;
   overflow-y: auto;
 }
 </style>
