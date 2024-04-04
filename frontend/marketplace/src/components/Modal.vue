@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.wrapper" @mousedown.self="$emit('close')">
-    <Shape :class="$style.shape">
+    <Shape :class="[$style.shape, $style[size]]">
       <div :class="$style.heading">
         <slot name="heading"></slot>
       </div>
@@ -17,9 +17,17 @@
 </template>
 
 <script setup lang="ts">
+import { PropType } from "vue";
 import Shape from "~/components/Shape.vue";
 
 defineEmits(["close"]);
+
+defineProps({
+  size: {
+    type: String as PropType<"md" | "lg">,
+    default: "md",
+  },
+});
 </script>
 
 <style module>
@@ -43,10 +51,17 @@ defineEmits(["close"]);
 }
 
 .shape {
-  min-width: 640px;
   display: flex;
   flex-flow: column;
   gap: 24px;
+}
+
+.shape.md {
+  min-width: 640px;
+}
+
+.shape.lg {
+  min-width: 960px;
 }
 
 .footer {

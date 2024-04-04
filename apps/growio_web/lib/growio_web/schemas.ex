@@ -34,12 +34,25 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
+  defmodule MarketplaceAccountRoleNullable do
+    schema(%{
+      type: :object,
+      nullable: true,
+      properties: %{
+        id: %Schema{type: :integer},
+        name: %Schema{type: :string},
+        description: %Schema{type: :string, nullable: true},
+        priority: %Schema{type: :integer}
+      }
+    })
+  end
+
   defmodule MarketplaceAccount do
     schema(%{
       type: :object,
       properties: %{
         id: %Schema{type: :integer},
-        role: MarketplaceAccountRole,
+        role: MarketplaceAccountRoleNullable,
         marketplace: Marketplace,
         account: Account
       }
@@ -87,6 +100,27 @@ defmodule GrowioWeb.Schemas do
       type: :object,
       properties: %{
         name: %Schema{type: :string}
+      }
+    })
+  end
+
+  defmodule MarketplaceAccountEmailInvitation do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer},
+        email: %Schema{type: :string},
+        role: MarketplaceAccountRoleNullable
+      }
+    })
+  end
+
+  defmodule MarketplaceAccountEmailInvitationCreateRequest do
+    schema(%{
+      type: :object,
+      properties: %{
+        email: %Schema{type: :string},
+        marketplace_account_role_id: %Schema{type: :integer}
       }
     })
   end

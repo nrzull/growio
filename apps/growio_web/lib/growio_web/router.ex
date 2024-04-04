@@ -4,6 +4,7 @@ defmodule GrowioWeb.Router do
   alias GrowioWeb.Controllers.AccountController
   alias GrowioWeb.Controllers.MarketplaceAccountController
   alias GrowioWeb.Controllers.MarketplaceController
+  alias GrowioWeb.Controllers.MarketplaceAccountEmailInvitationController
   alias GrowioWeb.Plugs.AuthPlug
   alias GrowioWeb.Plugs.MarketplaceAccountPlug
 
@@ -16,13 +17,16 @@ defmodule GrowioWeb.Router do
     plug(:accepts, ["html"])
   end
 
-  pipeline :account_api do
+  pipeline :account do
     plug(:accepts, ["json"])
     plug(OpenApiSpex.Plug.PutApiSpec, module: GrowioWeb.ApiSpec)
     plug(AuthPlug)
   end
 
-  pipeline :api do
+  pipeline :marketplace_account do
+    plug(:accepts, ["json"])
+    plug(OpenApiSpex.Plug.PutApiSpec, module: GrowioWeb.ApiSpec)
+    plug(AuthPlug)
     plug(MarketplaceAccountPlug)
   end
 
@@ -31,28 +35,33 @@ defmodule GrowioWeb.Router do
     post("/email", AuthController, :email)
     post("/email/otp", AuthController, :email_otp)
 
-    pipe_through([:account_api])
+    pipe_through([:account])
     get("/healthcheck", AuthController, :healthcheck)
     get("/signout", AuthController, :signout)
   end
 
   scope "/api/accounts" do
-    pipe_through([:account_api])
+    pipe_through([:account])
     get("/self", AccountController, :self)
   end
 
   scope "/api/marketplace_accounts" do
-    pipe_through([:account_api])
+    pipe_through([:account])
     get("/self", MarketplaceAccountController, :self)
     get("/self/active", MarketplaceAccountController, :self_active)
 
-    pipe_through([:api])
+    pipe_through([:marketplace_account])
     get("/", MarketplaceAccountController, :index)
   end
 
   scope "/api/marketplaces" do
-    pipe_through([:account_api])
+    pipe_through([:account])
     post("/", MarketplaceController, :create)
+  end
+
+  scope "/api/marketplace_account_email_invitations" do
+    pipe_through([:marketplace_account])
+    post("/", MarketplaceAccountEmailInvitationController, :create)
   end
 
   if Application.compile_env(:growio_web, :dev_routes) do

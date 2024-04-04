@@ -1,6 +1,8 @@
 defmodule GrowioWeb.SetupUtils do
   use GrowioWeb.ConnCase
+  alias Growio.Repo
   alias Growio.AccountsFixture
+  alias Growio.Marketplaces.MarketplaceAccount
 
   def auth(%{conn: conn}) do
     email = AccountsFixture.gen_account_email()
@@ -26,9 +28,16 @@ defmodule GrowioWeb.SetupUtils do
       conn
       |> post(~p"/api/marketplaces", %{name: account.email})
       |> get(~p"/api/marketplace_accounts/self/active")
+
+    %{"id" => id} = json_response(conn, 200)
+
+    marketplace_account = Repo.get(MarketplaceAccount, id)
+
+    conn =
+      conn
       |> recycle()
       |> Plug.Conn.put_req_header("content-type", "application/json")
 
-    {:ok, conn: conn}
+    {:ok, conn: conn, marketplace_account: marketplace_account}
   end
 end

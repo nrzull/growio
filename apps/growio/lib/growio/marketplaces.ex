@@ -204,18 +204,34 @@ defmodule Growio.Marketplaces do
 
   def get_account(%Marketplace{} = marketplace, id) when is_integer(id) do
     MarketplaceAccount
-    |> where([account], account.marketplace_id == ^marketplace.id and account.id == ^id)
+    |> where([account], account.id == ^id)
+    |> where([account], account.marketplace_id == ^marketplace.id)
     |> Repo.one()
   end
 
   def get_account(%Account{} = initiator, id) when is_integer(id) do
     MarketplaceAccount
-    |> where([account], account.account_id == ^initiator.id and account.id == ^id)
+    |> where([account], account.id == ^id)
+    |> where([account], account.account_id == ^initiator.id)
     |> Repo.one()
   end
 
   def get_account_role(%MarketplaceAccount{} = initiator) do
     {:ok, Map.get(Repo.preload(initiator, role: [:permissions]), :role)}
+  end
+
+  def get_account_role(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
+    MarketplaceAccountRole
+    |> where([role], role.id == ^id)
+    |> where([role], role.marketplace_id == ^initiator.marketplace_id)
+    |> Repo.one()
+  end
+
+  def get_account_role(%Marketplace{} = marketplace, name) when is_bitstring(name) do
+    MarketplaceAccountRole
+    |> where([role], role.name == ^name)
+    |> where([role], role.marketplace_id == ^marketplace.id)
+    |> Repo.one()
   end
 
   def create_account_role(%MarketplaceAccount{} = initiator, %{} = params) do
@@ -387,14 +403,6 @@ defmodule Growio.Marketplaces do
     |> Changeset.change()
     |> Changeset.force_change(:deleted_at, nil)
     |> Repo.update()
-  end
-
-  def get_account_role(%Marketplace{} = marketplace, name) do
-    Repo.one(
-      from(role in MarketplaceAccountRole,
-        where: role.name == ^name and role.marketplace_id == ^marketplace.id
-      )
-    )
   end
 
   def set_account_role_permissions(
