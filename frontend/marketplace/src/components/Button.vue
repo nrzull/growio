@@ -10,8 +10,8 @@ import { PropType } from "vue";
 
 defineProps({
   size: {
-    type: String as PropType<"sm" | "md">,
-    default: "md",
+    type: String as PropType<"sm" | "md" | "lg">,
+    default: "lg",
   },
 
   type: {
@@ -46,13 +46,17 @@ defineProps({
   cursor: pointer;
 }
 
-.button.md {
+.button.lg {
   padding: 16px;
 }
 
-.button.md .icon {
+.button.lg .icon {
   height: 16px;
   min-width: 16px;
+}
+
+.button.md {
+  padding: 12px 16px;
 }
 
 .button.sm {

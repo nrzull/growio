@@ -1,10 +1,24 @@
 <template>
   <PageLoader v-if="isLoading" />
 
+  <Modal v-if="inviteUserModal" @close="inviteUserModal = false">
+    <template #heading>Invite User</template>
+
+    <div>
+      <TextInput placeholder="Email" />
+    </div>
+
+    <template #footer>
+      <Button size="md">Submit</Button>
+    </template>
+  </Modal>
+
   <PageShape>
     <template #heading>Users</template>
     <template #tools>
-      <Button size="sm" :icon="plusSvg">Invite</Button>
+      <Button size="sm" :icon="plusSvg" @click="inviteUserModal = true">
+        Invite
+      </Button>
     </template>
 
     <Table :table="table" />
@@ -26,7 +40,11 @@ import { apiMarketplaceAccountsGetAll } from "~/api/growio/marketplace_accounts"
 import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
 import Button from "~/components/Button.vue";
+import Modal from "~/components/Modal.vue";
+import TextInput from "~/components/TextInput.vue";
 import plusSvg from "~/assets/plus.svg";
+
+const inviteUserModal = ref(false);
 
 const marketplaceAccounts = ref<MarketplaceAccount[]>([]);
 
