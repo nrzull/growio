@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-bind="wrapperAttrs"
-    :class="$style.wrapper"
-  >
+  <div v-bind="wrapperAttrs" :class="$style.wrapper">
     <div :class="$style.textInputWrapper">
       <label
         v-if="$attrs.placeholder"
@@ -25,7 +22,7 @@
         @focus="focused = true"
         @blur="focused = false"
         @input="(ev: any) => $emit('update:model-value', ev.target?.value!)"
-      >
+      />
     </div>
 
     <div
@@ -45,15 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  PropType,
-  computed,
-  ref,
-  defineEmits,
-  defineProps,
-  useAttrs,
-  defineOptions,
-} from "vue";
+import { PropType, computed, ref, useAttrs } from "vue";
 import { pick } from "remeda";
 
 defineOptions({ inheritAttrs: false });

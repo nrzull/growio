@@ -17,7 +17,7 @@ import Sidebar from "~/layouts/default/sidebar.vue";
 .default {
   display: grid;
   grid-template-areas: "sidebar top" "sidebar main";
-  grid-template-columns: 120px 1fr;
+  grid-template-columns: max-content 1fr;
   grid-template-rows: 60px auto;
   height: 100%;
 }

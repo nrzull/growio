@@ -9,7 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from "vue";
 import { state } from "~/composables/notifications";
 import NotificationItem from "~/components/notifications/item.vue";
 </script>
