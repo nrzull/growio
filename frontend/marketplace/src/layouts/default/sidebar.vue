@@ -19,20 +19,13 @@
 </template>
 
 <script setup>
-import dashboardTileSvg from "~/assets/dashboard-tile-solid.svg?raw";
 import usersSvg from "~/assets/users.svg?raw";
 
 const buttons = [
   {
-    icon: dashboardTileSvg,
-    text: "Dashboard",
-    to: "/",
-  },
-
-  {
     icon: usersSvg,
-    text: "Staff",
-    to: "/staff",
+    text: "Users",
+    to: "/users",
   },
 ];
 </script>

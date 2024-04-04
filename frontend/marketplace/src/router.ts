@@ -27,8 +27,13 @@ export const router = createRouter({
       ],
       children: [
         {
+          path: "users",
+          component: () => import("~/pages/users.vue"),
+        },
+
+        {
           path: "",
-          component: () => import("~/pages/dashboard.vue"),
+          redirect: "/users",
         },
       ],
     },

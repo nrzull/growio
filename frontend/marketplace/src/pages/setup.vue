@@ -1,9 +1,9 @@
 <template>
-  <LoaderPage />
+  <PageLoader />
 </template>
 
 <script setup lang="ts">
-import LoaderPage from "~/components/loader-page.vue";
+import PageLoader from "~/components/page-loader.vue";
 import { apiMarketplaceAccountsGetSelf } from "~/api/growio/marketplace_accounts";
 import { account } from "~/composables/account";
 import { apiMarketplacesCreate } from "~/api/growio/marketplaces";

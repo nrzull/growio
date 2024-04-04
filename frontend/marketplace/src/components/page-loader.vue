@@ -1,5 +1,5 @@
 <template>
-  <section :class="$style.loaderPage">
+  <section :class="$style.pageLoader">
     <LoaderIcon />
   </section>
 </template>
@@ -9,7 +9,7 @@ import LoaderIcon from "~/components/loader-icon.vue";
 </script>
 
 <style module>
-.loaderPage {
+.pageLoader {
   position: fixed;
   top: 0;
   left: 0;

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@floating-ui/vue": "1.0.6",
+    "@tanstack/vue-table": "8.15.3",
     "axios": "1.6.8",
     "modern-normalize": "2.0.0",
     "remeda": "1.47.1",
