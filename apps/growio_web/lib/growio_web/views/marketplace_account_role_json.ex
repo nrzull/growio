@@ -11,4 +11,6 @@ defmodule GrowioWeb.Views.MarketplaceAccountRoleJSON do
       priority: role.priority
     }
   end
+
+  def render(_value), do: nil
 end

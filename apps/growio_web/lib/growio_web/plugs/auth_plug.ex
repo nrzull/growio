@@ -37,16 +37,13 @@ defmodule GrowioWeb.Plugs.AuthPlug do
       (is_bitstring(refresh_token_age) && String.to_integer(refresh_token_age)) ||
         refresh_token_age
 
-    with {:has_pair, [true, true]} <-
-           {:has_pair, [is_bitstring(access_cookie), is_bitstring(refresh_cookie)]},
-         {:invalidated, false} <-
-           {:invalidated, Conn.invalidated_refresh_cookie?(refresh_cookie)},
-         {:decode_refresh, {:ok, decoded_refresh_token}} <-
-           {:decode_refresh, JWT.decode_jwt(refresh_cookie, refresh_token_age)},
+    with [true, true] <-
+           [is_bitstring(access_cookie), is_bitstring(refresh_cookie)],
+         false <- Conn.invalidated_refresh_cookie?(refresh_cookie),
+         {:ok, decoded_refresh_token} <- JWT.decode_jwt(refresh_cookie, refresh_token_age),
          {:decode_access, {:ok, decoded_access_token}} <-
            {:decode_access, JWT.decode_jwt(access_cookie, access_token_age)},
-         {:valid_pair, true} <-
-           {:valid_pair, Map.get(decoded_refresh_token, :access_token) == access_cookie},
+         true <- Map.get(decoded_refresh_token, :access_token) == access_cookie,
          %{account_id: account_id} <- decoded_access_token,
          account = %Account{} <- Accounts.get_account_by(:id, account_id) do
       ok(conn, account)

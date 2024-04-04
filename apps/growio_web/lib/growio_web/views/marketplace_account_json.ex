@@ -1,5 +1,6 @@
 defmodule GrowioWeb.Views.MarketplaceAccountJSON do
   alias Growio.Marketplaces.MarketplaceAccount
+  alias GrowioWeb.Views.AccountJSON
   alias GrowioWeb.Views.MarketplaceJSON
   alias GrowioWeb.Views.MarketplaceAccountRoleJSON
 
@@ -8,8 +9,11 @@ defmodule GrowioWeb.Views.MarketplaceAccountJSON do
   def render(%MarketplaceAccount{} = account) do
     %{
       id: account.id,
-      role: MarketplaceAccountRoleJSON.render(account.role),
-      marketplace: MarketplaceJSON.render(account.marketplace)
+      role: MarketplaceAccountRoleJSON.render(Map.get(account, :role)),
+      marketplace: MarketplaceJSON.render(Map.get(account, :marketplace)),
+      account: AccountJSON.render(Map.get(account, :account))
     }
   end
+
+  def render(_value), do: nil
 end

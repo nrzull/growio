@@ -9,4 +9,6 @@ defmodule GrowioWeb.Views.MarketplaceJSON do
       name: marketplace.name
     }
   end
+
+  def render(_value), do: nil
 end

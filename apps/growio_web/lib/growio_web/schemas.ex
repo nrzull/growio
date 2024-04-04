@@ -28,7 +28,7 @@ defmodule GrowioWeb.Schemas do
       properties: %{
         id: %Schema{type: :integer},
         name: %Schema{type: :string},
-        description: %Schema{type: :string},
+        description: %Schema{type: :string, nullable: true},
         priority: %Schema{type: :integer}
       }
     })
@@ -40,7 +40,8 @@ defmodule GrowioWeb.Schemas do
       properties: %{
         id: %Schema{type: :integer},
         role: MarketplaceAccountRole,
-        marketplace: Marketplace
+        marketplace: Marketplace,
+        account: Account
       }
     })
   end

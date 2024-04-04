@@ -6,12 +6,24 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountControllerTest do
     setup [{SetupUtils, :auth}]
 
     test "it should return self marketplace accounts", %{conn: conn, api_spec: api_spec} do
-      result =
-        conn
-        |> get(~p"/api/marketplace_accounts/self")
-        |> json_response(200)
+      conn
+      |> get(~p"/api/marketplace_accounts/self")
+      |> json_response(200)
+      |> assert_schema("MarketplaceAccounts", api_spec)
+    end
+  end
 
-      assert_schema(result, "MarketplaceAccounts", api_spec)
+  describe "GET /api/marketplace_accounts" do
+    setup [{SetupUtils, :auth}, {SetupUtils, :marketplace_account}]
+
+    test "it should return marketplace accounts of current active marketplace", %{
+      conn: conn,
+      api_spec: api_spec
+    } do
+      conn
+      |> get(~p"/api/marketplace_accounts")
+      |> json_response(200)
+      |> assert_schema("MarketplaceAccounts", api_spec)
     end
   end
 end

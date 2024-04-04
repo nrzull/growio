@@ -16,19 +16,30 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
 
   tags(["marketplace_accounts"])
 
+  operation(:index,
+    summary: "get marketplace accounts",
+    responses: [ok: {"", "application/json", Schemas.MarketplaceAccounts}]
+  )
+
+  def index(%{assigns: %{marketplace_account: marketplace_account}} = conn, _opts) do
+    marketplace_account
+    |> Marketplaces.all_accounts()
+    |> Enum.map(&Repo.preload(&1, [:marketplace, :role, :account]))
+    |> MarketplaceAccountJSON.render()
+    |> then(&Conn.ok(conn, &1))
+  end
+
   operation(:self,
     summary: "get self marketplace accounts",
     responses: [ok: {"", "application/json", Schemas.MarketplaceAccounts}]
   )
 
   def self(%{assigns: %{account: account}} = conn, _opts) do
-    values =
-      account
-      |> Marketplaces.all_accounts()
-      |> Enum.map(&Repo.preload(&1, [:marketplace, :role]))
-      |> MarketplaceAccountJSON.render()
-
-    Conn.ok(conn, values)
+    account
+    |> Marketplaces.all_accounts()
+    |> Enum.map(&Repo.preload(&1, [:marketplace, :role]))
+    |> MarketplaceAccountJSON.render()
+    |> then(&Conn.ok(conn, &1))
   end
 
   operation(:self_active,
@@ -62,7 +73,8 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
             setup_initial_account.()
 
           account ->
-            Repo.preload(account, [:marketplace, :role])
+            account
+            |> Repo.preload([:marketplace, :role])
             |> MarketplaceAccountJSON.render()
             |> then(&Conn.ok(conn, &1))
         end

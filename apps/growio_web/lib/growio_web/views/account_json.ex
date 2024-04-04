@@ -9,4 +9,6 @@ defmodule GrowioWeb.Views.AccountJSON do
       email: account.email
     }
   end
+
+  def render(_value), do: nil
 end
