@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import Top from "~/layouts/default/top.vue";
-import Sidebar from "~/layouts/default/sidebar.vue";
+import Top from "~/layouts/Default/Top.vue";
+import Sidebar from "~/layouts/Default/Sidebar.vue";
 </script>
 
 <style module>

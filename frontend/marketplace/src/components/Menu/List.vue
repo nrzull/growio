@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { PropType, defineOptions, ref } from "vue";
-import Dropdown from "~/components/dropdown.vue";
+import Dropdown from "~/components/Dropdown.vue";
 
 type Item = Record<any, any>;
 

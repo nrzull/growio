@@ -19,7 +19,7 @@ export const router = createRouter({
 
     {
       path: "/",
-      component: () => import("~/layouts/default.vue"),
+      component: () => import("~/layouts/Default.vue"),
       beforeEnter: [
         ensureAccount,
         ensureMarketplaceAccounts,

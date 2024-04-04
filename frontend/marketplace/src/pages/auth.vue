@@ -28,12 +28,12 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import Shape from "~/components/shape.vue";
-import Button from "~/components/button.vue";
-import Heading from "~/components/shape/heading.vue";
-import TextInput from "~/components/text-input.vue";
+import Shape from "~/components/Shape.vue";
+import Button from "~/components/Button.vue";
+import Heading from "~/components/Shape/Heading.vue";
+import TextInput from "~/components/TextInput.vue";
 import { useEmailAuth } from "~/composables/use-email-auth";
-import NotificationItem from "~/components/notifications/item.vue";
+import NotificationItem from "~/components/Notifications/Item.vue";
 import { account } from "~/composables/account";
 import { apiAuthSignout } from "~/api/growio/auth";
 import { useRoute, useRouter } from "vue-router";

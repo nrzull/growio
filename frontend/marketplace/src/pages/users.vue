@@ -18,14 +18,14 @@ import {
   getCoreRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import Table from "~/components/table.vue";
+import Table from "~/components/Table.vue";
 import { MarketplaceAccount } from "~/api/growio/marketplace_accounts/types";
 import { wait } from "~/composables/wait";
 import { WAIT_MARKETPLACE_ACCOUNTS_FETCH } from "~/constants";
 import { apiMarketplaceAccountsGetAll } from "~/api/growio/marketplace_accounts";
-import PageLoader from "~/components/page-loader.vue";
-import PageShape from "~/components/page-shape.vue";
-import Button from "~/components/button.vue";
+import PageLoader from "~/components/PageLoader.vue";
+import PageShape from "~/components/PageShape.vue";
+import Button from "~/components/Button.vue";
 import plusSvg from "~/assets/plus.svg";
 
 const marketplaceAccounts = ref<MarketplaceAccount[]>([]);

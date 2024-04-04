@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import { state } from "~/composables/notifications";
-import NotificationItem from "~/components/notifications/item.vue";
+import NotificationItem from "~/components/Notifications/Item.vue";
 </script>
 
 <style module>

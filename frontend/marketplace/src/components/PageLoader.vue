@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import LoaderIcon from "~/components/loader-icon.vue";
+import LoaderIcon from "~/components/LoaderIcon.vue";
 </script>
 
 <style module>

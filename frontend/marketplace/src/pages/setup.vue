@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import PageLoader from "~/components/page-loader.vue";
+import PageLoader from "~/components/PageLoader.vue";
 import { apiMarketplaceAccountsGetSelf } from "~/api/growio/marketplace_accounts";
 import { account } from "~/composables/account";
 import { apiMarketplacesCreate } from "~/api/growio/marketplaces";

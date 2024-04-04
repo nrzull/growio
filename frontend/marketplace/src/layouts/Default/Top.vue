@@ -15,8 +15,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { marketplaceAccount } from "~/composables/marketplace-accounts";
-import Menu from "~/components/menu.vue";
-import Tag from "~/components/tag.vue";
+import Menu from "~/components/Menu.vue";
+import Tag from "~/components/Tag.vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();

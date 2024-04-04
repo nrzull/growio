@@ -83,7 +83,7 @@
 
 <script setup lang="ts">
 import { PropType } from "vue";
-import Shape from "~/components/shape.vue";
+import Shape from "~/components/Shape.vue";
 import {
   useVueTable,
   FlexRender,

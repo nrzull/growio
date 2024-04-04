@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import Shape from "~/components/shape.vue";
+import Shape from "~/components/Shape.vue";
 </script>
 
 <style module>

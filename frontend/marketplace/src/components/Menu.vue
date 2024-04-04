@@ -10,8 +10,8 @@
 
 <script setup lang="ts">
 import { ref, PropType } from "vue";
-import List from "~/components/menu/list.vue";
-import Dropdown from "~/components/dropdown.vue";
+import List from "~/components/Menu/List.vue";
+import Dropdown from "~/components/Dropdown.vue";
 
 defineProps({
   items: {
