@@ -8,12 +8,13 @@ defmodule Growio.Marketplaces.MarketplaceAccountRole do
 
   @type t :: %__MODULE__{}
   @required ~w(name)a
-  @optional ~w(description priority deleted_at)a
+  @optional ~w(description priority deleted_at virtual_permissions)a
 
   schema "marketplace_account_roles" do
     field(:name, :string)
     field(:description, :string)
     field(:priority, :integer)
+    field(:virtual_permissions, {:array, :string}, virtual: true)
 
     belongs_to(:marketplace, Marketplace)
     has_many(:accounts, MarketplaceAccount, foreign_key: :role_id)

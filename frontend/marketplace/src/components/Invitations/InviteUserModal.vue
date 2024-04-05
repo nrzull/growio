@@ -3,12 +3,12 @@
     <template #heading>Invite User</template>
 
     <div :class="$style.row">
-      <TextInput placeholder="Email" v-model="email" />
+      <TextInput v-model="email" placeholder="Email" />
       <SelectInput
+        v-model="role"
         placeholder="Role"
         track-by="id"
         label-path="name"
-        v-model="role"
         :items="roles"
       />
     </div>
@@ -26,7 +26,7 @@ import TextInput from "~/components/TextInput.vue";
 import SelectInput from "~/components/SelectInput.vue";
 import Button from "~/components/Button.vue";
 import { apiMarketplaceAccountRolesGetAll } from "~/api/growio/marketplace_account_roles";
-import { MarketplaceAccountRole } from "~/api/growio/types";
+import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
 import { apiMarketplaceAccountEmailInvitationsCreate } from "~/api/growio/marketplace_account_email_invitations";
 
 const email = ref();

@@ -32,6 +32,11 @@ export const router = createRouter({
         },
 
         {
+          path: "roles",
+          component: () => import("~/pages/roles.vue"),
+        },
+
+        {
           path: "",
           redirect: "/users",
         },

@@ -224,6 +224,7 @@ defmodule Growio.Marketplaces do
     MarketplaceAccountRole
     |> where([role], role.id == ^id)
     |> where([role], role.marketplace_id == ^initiator.marketplace_id)
+    |> preload([role], [:permissions])
     |> Repo.one()
   end
 
@@ -231,6 +232,7 @@ defmodule Growio.Marketplaces do
     MarketplaceAccountRole
     |> where([role], role.name == ^name)
     |> where([role], role.marketplace_id == ^marketplace.id)
+    |> preload([role], [:permissions])
     |> Repo.one()
   end
 
@@ -292,6 +294,7 @@ defmodule Growio.Marketplaces do
           query
       end
     end)
+    |> preload([role], [:permissions])
     |> Repo.all()
   end
 

@@ -1,5 +1,5 @@
 import { growio } from "~/api/growio";
-import { MarketplaceAccountRole } from "~/api/growio/types";
+import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
 
 export const apiMarketplaceAccountRolesGetAll = () =>
   growio

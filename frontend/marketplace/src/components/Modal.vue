@@ -36,13 +36,16 @@ defineProps({
   left: 0;
   top: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.02);
   z-index: var(--z-index-modal);
   display: flex;
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(8px);
+  flex-flow: wrap;
+  overflow-y: auto;
+  overflow-x: clip;
 }
 
 .heading {
@@ -57,11 +60,11 @@ defineProps({
 }
 
 .shape.md {
-  min-width: 640px;
+  width: 640px;
 }
 
 .shape.lg {
-  min-width: 960px;
+  width: 960px;
 }
 
 .footer {

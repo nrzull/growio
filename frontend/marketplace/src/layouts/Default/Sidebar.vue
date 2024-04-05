@@ -20,12 +20,19 @@
 
 <script setup>
 import usersSvg from "~/assets/users.svg?raw";
+import crownLineSvg from "~/assets/crown-line.svg?raw";
 
 const buttons = [
   {
     icon: usersSvg,
     text: "Users",
     to: "/users",
+  },
+
+  {
+    icon: crownLineSvg,
+    text: "Roles",
+    to: "/roles",
   },
 ];
 </script>

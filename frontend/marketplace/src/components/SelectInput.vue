@@ -10,10 +10,10 @@
   >
     <TextInput
       v-bind="$attrs"
-      @focus="items.length && menuRef.setOpen(true)"
-      @blur="menuRef.setOpen(false)"
       readonly
       :model-value="getLabel(proxyModelValue, labelPath)"
+      @focus="items.length && menuRef.setOpen(true)"
+      @blur="menuRef.setOpen(false)"
     />
   </Menu>
 </template>

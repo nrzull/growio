@@ -6,6 +6,7 @@ defmodule GrowioWeb.Router do
   alias GrowioWeb.Controllers.MarketplaceController
   alias GrowioWeb.Controllers.MarketplaceAccountEmailInvitationController
   alias GrowioWeb.Controllers.MarketplaceAccountRoleController
+  alias GrowioWeb.Controllers.PermissionController
   alias GrowioWeb.Plugs.AuthPlug
   alias GrowioWeb.Plugs.MarketplaceAccountPlug
 
@@ -67,7 +68,12 @@ defmodule GrowioWeb.Router do
 
   scope "/api/marketplace_account_roles" do
     pipe_through([:marketplace_account])
-    resources("/", MarketplaceAccountRoleController, only: [:index])
+    resources("/", MarketplaceAccountRoleController, only: [:index, :create])
+  end
+
+  scope "/api/permissions" do
+    pipe_through([:account])
+    resources("/", PermissionController, only: [:index])
   end
 
   if Application.compile_env(:growio_web, :dev_routes) do

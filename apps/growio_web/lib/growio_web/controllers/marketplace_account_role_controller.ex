@@ -27,4 +27,18 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountRoleController do
       |> then(&Conn.ok(conn, &1))
     end
   end
+
+  operation(:create,
+    summary: "create marketplace account role",
+    request_body: {"", "application/json", Schemas.MarketplaceAccountRoleCreate, required: true},
+    responses: [ok: {"", "application/json", Schemas.MarketplaceAccountRole}]
+  )
+
+  def create(%{assigns: %{marketplace_account: marketplace_account}} = conn, params) do
+    with {:ok, role} <- Marketplaces.create_account_role(marketplace_account, params) do
+      role
+      |> MarketplaceAccountRoleJSON.render()
+      |> then(&Conn.ok(conn, &1))
+    end
+  end
 end

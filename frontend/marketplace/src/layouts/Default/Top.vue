@@ -5,9 +5,9 @@
 
     <Menu
       :items="items"
-      @click:item="isComplex($event) && $event.action?.()"
       track-by="text"
       label-path="text"
+      @click:item="isComplex($event) && $event.action?.()"
     >
       <div :class="$style.profile">
         <div>{{ marketplaceAccount?.marketplace?.name }}</div>

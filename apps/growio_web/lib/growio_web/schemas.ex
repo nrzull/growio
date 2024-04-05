@@ -12,6 +12,13 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
+  defmodule Permissions do
+    schema(%{
+      type: :array,
+      items: %Schema{type: :string}
+    })
+  end
+
   defmodule Marketplace do
     schema(%{
       type: :object,
@@ -30,6 +37,17 @@ defmodule GrowioWeb.Schemas do
         name: %Schema{type: :string},
         description: %Schema{type: :string, nullable: true},
         priority: %Schema{type: :integer}
+      }
+    })
+  end
+
+  defmodule MarketplaceAccountRoleCreate do
+    schema(%{
+      type: :object,
+      properties: %{
+        name: %Schema{type: :string},
+        description: %Schema{type: :string, nullable: true},
+        permissions: %Schema{type: :array, items: %Schema{type: :string}}
       }
     })
   end
