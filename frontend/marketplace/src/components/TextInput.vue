@@ -19,8 +19,8 @@
         v-bind="inputAttrs"
         :class="[$style.textInput, { [$style.invalid]: isInvalid }]"
         :value="modelValue"
-        @focus="focused = true"
-        @blur="focused = false"
+        @focus="setFocus(true)"
+        @blur="setFocus(false)"
         @input="(ev: any) => $emit('update:model-value', ev.target?.value!)"
       />
     </div>
@@ -61,16 +61,21 @@ const props = defineProps({
 
 defineEmits(["update:model-value"]);
 
-const attrs = useAttrs();
+const attrs = useAttrs() as Record<any, any>;
 
 const focused = ref(false);
+
+const setFocus = (v: boolean) => {
+  focused.value = v;
+  v ? attrs.onFocus?.(v) : attrs.onBlur?.(v);
+};
 
 const wrapperAttrs = computed(() =>
   pick(attrs, ["class", "style"])
 ) as unknown as typeof attrs;
 
-const inputAttrs = computed(
-  () => pick(attrs, ["type", "readonly", "disabled"]) as unknown as typeof attrs
+const inputAttrs = computed(() =>
+  pick(attrs, ["type", "readonly", "disabled"])
 );
 
 const isInvalid = computed(() =>

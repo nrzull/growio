@@ -47,6 +47,13 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
+  defmodule MarketplaceAccountRoles do
+    schema(%{
+      type: :array,
+      items: MarketplaceAccountRole
+    })
+  end
+
   defmodule MarketplaceAccount do
     schema(%{
       type: :object,

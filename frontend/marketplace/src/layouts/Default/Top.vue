@@ -3,7 +3,12 @@
     <div></div>
     <div></div>
 
-    <Menu :items="items" @click:item="$event?.action?.()">
+    <Menu
+      :items="items"
+      @click:item="isComplex($event) && $event.action?.()"
+      track-by="text"
+      label-path="text"
+    >
       <div :class="$style.profile">
         <div>{{ marketplaceAccount?.marketplace?.name }}</div>
         <Tag>{{ marketplaceAccount?.role?.name }}</Tag>
@@ -18,10 +23,12 @@ import { marketplaceAccount } from "~/composables/marketplace-accounts";
 import Menu from "~/components/Menu.vue";
 import Tag from "~/components/Tag.vue";
 import { useRouter } from "vue-router";
+import { ItemComplex } from "~/components/Menu/types";
+import { isComplex } from "~/components/Menu/utils";
 
 const router = useRouter();
 
-const items = ref([
+const items = ref<ItemComplex[]>([
   {
     text: "Sign-Out",
     action: () => router.push("/auth"),

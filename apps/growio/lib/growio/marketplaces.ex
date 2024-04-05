@@ -257,7 +257,17 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def all_account_roles(%Marketplace{} = marketplace, opts \\ []) do
+  def all_account_roles(initiator, opts \\ [])
+
+  def all_account_roles(%MarketplaceAccount{} = initiator, opts) do
+    with true <- Permissions.ok?(initiator, marketplaces__marketplace_account_role__read()) do
+      all_account_roles(%Marketplace{id: initiator.marketplace_id}, opts)
+    else
+      _ -> {:error, "cannot get account roles"}
+    end
+  end
+
+  def all_account_roles(%Marketplace{} = marketplace, opts) do
     MarketplaceAccountRole
     |> where([role], role.marketplace_id == ^marketplace.id)
     |> order_by(asc: :priority)

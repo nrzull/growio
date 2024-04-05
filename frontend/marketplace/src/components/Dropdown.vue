@@ -1,6 +1,10 @@
 <template>
   <div :class="$style.dropdown">
-    <div ref="triggerRef" :class="$style.trigger" @click="open = !open">
+    <div
+      ref="triggerRef"
+      :class="$style.trigger"
+      @click="manual ? $emit('click:trigger', !open) : (open = !open)"
+    >
       <slot name="trigger"></slot>
     </div>
 
@@ -19,10 +23,19 @@
 import { ref, computed } from "vue";
 import { useFloating, autoUpdate } from "@floating-ui/vue";
 
-const open = ref(false);
+defineProps({
+  manual: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+defineEmits({ "click:trigger": (_v: boolean) => true });
+
 const triggerRef = ref<HTMLDivElement>();
 const floatingRef = ref<HTMLDivElement>();
 
+const open = ref(false);
 const setOpen = (v: boolean) => (open.value = v);
 
 const minWidth = computed(() => {
@@ -38,7 +51,7 @@ const { floatingStyles } = useFloating(triggerRef, floatingRef, {
   open,
 });
 
-defineExpose({ setOpen });
+defineExpose({ open, setOpen });
 </script>
 
 <style module>

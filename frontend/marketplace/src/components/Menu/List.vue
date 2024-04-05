@@ -1,23 +1,30 @@
 <template>
   <div :class="[$style.list, { [$style.child]: child }]">
     <Dropdown
-      v-for="item in items"
-      :ref="(r: any) => dropdownRefs[item.text] = r"
-      :key="item.text"
+      v-for="(item, i) in items"
+      :ref="(r: any) => dropdownRefs[getKey(item, trackBy, i)] = r"
+      :key="getKey(item, trackBy, i)"
     >
       <template #trigger>
         <div
           :class="$style.item"
-          @click="item.children?.length ? null : handleClickItem(item)"
+          @mousedown="
+            getChildren(item, childrenPath)?.length
+              ? null
+              : handleClickItem(item)
+          "
         >
-          {{ item.text }}
+          {{ getLabel(item, labelPath) }}
         </div>
       </template>
 
       <List
-        v-if="item.children"
+        v-if="getChildren(item, childrenPath)"
         child
-        :items="item.children"
+        :track-by
+        :label-path
+        :children-path
+        :items="getChildren(item, childrenPath)"
         @click:item="handleClickItem($event)"
       />
     </Dropdown>
@@ -25,17 +32,34 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, defineOptions, ref } from "vue";
+import { defineOptions, ref } from "vue";
 import Dropdown from "~/components/Dropdown.vue";
-
-type Item = Record<any, any>;
+import {
+  itemsProp,
+  getLabel,
+  getKey,
+  getChildren,
+} from "~/components/Menu/utils";
+import { Item } from "~/components/Menu/types";
 
 defineOptions({ name: "List", inheritAttrs: false });
 
 defineProps({
-  items: {
-    type: Array as PropType<Item[]>,
-    default: () => [],
+  items: itemsProp,
+
+  trackBy: {
+    type: String,
+    default: "id",
+  },
+
+  labelPath: {
+    type: String,
+    default: "title",
+  },
+
+  childrenPath: {
+    type: String,
+    default: "children",
   },
 
   child: {

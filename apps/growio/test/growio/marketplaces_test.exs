@@ -131,6 +131,13 @@ defmodule Growio.MarketplacesTest do
         )
     end
 
+    test "get all account roles" do
+      %{marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      match?([_ | _], Marketplaces.all_account_roles(marketplace_account))
+    end
+
     test "get an account role" do
       %{marketplace_account: marketplace_account} =
         MarketplacesFixture.marketplace!(AccountsFixture.account!())
