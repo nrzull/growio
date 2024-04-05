@@ -16,6 +16,20 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountEmailInvitationController do
 
   tags(["marketplace_account_email_invitations"])
 
+  operation(:index,
+    summary: "show email invitations",
+    responses: [ok: {"", "application/json", Schemas.MarketplaceAccountEmailInvitations}]
+  )
+
+  def index(%{assigns: %{marketplace_account: marketplace_account}} = conn, _params) do
+    with invitations when is_list(invitations) <-
+           Marketplaces.all_account_email_invitations(marketplace_account) do
+      invitations
+      |> MarketplaceAccountEmailInvitationJson.render()
+      |> then(&Conn.ok(conn, &1))
+    end
+  end
+
   operation(:create,
     summary: "create email invitation",
     request_body:

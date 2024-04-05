@@ -61,7 +61,7 @@ defmodule GrowioWeb.Router do
 
   scope "/api/marketplace_account_email_invitations" do
     pipe_through([:marketplace_account])
-    post("/", MarketplaceAccountEmailInvitationController, :create)
+    resources("/", MarketplaceAccountEmailInvitationController, only: [:index, :create])
   end
 
   if Application.compile_env(:growio_web, :dev_routes) do

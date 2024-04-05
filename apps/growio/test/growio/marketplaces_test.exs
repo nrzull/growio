@@ -518,6 +518,24 @@ defmodule Growio.MarketplacesTest do
       assert asset.id == deleted_asset.id
     end
 
+    test "get all email invitations" do
+      email = "hello@example.com"
+
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      role = MarketplacesFixture.role!(marketplace)
+
+      Marketplaces.create_account_email_invitation(marketplace_account, role, %{
+        email: email
+      })
+
+      match?(
+        [%MarketplaceAccountEmailInvitation{email: ^email}],
+        Marketplaces.all_account_email_invitations(marketplace_account)
+      )
+    end
+
     test "create an account email invitation" do
       email = "hello@example.com"
 

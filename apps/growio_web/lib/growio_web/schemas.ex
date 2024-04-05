@@ -115,6 +115,13 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
+  defmodule MarketplaceAccountEmailInvitations do
+    schema(%{
+      type: :array,
+      items: MarketplaceAccountEmailInvitation
+    })
+  end
+
   defmodule MarketplaceAccountEmailInvitationCreateRequest do
     schema(%{
       type: :object,

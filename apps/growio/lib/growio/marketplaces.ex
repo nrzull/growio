@@ -901,6 +901,25 @@ defmodule Growio.Marketplaces do
     Repo.delete(asset)
   end
 
+  def all_account_email_invitations(%MarketplaceAccount{} = initiator) do
+    with true <-
+           Permissions.ok?(initiator, marketplaces__marketplace_account_email_invitation__read()) do
+      Repo.preload(initiator, [:marketplace])
+      |> Map.get(:marketplace)
+      |> all_account_email_invitations()
+    else
+      _ -> {:error, "cannot get an account email invitations"}
+    end
+  end
+
+  def all_account_email_invitations(%Marketplace{} = marketplace) do
+    MarketplaceAccountEmailInvitation
+    |> join(:left, [invitation], role in assoc(invitation, :role))
+    |> where([invitation, role], role.marketplace_id == ^marketplace.id)
+    |> preload([_, role], role: role)
+    |> Repo.all()
+  end
+
   def create_account_email_invitation(
         %MarketplaceAccount{} = initiator,
         %MarketplaceAccountRole{} = role,

@@ -4,6 +4,31 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountEmailInvitationControllerTest 
   alias Growio.MarketplacesFixture
   alias Growio.Repo
 
+  describe "GET /api/marketplace_account_email_invitations" do
+    setup [{SetupUtils, :auth}, {SetupUtils, :marketplace_account}]
+
+    test "it should get email invitations", %{
+      conn: conn,
+      marketplace_account: marketplace_account,
+      api_spec: api_spec
+    } do
+      marketplace_account = Repo.preload(marketplace_account, [:marketplace])
+      role = MarketplacesFixture.role!(marketplace_account.marketplace)
+
+      conn
+      |> post(~p"/api/marketplace_account_email_invitations", %{
+        email: "example@example.com",
+        role_id: role.id
+      })
+      |> json_response(200)
+
+      conn
+      |> get(~p"/api/marketplace_account_email_invitations")
+      |> json_response(200)
+      |> assert_schema("MarketplaceAccountEmailInvitations", api_spec)
+    end
+  end
+
   describe "POST /api/marketplace_account_email_invitations" do
     setup [{SetupUtils, :auth}, {SetupUtils, :marketplace_account}]
 
