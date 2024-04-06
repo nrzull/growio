@@ -13,6 +13,7 @@ defmodule Growio.MarketplacesTest do
   alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
   alias Growio.Marketplaces.MarketplaceWarehouse
   alias Growio.Marketplaces.MarketplaceWarehouseItem
+  alias Growio.Permissions.Permission
 
   describe "Growio.Marketplaces" do
     test "get marketplace accounts of a marketplace" do
@@ -231,11 +232,23 @@ defmodule Growio.MarketplacesTest do
       {:ok, role2} =
         Marketplaces.create_account_role(marketplace_account, %{name: "role2"})
 
-      {:error, _} = Marketplaces.update_account_role(marketplace_account, role, %{name: "test"})
+      {:ok, role} =
+        Marketplaces.update_account_role(marketplace_account, role, %{name: "test", priority: 9})
+
+      assert role.priority == 0
+      assert role.name == "test"
+
+      new_permission = PermissionDefs.bots__telegram_bot__create()
 
       {:ok, updated_role} =
-        Marketplaces.update_account_role(marketplace_account, role2, %{name: updated_name})
+        Marketplaces.update_account_role(marketplace_account, role2, %{
+          "name" => updated_name,
+          "permissions" => [new_permission]
+        })
 
+      updated_role = Repo.preload(updated_role, [:permissions])
+
+      match?([%Permission{name: ^new_permission}], updated_role.permissions)
       assert updated_role.id == role2.id
       assert updated_role.name == updated_name
     end

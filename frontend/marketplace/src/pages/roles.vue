@@ -40,7 +40,10 @@ import plusSvg from "~/assets/plus.svg";
 import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
 import { wait } from "~/composables/wait";
 import { WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH } from "~/constants";
-import { apiMarketplaceAccountRolesGetAll } from "~/api/growio/marketplace_account_roles";
+import {
+  apiMarketplaceAccountRolesGetAll,
+  apiMarketplaceAccountRolesUpdate,
+} from "~/api/growio/marketplace_account_roles";
 import Table from "~/components/Table.vue";
 import RoleModal from "~/components/Roles/RoleModal.vue";
 import {
@@ -93,7 +96,7 @@ const saveRole = async (
   role: MarketplaceAccountRole | PartialMarketplaceAccountRole
 ) => {
   if (isMarketplaceAccountRole(role)) {
-    console.log("update", role);
+    await apiMarketplaceAccountRolesUpdate(role);
   } else {
     await apiMarketplaceAccountRolesCreate(role);
   }

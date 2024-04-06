@@ -13,3 +13,13 @@ export const apiMarketplaceAccountRolesCreate = (
   growio
     .post<MarketplaceAccountRole>("/api/marketplace_account_roles", params)
     .then((r) => r.data);
+
+export const apiMarketplaceAccountRolesUpdate = (
+  params: MarketplaceAccountRole
+) =>
+  growio
+    .patch<MarketplaceAccountRole>(
+      `/api/marketplace_account_roles/${params.id}`,
+      params
+    )
+    .then((r) => r.data);

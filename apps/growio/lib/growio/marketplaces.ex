@@ -264,9 +264,10 @@ defmodule Growio.Marketplaces do
            |> Changeset.put_assoc(:marketplace, marketplace)
            |> Changeset.put_change(:priority, length(all_account_roles(marketplace)) + 1)
            |> Repo.insert() do
-      case set_account_role_permissions(role, params["permissions"] || []) do
-        {:ok, role} -> {:ok, role}
-        _ -> {:ok, role}
+      if is_list(params["permissions"]) do
+        set_account_role_permissions(role, params["permissions"])
+      else
+        {:ok, role}
       end
     end
   end
@@ -367,12 +368,23 @@ defmodule Growio.Marketplaces do
   end
 
   def update_account_role(%MarketplaceAccountRole{} = role, %{} = params) do
-    if primary_account_role?(role) do
-      {:error, "cannot update primary role"}
-    else
-      role
-      |> MarketplaceAccountRole.changeset(params)
-      |> Repo.update()
+    MarketplaceAccountRole.changeset(role, params)
+    |> then(fn changeset ->
+      if primary_account_role?(role),
+        do: changeset |> Changeset.put_change(:priority, role.priority),
+        else: changeset
+    end)
+    |> Repo.update()
+    |> case do
+      {:ok, updated_role} ->
+        if is_list(params["permissions"]) do
+          set_account_role_permissions(role, params["permissions"])
+        else
+          {:ok, updated_role}
+        end
+
+      err ->
+        err
     end
   end
 

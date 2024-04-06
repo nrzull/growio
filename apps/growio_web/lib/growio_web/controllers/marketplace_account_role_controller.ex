@@ -3,6 +3,7 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountRoleController do
   use OpenApiSpex.ControllerSpecs
   alias GrowioWeb.Conn
   alias GrowioWeb.Schemas
+  alias Growio.Marketplaces.MarketplaceAccountRole
   alias GrowioWeb.Views.MarketplaceAccountRoleJSON
   alias Growio.Marketplaces
 
@@ -39,6 +40,28 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountRoleController do
       role
       |> MarketplaceAccountRoleJSON.render()
       |> then(&Conn.ok(conn, &1))
+    end
+  end
+
+  operation(:update,
+    summary: "update marketplace account role",
+    parameters: [
+      id: [in: :path, description: "role id", type: :integer, example: 1]
+    ],
+    request_body: {"", "application/json", Schemas.MarketplaceAccountRoleUpdate, required: true},
+    responses: [ok: {"", "application/json", Schemas.MarketplaceAccountRole}]
+  )
+
+  def update(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"id" => id} = params
+      ) do
+    with id when is_integer(id) <- String.to_integer(id),
+         role = %MarketplaceAccountRole{} <-
+           Marketplaces.get_account_role(marketplace_account, id),
+         {:ok, updated_role} <-
+           Marketplaces.update_account_role(marketplace_account, role, params) do
+      Conn.ok(conn, MarketplaceAccountRoleJSON.render(updated_role))
     end
   end
 end

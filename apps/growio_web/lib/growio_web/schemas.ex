@@ -52,6 +52,17 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
+  defmodule MarketplaceAccountRoleUpdate do
+    schema(%{
+      type: :object,
+      properties: %{
+        name: %Schema{type: :string},
+        description: %Schema{type: :string, nullable: true},
+        permissions: %Schema{type: :array, items: %Schema{type: :string}}
+      }
+    })
+  end
+
   defmodule MarketplaceAccountRoleNullable do
     schema(%{
       type: :object,
