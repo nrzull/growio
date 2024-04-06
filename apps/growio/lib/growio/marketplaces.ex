@@ -220,6 +220,13 @@ defmodule Growio.Marketplaces do
     {:ok, Map.get(Repo.preload(initiator, role: [:permissions]), :role)}
   end
 
+  def get_account_role(role_id) when is_integer(role_id) do
+    MarketplaceAccountRole
+    |> where([role], role.id == ^role_id)
+    |> preload([role], [:permissions])
+    |> Repo.one()
+  end
+
   def get_account_role(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
     MarketplaceAccountRole
     |> where([role], role.id == ^id)
@@ -251,11 +258,16 @@ defmodule Growio.Marketplaces do
   end
 
   def create_account_role(%Marketplace{} = marketplace, %{} = params) do
-    with changeset = %Changeset{valid?: true} <- MarketplaceAccountRole.changeset(params) do
-      changeset
-      |> Changeset.put_assoc(:marketplace, marketplace)
-      |> Changeset.put_change(:priority, length(all_account_roles(marketplace)) + 1)
-      |> Repo.insert()
+    with changeset = %Changeset{valid?: true} <- MarketplaceAccountRole.changeset(params),
+         {:ok, role} <-
+           changeset
+           |> Changeset.put_assoc(:marketplace, marketplace)
+           |> Changeset.put_change(:priority, length(all_account_roles(marketplace)) + 1)
+           |> Repo.insert() do
+      case set_account_role_permissions(role, params["permissions"] || []) do
+        {:ok, role} -> {:ok, role}
+        _ -> {:ok, role}
+      end
     end
   end
 
@@ -421,9 +433,9 @@ defmodule Growio.Marketplaces do
   def set_account_role_permissions(
         %MarketplaceAccount{} = initiator,
         %MarketplaceAccountRole{} = role,
-        [permission_name | _] = permission_names
+        permission_names
       )
-      when is_bitstring(permission_name) do
+      when is_list(permission_names) do
     with true <-
            Permissions.ok?(
              initiator,
@@ -439,15 +451,21 @@ defmodule Growio.Marketplaces do
 
   def set_account_role_permissions(
         %MarketplaceAccountRole{} = role,
-        [permission_name | _] = permission_names
+        permission_names
       )
-      when is_bitstring(permission_name) do
+      when is_list(permission_names) do
     all_permissions = Permissions.all()
 
     is_valid_permissions =
-      Enum.all?(permission_names, fn name ->
-        Enum.any?(all_permissions, fn permission -> permission.name == name end)
-      end)
+      case permission_names do
+        [] ->
+          true
+
+        _ ->
+          Enum.all?(permission_names, fn name ->
+            Enum.any?(all_permissions, fn permission -> permission.name == name end)
+          end)
+      end
 
     with true <- is_valid_permissions do
       role = Repo.preload(role, [:permissions])
@@ -487,7 +505,7 @@ defmodule Growio.Marketplaces do
         )
         |> Repo.transaction()
 
-      {:ok, nil}
+      {:ok, get_account_role(role.id)}
     else
       {:error, _} = v -> v
       _ -> {:error, "cannot set account role permissions"}

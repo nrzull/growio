@@ -15,7 +15,6 @@
           :class="$style.permission"
           :active="isActive(permission)"
           clickable
-          size="md"
           @click="togglePermission(permission)"
         >
           {{ permission }}
@@ -93,8 +92,9 @@ apiPermissionsGetAll().then((r) => (permissions.value = r));
 }
 
 .row {
-  display: flex;
+  display: grid;
   gap: 8px;
+  grid-template-columns: 1fr 1fr;
 }
 
 .permissions {

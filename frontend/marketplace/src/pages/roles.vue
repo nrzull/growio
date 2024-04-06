@@ -48,6 +48,7 @@ import {
   isMarketplaceAccountRole,
 } from "~/components/Roles/utils";
 import { PartialMarketplaceAccountRole } from "~/components/Roles/types";
+import { apiMarketplaceAccountRolesCreate } from "~/api/growio/marketplace_account_roles";
 
 const roles = ref<MarketplaceAccountRole[]>([]);
 const activeRole = ref<
@@ -88,15 +89,29 @@ const handleClickRole = (row: Row<MarketplaceAccountRole>) => {
   activeRole.value = row.original;
 };
 
-const saveRole = (
+const saveRole = async (
   role: MarketplaceAccountRole | PartialMarketplaceAccountRole
 ) => {
   if (isMarketplaceAccountRole(role)) {
     console.log("update", role);
   } else {
-    console.log("create", role);
+    await apiMarketplaceAccountRolesCreate(role);
+  }
+
+  activeRole.value = undefined;
+  await fetchRoles();
+};
+
+const fetchRoles = async () => {
+  try {
+    wait.start(WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH);
+    roles.value = await apiMarketplaceAccountRolesGetAll();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH);
   }
 };
 
-apiMarketplaceAccountRolesGetAll().then((r) => (roles.value = r));
+fetchRoles();
 </script>
