@@ -1,5 +1,5 @@
 <template>
-  <PageLoader v-if="isLoading" />
+  <PageLoader :loading="isLoading" />
 
   <InviteUserModal v-if="inviteUserModal" @close="inviteUserModal = false" />
 

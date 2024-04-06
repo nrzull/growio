@@ -12,7 +12,7 @@
 
       <template v-if="stage === 2">
         <TextInput v-model="state.password" placeholder="verification code" />
-        <NotificationItem
+        <Notification
           :model-value="{
             text: 'Check your email for verification code',
             type: 'info',
@@ -33,7 +33,7 @@ import Button from "~/components/Button.vue";
 import Heading from "~/components/Shape/Heading.vue";
 import TextInput from "~/components/TextInput.vue";
 import { useEmailAuth } from "~/composables/use-email-auth";
-import NotificationItem from "~/components/Notifications/Item.vue";
+import Notification from "~/components/Notifications/Notification.vue";
 import { account } from "~/composables/account";
 import { apiAuthSignout } from "~/api/growio/auth";
 import { useRoute, useRouter } from "vue-router";

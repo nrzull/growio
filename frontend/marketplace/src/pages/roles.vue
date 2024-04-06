@@ -1,5 +1,5 @@
 <template>
-  <PageLoader v-if="isLoading" />
+  <PageLoader :loading="isLoading" />
 
   <RoleModal
     v-if="activeRole"
@@ -9,8 +9,8 @@
   />
 
   <PageShape>
-    <template #heading
-      >Roles <template v-if="deletedRoles">(Deleted)</template>
+    <template #heading>
+      Roles <template v-if="deletedRoles">(Deleted)</template>
     </template>
 
     <template #tools>
@@ -55,10 +55,16 @@ import plusSvg from "~/assets/plus.svg";
 import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
 import { wait } from "~/composables/wait";
 import {
-  NOTIFICATION_ROLE_CREATED,
-  NOTIFICATION_ROLE_DELETED,
-  NOTIFICATION_ROLE_UPDATED,
+  NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_CREATED,
+  NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_CREATED_FAILURE,
+  NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_DELETED,
+  NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_DELETED_FAILURE,
+  NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_UPDATED,
   WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH,
+  WAIT_MARKETPLACE_ACCOUNT_ROLE_CREATE,
+  WAIT_MARKETPLACE_ACCOUNT_ROLE_UPDATE,
+  WAIT_MARKETPLACE_ACCOUNT_ROLE_DELETE,
+  NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_UPDATED_FAILURE,
 } from "~/constants";
 import {
   apiMarketplaceAccountRolesGetAll,
@@ -74,7 +80,10 @@ import {
 import { PartialMarketplaceAccountRole } from "~/components/Roles/types";
 import { apiMarketplaceAccountRolesCreate } from "~/api/growio/marketplace_account_roles";
 import trashCircleSvg from "~/assets/trash-circle.svg?raw";
-import { addSuccessNotification } from "~/composables/notifications";
+import {
+  addSuccessNotification,
+  addErrorNotification,
+} from "~/composables/notifications";
 
 const roles = ref<MarketplaceAccountRole[]>([]);
 const deletedRoles = ref(false);
@@ -114,7 +123,12 @@ const table = useVueTable({
 });
 
 const isLoading = computed(() =>
-  wait.some([WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH])
+  wait.some([
+    WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH,
+    WAIT_MARKETPLACE_ACCOUNT_ROLE_CREATE,
+    WAIT_MARKETPLACE_ACCOUNT_ROLE_UPDATE,
+    WAIT_MARKETPLACE_ACCOUNT_ROLE_DELETE,
+  ])
 );
 
 const handleClickRole = (row: Row<MarketplaceAccountRole>) => {
@@ -125,11 +139,35 @@ const saveRole = async (
   role: MarketplaceAccountRole | PartialMarketplaceAccountRole
 ) => {
   if (isMarketplaceAccountRole(role)) {
-    await apiMarketplaceAccountRolesUpdate(role);
-    addSuccessNotification({ text: NOTIFICATION_ROLE_UPDATED });
+    try {
+      wait.start(WAIT_MARKETPLACE_ACCOUNT_ROLE_UPDATE);
+      await apiMarketplaceAccountRolesUpdate(role);
+      addSuccessNotification({
+        text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_UPDATED,
+      });
+    } catch (e) {
+      console.error(e);
+      addErrorNotification({
+        text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_UPDATED_FAILURE,
+      });
+    } finally {
+      wait.end(WAIT_MARKETPLACE_ACCOUNT_ROLE_UPDATE);
+    }
   } else {
-    await apiMarketplaceAccountRolesCreate(role);
-    addSuccessNotification({ text: NOTIFICATION_ROLE_CREATED });
+    try {
+      wait.start(WAIT_MARKETPLACE_ACCOUNT_ROLE_CREATE);
+      await apiMarketplaceAccountRolesCreate(role);
+      addSuccessNotification({
+        text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_CREATED,
+      });
+    } catch (e) {
+      console.error(e);
+      addErrorNotification({
+        text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_CREATED_FAILURE,
+      });
+    } finally {
+      wait.end(WAIT_MARKETPLACE_ACCOUNT_ROLE_CREATE);
+    }
   }
 
   activeRole.value = undefined;
@@ -137,9 +175,21 @@ const saveRole = async (
 };
 
 const deleteRole = async (role: MarketplaceAccountRole) => {
-  await apiMarketplaceAccountRolesDelete(role);
-  await fetchRoles();
-  addSuccessNotification({ text: NOTIFICATION_ROLE_DELETED });
+  try {
+    wait.start(WAIT_MARKETPLACE_ACCOUNT_ROLE_DELETE);
+    await apiMarketplaceAccountRolesDelete(role);
+    await fetchRoles();
+    addSuccessNotification({
+      text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_DELETED,
+    });
+  } catch (e) {
+    console.error(e);
+    addErrorNotification({
+      text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_DELETED_FAILURE,
+    });
+  } finally {
+    wait.end(WAIT_MARKETPLACE_ACCOUNT_ROLE_DELETE);
+  }
 };
 
 const toggleDeletedRoles = () => {

@@ -1,8 +1,14 @@
 <template>
+  <PageLoader :loading="isLoading" />
+
   <Modal size="lg" @close="$emit('close')">
     <template #heading>Invitations</template>
 
-    <Table :table="table" />
+    <Notification
+      v-if="isEmpty"
+      :model-value="{ type: 'info', text: 'There is no invitations' }"
+    />
+    <Table v-else :table="table" />
   </Modal>
 </template>
 
@@ -15,10 +21,22 @@ import {
   getCoreRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import Table from "~/components/Table.vue";
+import { WAIT_MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH } from "~/constants";
+import { wait } from "~/composables/wait";
+import PageLoader from "~/components/PageLoader.vue";
+import Notification from "~/components/Notifications/Notification.vue";
 
 defineEmits(["close"]);
+
+defineOptions({ inheritAttrs: false });
+
+const isLoading = computed(() =>
+  wait.some([WAIT_MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH])
+);
+
+const isEmpty = computed(() => !isLoading.value && !invitations.value.length);
 
 const invitations = ref<MarketplaceAccountEmailInvitation[]>([]);
 
@@ -48,7 +66,16 @@ const table = useVueTable({
   },
 });
 
-apiMarketplaceAccountEmailInvitationsGetAll().then(
-  (r) => (invitations.value = r)
-);
+const fetchAccountEmailInvitations = async () => {
+  try {
+    wait.start(WAIT_MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH);
+    invitations.value = await apiMarketplaceAccountEmailInvitationsGetAll();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(WAIT_MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH);
+  }
+};
+
+fetchAccountEmailInvitations();
 </script>

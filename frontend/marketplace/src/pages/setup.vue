@@ -1,5 +1,5 @@
 <template>
-  <PageLoader />
+  <PageLoader :loading="true" />
 </template>
 
 <script setup lang="ts">

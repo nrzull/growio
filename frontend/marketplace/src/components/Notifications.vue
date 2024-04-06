@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.notifications">
-    <NotificationItem
+    <Notification
       v-for="notification in state"
       :key="notification.id"
       :model-value="notification"
@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import { state } from "~/composables/notifications";
-import NotificationItem from "~/components/Notifications/Item.vue";
+import Notification from "~/components/Notifications/Notification.vue";
 </script>
 
 <style module>

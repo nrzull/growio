@@ -3,7 +3,7 @@ import { ref } from "vue";
 
 export type NotificationItem = {
   id: IdParam;
-  type: "success" | "warning" | "error" | "info";
+  type: "success" | "error" | "info";
   text: string;
   closable?: boolean;
   lifetime?: number;
@@ -35,10 +35,6 @@ const addNotification = (params: Omit<NotificationItem, "id">) => {
 export const addSuccessNotification = (
   params: Omit<NotificationItem, "id" | "type">
 ) => addNotification({ ...params, type: "success" });
-
-export const addWarningNotification = (
-  params: Omit<NotificationItem, "id" | "type">
-) => addNotification({ ...params, type: "warning" });
 
 export const addErrorNotification = (
   params: Omit<NotificationItem, "id" | "type">
