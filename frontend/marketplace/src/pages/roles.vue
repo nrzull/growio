@@ -54,7 +54,12 @@ import Button from "~/components/Button.vue";
 import plusSvg from "~/assets/plus.svg";
 import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
 import { wait } from "~/composables/wait";
-import { WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH } from "~/constants";
+import {
+  NOTIFICATION_ROLE_CREATED,
+  NOTIFICATION_ROLE_DELETED,
+  NOTIFICATION_ROLE_UPDATED,
+  WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH,
+} from "~/constants";
 import {
   apiMarketplaceAccountRolesGetAll,
   apiMarketplaceAccountRolesUpdate,
@@ -69,6 +74,7 @@ import {
 import { PartialMarketplaceAccountRole } from "~/components/Roles/types";
 import { apiMarketplaceAccountRolesCreate } from "~/api/growio/marketplace_account_roles";
 import trashCircleSvg from "~/assets/trash-circle.svg?raw";
+import { addSuccessNotification } from "~/composables/notifications";
 
 const roles = ref<MarketplaceAccountRole[]>([]);
 const deletedRoles = ref(false);
@@ -120,8 +126,10 @@ const saveRole = async (
 ) => {
   if (isMarketplaceAccountRole(role)) {
     await apiMarketplaceAccountRolesUpdate(role);
+    addSuccessNotification({ text: NOTIFICATION_ROLE_UPDATED });
   } else {
     await apiMarketplaceAccountRolesCreate(role);
+    addSuccessNotification({ text: NOTIFICATION_ROLE_CREATED });
   }
 
   activeRole.value = undefined;
@@ -131,6 +139,7 @@ const saveRole = async (
 const deleteRole = async (role: MarketplaceAccountRole) => {
   await apiMarketplaceAccountRolesDelete(role);
   await fetchRoles();
+  addSuccessNotification({ text: NOTIFICATION_ROLE_DELETED });
 };
 
 const toggleDeletedRoles = () => {
