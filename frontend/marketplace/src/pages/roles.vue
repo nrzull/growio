@@ -9,9 +9,15 @@
   />
 
   <PageShape>
-    <template #heading>Roles</template>
+    <template #heading
+      >Roles <template v-if="deletedRoles">(Deleted)</template>
+    </template>
 
     <template #tools>
+      <Button size="sm" type="neutral" @click="toggleDeletedRoles">
+        Toggle deleted roles
+      </Button>
+
       <Button
         size="sm"
         :icon="plusSvg"
@@ -21,7 +27,16 @@
       </Button>
     </template>
 
-    <Table clickable :table="table" @click:row="handleClickRole" />
+    <Table clickable :table="table" @click:row="handleClickRole">
+      <template #actions="{ ctx }">
+        <div
+          v-if="!deletedRoles"
+          :class="$style.trash"
+          v-html="trashCircleSvg"
+          @click.stop="deleteRole(ctx.row.original)"
+        ></div>
+      </template>
+    </Table>
   </PageShape>
 </template>
 
@@ -43,6 +58,7 @@ import { WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH } from "~/constants";
 import {
   apiMarketplaceAccountRolesGetAll,
   apiMarketplaceAccountRolesUpdate,
+  apiMarketplaceAccountRolesDelete,
 } from "~/api/growio/marketplace_account_roles";
 import Table from "~/components/Table.vue";
 import RoleModal from "~/components/Roles/RoleModal.vue";
@@ -52,8 +68,10 @@ import {
 } from "~/components/Roles/utils";
 import { PartialMarketplaceAccountRole } from "~/components/Roles/types";
 import { apiMarketplaceAccountRolesCreate } from "~/api/growio/marketplace_account_roles";
+import trashCircleSvg from "~/assets/trash-circle.svg?raw";
 
 const roles = ref<MarketplaceAccountRole[]>([]);
+const deletedRoles = ref(false);
 const activeRole = ref<
   MarketplaceAccountRole | PartialMarketplaceAccountRole
 >();
@@ -69,6 +87,11 @@ const columns = ref([
   columnHelper.accessor("description", {
     cell: (info) => info.getValue(),
     header: () => "Description",
+  }),
+
+  columnHelper.accessor("actions" as any, {
+    cell: (info) => info.getValue(),
+    header: () => "",
   }),
 ]);
 
@@ -105,10 +128,22 @@ const saveRole = async (
   await fetchRoles();
 };
 
+const deleteRole = async (role: MarketplaceAccountRole) => {
+  await apiMarketplaceAccountRolesDelete(role);
+  await fetchRoles();
+};
+
+const toggleDeletedRoles = () => {
+  deletedRoles.value = !deletedRoles.value;
+  fetchRoles();
+};
+
 const fetchRoles = async () => {
   try {
     wait.start(WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH);
-    roles.value = await apiMarketplaceAccountRolesGetAll();
+    roles.value = await apiMarketplaceAccountRolesGetAll({
+      deleted_at: deletedRoles.value,
+    });
   } catch (e) {
     console.error(e);
   } finally {
@@ -118,3 +153,14 @@ const fetchRoles = async () => {
 
 fetchRoles();
 </script>
+
+<style module>
+.trash {
+  height: 32px;
+  width: 32px;
+}
+
+.trash:hover * {
+  fill: var(--color-primary);
+}
+</style>

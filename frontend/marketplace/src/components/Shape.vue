@@ -61,7 +61,6 @@ defineProps({
 }
 
 .shape.fullHeight {
-  height: inherit;
   min-height: 100%;
 }
 </style>

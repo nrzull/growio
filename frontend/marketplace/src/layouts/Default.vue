@@ -33,5 +33,8 @@ import Sidebar from "~/layouts/Default/Sidebar.vue";
 .main {
   grid-area: main;
   padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: clip;
 }
 </style>

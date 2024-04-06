@@ -23,7 +23,7 @@
             <slot
               v-if="!header.isPlaceholder"
               :name="prepareSlotName(getAccessorKey(header), 'header')"
-              v-bind="{ header }"
+              v-bind="{ ctx: header }"
             >
               <FlexRender
                 :render="header.column.columnDef.header"
@@ -43,7 +43,7 @@
           <td v-for="cell in row.getVisibleCells()" :key="cell.id">
             <slot
               :name="prepareSlotName(getAccessorKey(cell))"
-              v-bind="{ cell }"
+              v-bind="{ ctx: cell }"
             >
               <FlexRender
                 :render="cell.column.columnDef.cell"
@@ -67,7 +67,7 @@
             <slot
               v-if="!header.isPlaceholder"
               :name="prepareSlotName(getAccessorKey(header), 'footer')"
-              v-bind="{ footer: header }"
+              v-bind="{ ctx: header }"
             >
               <FlexRender
                 :render="header.column.columnDef.footer"

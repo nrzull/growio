@@ -1,10 +1,13 @@
 import { growio } from "~/api/growio";
 import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
+import { IdParam } from "~/api/types";
 import { PartialMarketplaceAccountRole } from "~/components/Roles/types";
 
-export const apiMarketplaceAccountRolesGetAll = () =>
+export const apiMarketplaceAccountRolesGetAll = (
+  params: { deleted_at?: boolean } = {}
+) =>
   growio
-    .get<MarketplaceAccountRole[]>("/api/marketplace_account_roles")
+    .get<MarketplaceAccountRole[]>("/api/marketplace_account_roles", { params })
     .then((r) => r.data);
 
 export const apiMarketplaceAccountRolesCreate = (
@@ -23,3 +26,7 @@ export const apiMarketplaceAccountRolesUpdate = (
       params
     )
     .then((r) => r.data);
+
+export const apiMarketplaceAccountRolesDelete = (
+  params: MarketplaceAccountRole
+) => growio.delete(`/api/marketplace_account_roles/${params.id}`);
