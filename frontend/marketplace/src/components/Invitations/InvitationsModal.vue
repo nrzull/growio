@@ -23,8 +23,7 @@ import {
 } from "@tanstack/vue-table";
 import { computed, ref } from "vue";
 import Table from "~/components/Table.vue";
-import { WAIT_MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH } from "~/constants";
-import { wait } from "~/composables/wait";
+import { wait, Wait } from "~/composables/wait";
 import PageLoader from "~/components/PageLoader.vue";
 import Notification from "~/components/Notifications/Notification.vue";
 
@@ -33,7 +32,7 @@ defineEmits(["close"]);
 defineOptions({ inheritAttrs: false });
 
 const isLoading = computed(() =>
-  wait.some([WAIT_MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH])
+  wait.some([Wait.MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH])
 );
 
 const isEmpty = computed(() => !isLoading.value && !invitations.value.length);
@@ -68,12 +67,12 @@ const table = useVueTable({
 
 const fetchAccountEmailInvitations = async () => {
   try {
-    wait.start(WAIT_MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH);
+    wait.start(Wait.MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH);
     invitations.value = await apiMarketplaceAccountEmailInvitationsGetAll();
   } catch (e) {
     console.error(e);
   } finally {
-    wait.end(WAIT_MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH);
+    wait.end(Wait.MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH);
   }
 };
 

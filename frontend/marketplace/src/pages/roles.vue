@@ -27,7 +27,11 @@
       </Button>
     </template>
 
-    <Table clickable :table="table" @click:row="handleClickRole">
+    <Notification
+      v-if="isEmpty"
+      :model-value="{ type: 'info', text: 'There are no roles' }"
+    />
+    <Table v-else clickable :table="table" @click:row="handleClickRole">
       <template #actions="{ ctx }">
         <div
           v-if="!deletedRoles"
@@ -53,19 +57,15 @@ import PageShape from "~/components/PageShape.vue";
 import Button from "~/components/Button.vue";
 import plusSvg from "~/assets/plus.svg";
 import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
-import { wait } from "~/composables/wait";
+import { wait, Wait } from "~/composables/wait";
 import {
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_CREATED,
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_CREATED_FAILURE,
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_DELETED,
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_DELETED_FAILURE,
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_UPDATED,
-  WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH,
-  WAIT_MARKETPLACE_ACCOUNT_ROLE_CREATE,
-  WAIT_MARKETPLACE_ACCOUNT_ROLE_UPDATE,
-  WAIT_MARKETPLACE_ACCOUNT_ROLE_DELETE,
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_UPDATED_FAILURE,
-} from "~/constants";
+} from "~/composables/notifications/constants";
 import {
   apiMarketplaceAccountRolesGetAll,
   apiMarketplaceAccountRolesUpdate,
@@ -84,6 +84,7 @@ import {
   addSuccessNotification,
   addErrorNotification,
 } from "~/composables/notifications";
+import Notification from "~/components/Notifications/Notification.vue";
 
 const roles = ref<MarketplaceAccountRole[]>([]);
 const deletedRoles = ref(false);
@@ -124,12 +125,14 @@ const table = useVueTable({
 
 const isLoading = computed(() =>
   wait.some([
-    WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH,
-    WAIT_MARKETPLACE_ACCOUNT_ROLE_CREATE,
-    WAIT_MARKETPLACE_ACCOUNT_ROLE_UPDATE,
-    WAIT_MARKETPLACE_ACCOUNT_ROLE_DELETE,
+    Wait.MARKETPLACE_ACCOUNT_ROLES_FETCH,
+    Wait.MARKETPLACE_ACCOUNT_ROLE_CREATE,
+    Wait.MARKETPLACE_ACCOUNT_ROLE_UPDATE,
+    Wait.MARKETPLACE_ACCOUNT_ROLE_DELETE,
   ])
 );
+
+const isEmpty = computed(() => !isLoading.value && !roles.value.length);
 
 const handleClickRole = (row: Row<MarketplaceAccountRole>) => {
   activeRole.value = row.original;
@@ -140,7 +143,7 @@ const saveRole = async (
 ) => {
   if (isMarketplaceAccountRole(role)) {
     try {
-      wait.start(WAIT_MARKETPLACE_ACCOUNT_ROLE_UPDATE);
+      wait.start(Wait.MARKETPLACE_ACCOUNT_ROLE_UPDATE);
       await apiMarketplaceAccountRolesUpdate(role);
       addSuccessNotification({
         text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_UPDATED,
@@ -151,11 +154,11 @@ const saveRole = async (
         text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_UPDATED_FAILURE,
       });
     } finally {
-      wait.end(WAIT_MARKETPLACE_ACCOUNT_ROLE_UPDATE);
+      wait.end(Wait.MARKETPLACE_ACCOUNT_ROLE_UPDATE);
     }
   } else {
     try {
-      wait.start(WAIT_MARKETPLACE_ACCOUNT_ROLE_CREATE);
+      wait.start(Wait.MARKETPLACE_ACCOUNT_ROLE_CREATE);
       await apiMarketplaceAccountRolesCreate(role);
       addSuccessNotification({
         text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_CREATED,
@@ -166,7 +169,7 @@ const saveRole = async (
         text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_CREATED_FAILURE,
       });
     } finally {
-      wait.end(WAIT_MARKETPLACE_ACCOUNT_ROLE_CREATE);
+      wait.end(Wait.MARKETPLACE_ACCOUNT_ROLE_CREATE);
     }
   }
 
@@ -176,7 +179,7 @@ const saveRole = async (
 
 const deleteRole = async (role: MarketplaceAccountRole) => {
   try {
-    wait.start(WAIT_MARKETPLACE_ACCOUNT_ROLE_DELETE);
+    wait.start(Wait.MARKETPLACE_ACCOUNT_ROLE_DELETE);
     await apiMarketplaceAccountRolesDelete(role);
     await fetchRoles();
     addSuccessNotification({
@@ -188,7 +191,7 @@ const deleteRole = async (role: MarketplaceAccountRole) => {
       text: NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_DELETED_FAILURE,
     });
   } finally {
-    wait.end(WAIT_MARKETPLACE_ACCOUNT_ROLE_DELETE);
+    wait.end(Wait.MARKETPLACE_ACCOUNT_ROLE_DELETE);
   }
 };
 
@@ -199,14 +202,14 @@ const toggleDeletedRoles = () => {
 
 const fetchRoles = async () => {
   try {
-    wait.start(WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH);
+    wait.start(Wait.MARKETPLACE_ACCOUNT_ROLES_FETCH);
     roles.value = await apiMarketplaceAccountRolesGetAll({
       deleted_at: deletedRoles.value,
     });
   } catch (e) {
     console.error(e);
   } finally {
-    wait.end(WAIT_MARKETPLACE_ACCOUNT_ROLES_FETCH);
+    wait.end(Wait.MARKETPLACE_ACCOUNT_ROLES_FETCH);
   }
 };
 

@@ -1,10 +1,18 @@
 import { ref } from "vue";
 
-const state = ref(new Set<string>([]));
-
-const start = (v: string) => state.value.add(v);
-const end = (v: string) => state.value.delete(v);
-const is = (v: string) => state.value.has(v);
-const some = (v: string[]) => v.some((vv) => state.value.has(vv));
+const state = ref(new Set<string | number>([]));
+const start = (v: string | number) => state.value.add(v);
+const end = (v: string | number) => state.value.delete(v);
+const is = (v: string | number) => state.value.has(v);
+const some = (v: Array<string | number>) => v.some((vv) => state.value.has(vv));
 
 export const wait = { start, is, some, end };
+
+export enum Wait {
+  MARKETPLACE_ACCOUNT_EMAIL_INVITATIONS_FETCH,
+  MARKETPLACE_ACCOUNT_ROLES_FETCH,
+  MARKETPLACE_ACCOUNT_ROLE_DELETE,
+  MARKETPLACE_ACCOUNT_ROLE_CREATE,
+  MARKETPLACE_ACCOUNT_ROLE_UPDATE,
+  MARKETPLACE_ACCOUNTS_FETCH,
+}

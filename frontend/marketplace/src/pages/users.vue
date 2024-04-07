@@ -17,7 +17,11 @@
       </Button>
     </template>
 
-    <Table :table="table" />
+    <Notification
+      v-if="isEmpty"
+      :model-value="{ type: 'info', text: 'There are no users' }"
+    />
+    <Table v-else :table="table" />
   </PageShape>
 </template>
 
@@ -30,8 +34,7 @@ import {
 } from "@tanstack/vue-table";
 import Table from "~/components/Table.vue";
 import { MarketplaceAccount } from "~/api/growio/marketplace_accounts/types";
-import { wait } from "~/composables/wait";
-import { WAIT_MARKETPLACE_ACCOUNTS_FETCH } from "~/constants";
+import { wait, Wait } from "~/composables/wait";
 import { apiMarketplaceAccountsGetAll } from "~/api/growio/marketplace_accounts";
 import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
@@ -39,6 +42,7 @@ import Button from "~/components/Button.vue";
 import plusSvg from "~/assets/plus.svg";
 import InviteUserModal from "~/components/Invitations/InviteUserModal.vue";
 import InvitationsModal from "~/components/Invitations/InvitationsModal.vue";
+import Notification from "~/components/Notifications/Notification.vue";
 
 const inviteUserModal = ref(false);
 const invitationsModal = ref(false);
@@ -71,16 +75,20 @@ const table = useVueTable({
   },
 });
 
-const isLoading = computed(() => wait.some([WAIT_MARKETPLACE_ACCOUNTS_FETCH]));
+const isLoading = computed(() => wait.some([Wait.MARKETPLACE_ACCOUNTS_FETCH]));
+
+const isEmpty = computed(
+  () => !isLoading.value && !marketplaceAccounts.value.length
+);
 
 const fetchMarketplaceAccounts = async () => {
   try {
-    wait.start(WAIT_MARKETPLACE_ACCOUNTS_FETCH);
+    wait.start(Wait.MARKETPLACE_ACCOUNTS_FETCH);
     marketplaceAccounts.value = await apiMarketplaceAccountsGetAll();
   } catch (e) {
     console.error(e);
   } finally {
-    wait.end(WAIT_MARKETPLACE_ACCOUNTS_FETCH);
+    wait.end(Wait.MARKETPLACE_ACCOUNTS_FETCH);
   }
 };
 
