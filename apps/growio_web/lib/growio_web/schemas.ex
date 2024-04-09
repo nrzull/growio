@@ -83,6 +83,32 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
+  defmodule MarketplaceAccountItemCategory do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer},
+        name: %Schema{type: :string}
+      }
+    })
+  end
+
+  defmodule MarketplaceAccountItemCategoryCreate do
+    schema(%{
+      type: :object,
+      properties: %{
+        name: %Schema{type: :string}
+      }
+    })
+  end
+
+  defmodule MarketplaceAccountItemCategories do
+    schema(%{
+      type: :array,
+      items: MarketplaceAccountItemCategory
+    })
+  end
+
   defmodule MarketplaceAccount do
     schema(%{
       type: :object,

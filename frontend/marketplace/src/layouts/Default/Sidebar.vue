@@ -21,6 +21,7 @@
 <script setup>
 import usersSvg from "~/assets/users.svg?raw";
 import crownLineSvg from "~/assets/crown-line.svg?raw";
+import adProductSvg from "~/assets/ad-product.svg?raw";
 
 const buttons = [
   {
@@ -33,6 +34,12 @@ const buttons = [
     icon: crownLineSvg,
     text: "Roles",
     to: "/roles",
+  },
+
+  {
+    icon: adProductSvg,
+    text: "Inventory",
+    to: "/inventory",
   },
 ];
 </script>

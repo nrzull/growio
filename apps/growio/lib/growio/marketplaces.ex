@@ -577,7 +577,7 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def all_item_categories(a, b \\ [])
+  def all_item_categories(initiator, opts \\ [])
 
   def all_item_categories(%MarketplaceAccount{} = initiator, opts) do
     with true <-

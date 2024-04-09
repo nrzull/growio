@@ -40,8 +40,8 @@ import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
 import Button from "~/components/Button.vue";
 import plusSvg from "~/assets/plus.svg";
-import InviteUserModal from "~/components/Invitations/InviteUserModal.vue";
-import InvitationsModal from "~/components/Invitations/InvitationsModal.vue";
+import InviteUserModal from "~/components/Users/InviteUserModal.vue";
+import InvitationsModal from "~/components/Users/InvitationsModal.vue";
 import Notification from "~/components/Notifications/Notification.vue";
 
 const inviteUserModal = ref(false);

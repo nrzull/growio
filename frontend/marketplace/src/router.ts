@@ -37,6 +37,27 @@ export const router = createRouter({
         },
 
         {
+          path: "inventory",
+          component: () => import("~/pages/inventory.vue"),
+          children: [
+            {
+              path: "items",
+              component: () => import("~/pages/inventory/items.vue"),
+            },
+
+            {
+              path: "categories",
+              component: () => import("~/pages/inventory/categories.vue"),
+            },
+
+            {
+              path: "",
+              redirect: "/inventory/items",
+            },
+          ],
+        },
+
+        {
           path: "",
           redirect: "/users",
         },

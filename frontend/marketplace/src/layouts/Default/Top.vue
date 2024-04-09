@@ -1,7 +1,6 @@
 <template>
   <div :class="$style.top">
-    <div></div>
-    <div></div>
+    <div id="top-navigation" :class="$style.navigation"></div>
 
     <Menu
       :items="items"
@@ -44,6 +43,11 @@ const items = ref<ItemComplex[]>([
   align-items: center;
   padding: 0 20px;
   justify-content: space-between;
+}
+
+.navigation {
+  display: flex;
+  gap: 8px;
 }
 
 .profile {
