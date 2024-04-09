@@ -27,13 +27,24 @@ export const router = createRouter({
       ],
       children: [
         {
-          path: "users",
-          component: () => import("~/pages/users.vue"),
-        },
+          path: "staff",
+          component: () => import("~/pages/staff.vue"),
+          children: [
+            {
+              path: "users",
+              component: () => import("~/pages/staff/users.vue"),
+            },
 
-        {
-          path: "roles",
-          component: () => import("~/pages/roles.vue"),
+            {
+              path: "roles",
+              component: () => import("~/pages/staff/roles.vue"),
+            },
+
+            {
+              path: "",
+              redirect: "/staff/users",
+            },
+          ],
         },
 
         {

@@ -20,20 +20,13 @@
 
 <script setup>
 import usersSvg from "~/assets/users.svg?raw";
-import crownLineSvg from "~/assets/crown-line.svg?raw";
 import adProductSvg from "~/assets/ad-product.svg?raw";
 
 const buttons = [
   {
     icon: usersSvg,
-    text: "Users",
-    to: "/users",
-  },
-
-  {
-    icon: crownLineSvg,
-    text: "Roles",
-    to: "/roles",
+    text: "Staff",
+    to: "/staff",
   },
 
   {
