@@ -2,6 +2,7 @@
   <Dropdown
     ref="dropdownRef"
     :manual
+    :class="$style.menu"
     @click:trigger="$emit('click:trigger', $event)"
   >
     <template #trigger>
@@ -65,3 +66,9 @@ const handleClickItem = (v: Item) => {
 
 defineExpose({ open, setOpen });
 </script>
+
+<style module>
+.menu {
+  z-index: var(--z-index-menu);
+}
+</style>

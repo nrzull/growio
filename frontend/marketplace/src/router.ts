@@ -69,6 +69,27 @@ export const router = createRouter({
         },
 
         {
+          path: "settings",
+          component: () => import("~/pages/settings.vue"),
+          children: [
+            {
+              path: "general",
+              component: () => import("~/pages/settings/general.vue"),
+            },
+
+            {
+              path: "subscription",
+              component: () => import("~/pages/settings/subscription.vue"),
+            },
+
+            {
+              path: "",
+              redirect: "/settings/general",
+            },
+          ],
+        },
+
+        {
           path: "",
           redirect: "/users",
         },

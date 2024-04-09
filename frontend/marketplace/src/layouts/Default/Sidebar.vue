@@ -24,6 +24,7 @@
 <script setup>
 import usersSvg from "~/assets/users.svg?raw";
 import adProductSvg from "~/assets/ad-product.svg?raw";
+import settings01Svg from "~/assets/settings-01.svg?raw";
 import Button from "~/components/Button.vue";
 
 const buttons = [
@@ -37,6 +38,12 @@ const buttons = [
     icon: adProductSvg,
     text: "Inventory",
     to: "/inventory",
+  },
+
+  {
+    icon: settings01Svg,
+    text: "Settings",
+    to: "/settings",
   },
 ];
 </script>
