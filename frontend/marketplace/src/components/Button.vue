@@ -1,5 +1,12 @@
 <template>
-  <button :class="[$style.button, $style[size], $style[type]]">
+  <button
+    :class="[
+      $style.button,
+      $style[size],
+      $style[type],
+      { [$style.active]: active },
+    ]"
+  >
     <img v-if="icon" :class="$style.icon" :src="icon" />
     <slot />
   </button>
@@ -15,8 +22,13 @@ defineProps({
   },
 
   type: {
-    type: String as PropType<"primary" | "neutral">,
+    type: String as PropType<"primary" | "neutral" | "link-neutral">,
     default: "primary",
+  },
+
+  active: {
+    type: Boolean,
+    default: false,
   },
 
   icon: {
@@ -57,6 +69,7 @@ defineProps({
 
 .button.md {
   padding: 12px 16px;
+  font-size: 14px;
 }
 
 .button.sm {
@@ -81,11 +94,16 @@ defineProps({
   background-color: var(--color-primary-hover);
 }
 
-.button:not(:disabled).neutral {
+.button:not(:disabled).neutral.active,
+.button:not(:disabled).neutral:hover {
+  background-color: var(--color-gray-50);
+}
+
+.button:not(:disabled).link-neutral {
   color: var(--color-black);
 }
 
-.button:not(:disabled).neutral:hover {
+.button:not(:disabled).link-neutral:hover {
   color: var(--color-gray-600);
 }
 </style>

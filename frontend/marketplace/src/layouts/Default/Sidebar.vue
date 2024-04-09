@@ -7,13 +7,16 @@
       custom
       :to="to"
     >
-      <div
-        :class="[$style.button, { [$style.active]: isActive }]"
+      <Button
+        :class="$style.button"
+        type="neutral"
+        size="md"
+        :active="isActive"
         @click="navigate"
       >
         <div :class="$style.icon" v-html="icon"></div>
-        <div :class="$style.text">{{ text }}</div>
-      </div>
+        <div>{{ text }}</div>
+      </Button>
     </RouterLink>
   </div>
 </template>
@@ -21,6 +24,7 @@
 <script setup>
 import usersSvg from "~/assets/users.svg?raw";
 import adProductSvg from "~/assets/ad-product.svg?raw";
+import Button from "~/components/Button.vue";
 
 const buttons = [
   {
@@ -45,26 +49,14 @@ const buttons = [
   display: flex;
   flex-flow: column;
   align-items: center;
-  gap: 24px;
+  gap: 8px;
   overflow-x: clip;
   overflow-y: auto;
 }
 
 .button {
-  display: flex;
-  align-items: center;
   justify-content: flex-start;
-  gap: 8px;
-
-  user-select: none;
-  cursor: pointer;
-  padding: 8px 16px;
-  border-radius: 8px;
   width: 100%;
-}
-
-.text {
-  font-size: 14px;
 }
 
 .button.active {

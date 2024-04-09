@@ -53,6 +53,10 @@ defineProps({
   user-select: none;
 }
 
+.body {
+  position: relative;
+}
+
 .shape {
   display: flex;
   flex-flow: column;

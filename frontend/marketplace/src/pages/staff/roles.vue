@@ -14,7 +14,7 @@
     </template>
 
     <template #tools>
-      <Button size="sm" type="neutral" @click="toggleDeletedRoles">
+      <Button size="sm" type="link-neutral" @click="toggleDeletedRoles">
         Toggle deleted roles
       </Button>
 

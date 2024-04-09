@@ -23,7 +23,7 @@
     </div>
 
     <template #footer>
-      <Button type="neutral" size="md" @click="toggleAllPermissions">
+      <Button type="link-neutral" size="md" @click="toggleAllPermissions">
         Toggle all permissions
       </Button>
 

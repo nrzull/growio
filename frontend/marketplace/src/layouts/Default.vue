@@ -3,6 +3,7 @@
     <Top :class="$style.top" />
     <Sidebar :class="$style.sidebar" />
     <div :class="$style.main">
+      <div id="main"></div>
       <RouterView v-if="isMounted" />
     </div>
   </div>
@@ -35,6 +36,7 @@ onMounted(() => (isMounted.value = true));
 }
 
 .main {
+  position: relative;
   display: flex;
   flex-flow: column;
   gap: 20px;
@@ -43,5 +45,12 @@ onMounted(() => (isMounted.value = true));
   height: 100%;
   overflow-y: auto;
   overflow-x: clip;
+}
+
+:global(#main) {
+  position: absolute;
+  height: calc(100% - 40px);
+  width: calc(100% - 40px);
+  z-index: -1;
 }
 </style>

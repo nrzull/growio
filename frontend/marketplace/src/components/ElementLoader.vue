@@ -1,9 +1,7 @@
 <template>
-  <Teleport to="#main">
-    <section :class="['pageLoader', { visible: loading }]">
-      <LoaderIcon />
-    </section>
-  </Teleport>
+  <section :class="[$style.elementLoader, { [$style.visible]: loading }]">
+    <LoaderIcon />
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -17,28 +15,26 @@ defineProps({
 });
 </script>
 
-<style>
-.pageLoader {
+<style module>
+.elementLoader {
   position: absolute;
   height: 100%;
   width: 100%;
+  left: 0;
+  top: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-flow: column;
   opacity: 0;
   visibility: hidden;
-  z-index: var(--z-index-page-loader);
+  z-index: var(--z-index-element-loader);
   background-color: hsl(0, 100%, 100%);
   border-radius: 8px;
 }
 
-.pageLoader.visible {
+.elementLoader.visible {
   opacity: 1;
   visibility: visible;
-}
-
-#main:has(.pageLoader.visible) {
-  z-index: unset;
 }
 </style>

@@ -9,7 +9,7 @@
     <template #heading>Users</template>
 
     <template #tools>
-      <Button size="sm" type="neutral" @click="invitationsModal = true">
+      <Button size="sm" type="link-neutral" @click="invitationsModal = true">
         Invitations
       </Button>
       <Button size="sm" :icon="plusSvg" @click="inviteUserModal = true">

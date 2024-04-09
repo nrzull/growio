@@ -1,11 +1,19 @@
 <template>
   <teleport to="#top-navigation">
-    <RouterLink to="/inventory/items" custom v-slot="{ navigate }">
-      <Button type="neutral" size="sm" @click="navigate">Items</Button>
+    <RouterLink to="/inventory/items" custom v-slot="{ navigate, isActive }">
+      <Button type="neutral" size="sm" :active="isActive" @click="navigate">
+        Items
+      </Button>
     </RouterLink>
 
-    <RouterLink to="/inventory/categories" custom v-slot="{ navigate }">
-      <Button type="neutral" size="sm" @click="navigate">Categories</Button>
+    <RouterLink
+      to="/inventory/categories"
+      custom
+      v-slot="{ navigate, isActive }"
+    >
+      <Button type="neutral" size="sm" :active="isActive" @click="navigate">
+        Categories
+      </Button>
     </RouterLink>
   </teleport>
 
