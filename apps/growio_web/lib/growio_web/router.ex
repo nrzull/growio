@@ -75,7 +75,7 @@ defmodule GrowioWeb.Router do
 
   scope "/api/marketplace_item_categories" do
     pipe_through([:marketplace_account])
-    resources("/", MarketplaceItemCategoryController, only: [:index, :create, :delete])
+    resources("/", MarketplaceItemCategoryController, only: [:index, :create, :update, :delete])
 
     resources("/:category_item_id/marketplace_items", MarketplaceItemController,
       only: [:index, :create]

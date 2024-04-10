@@ -16,6 +16,16 @@ export const apiMarketplaceItemCategoriesCreate = (params: { name: string }) =>
     .post<MarketplaceItemCategory>("/api/marketplace_item_categories", params)
     .then((r) => r.data);
 
+export const apiMarketplaceItemCategoriesUpdate = (
+  params: MarketplaceItemCategory
+) =>
+  growio
+    .patch<MarketplaceItemCategory>(
+      `/api/marketplace_item_categories/${params.id}`,
+      params
+    )
+    .then((r) => r.data);
+
 export const apiMarketplaceItemCategoriesDelete = (params: {
   item_category_id: IdParam;
 }) =>

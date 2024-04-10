@@ -29,6 +29,7 @@
       <Button
         size="sm"
         :icon="plusSvg"
+        :disabled="deletedRoles"
         @click="activeRole = buildMarketplaceAccountRole()"
       >
         Create
@@ -39,7 +40,12 @@
       v-if="isEmpty"
       :model-value="{ type: 'info', text: 'There are no roles' }"
     />
-    <Table v-else clickable :table="table" @click:row="handleClickRole">
+    <Table
+      v-else
+      :clickable="!deletedRoles"
+      :table="table"
+      @click:row="handleClickRole"
+    >
       <template #actions="{ ctx }">
         <div
           v-if="!deletedRoles"

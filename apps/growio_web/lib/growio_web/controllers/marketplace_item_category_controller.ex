@@ -46,6 +46,28 @@ defmodule GrowioWeb.Controllers.MarketplaceItemCategoryController do
     end
   end
 
+  operation(:update,
+    summary: "update marketplace item category",
+    parameters: [
+      id: [in: :path, description: "category id", type: :integer, example: 1]
+    ],
+    request_body: {"", "application/json", Schemas.MarketplaceItemCategory, required: true},
+    responses: [ok: {"", "application/json", Schemas.MarketplaceItemCategory}]
+  )
+
+  def update(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"id" => id} = params
+      ) do
+    with id when is_integer(id) <- String.to_integer(id),
+         category = %MarketplaceItemCategory{} <-
+           Marketplaces.get_item_category(marketplace_account, id),
+         {:ok, updated_category} <-
+           Marketplaces.update_item_category(marketplace_account, category, params) do
+      Conn.ok(conn, MarketplaceItemCategoryJSON.render(updated_category))
+    end
+  end
+
   operation(:delete,
     summary: "delete marketplace item category",
     parameters: [

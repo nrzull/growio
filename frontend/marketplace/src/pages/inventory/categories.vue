@@ -1,10 +1,11 @@
 <template>
   <PageLoader :loading="isLoading" />
 
-  <CreateCategoryModal
-    v-if="createCategoryModal"
+  <CategoryModal
+    v-if="categoryModal"
     @submit="handleSubmitCategory"
-    @close="createCategoryModal = false"
+    :model-value="categoryModal"
+    @close="categoryModal = undefined"
   />
 
   <PromiseModal ref="deleteCategoryModal">
@@ -25,7 +26,12 @@
         Toggle deleted categories
       </Button>
 
-      <Button size="sm" :icon="plusSvg" @click="createCategoryModal = true">
+      <Button
+        :disabled="deletedCategories"
+        size="sm"
+        :icon="plusSvg"
+        @click="categoryModal = buildPartialMarketplaceItemCategory()"
+      >
         Create
       </Button>
     </template>
@@ -34,7 +40,12 @@
       v-if="isEmpty"
       :model-value="{ type: 'info', text: 'There are no categories' }"
     />
-    <Table v-else :table="table">
+    <Table
+      v-else
+      :clickable="!deletedCategories"
+      :table="table"
+      @click:row="categoryModal = $event.original"
+    >
       <template #actions="{ ctx }">
         <div
           v-if="!deletedCategories"
@@ -61,18 +72,30 @@ import {
   useVueTable,
 } from "@tanstack/vue-table";
 import Notification from "~/components/Notifications/Notification.vue";
-import CreateCategoryModal from "~/components/Inventory/CreateCategoryModal.vue";
+import CategoryModal from "~/components/Inventory/CategoryModal.vue";
 import {
   apiMarketplaceItemCategoriesGetAll,
   apiMarketplaceItemCategoriesCreate,
   apiMarketplaceItemCategoriesDelete,
+  apiMarketplaceItemCategoriesUpdate,
 } from "~/api/growio/marketplace_item_categories";
-import { MarketplaceItemCategory } from "~/api/growio/marketplace_item_categories/types";
+import {
+  MarketplaceItemCategory,
+  PartialMarketplaceItemCategory,
+} from "~/api/growio/marketplace_item_categories/types";
 import trashCircleSvg from "~/assets/trash-circle.svg?raw";
 import PromiseModal from "~/components/PromiseModal.vue";
+import {
+  buildPartialMarketplaceItemCategory,
+  isMarketplaceItemCategory,
+} from "~/api/growio/marketplace_item_categories/utils";
 
 const categories = ref<MarketplaceItemCategory[]>([]);
-const createCategoryModal = ref(false);
+
+const categoryModal = ref<
+  MarketplaceItemCategory | PartialMarketplaceItemCategory
+>();
+
 const deleteCategoryModal = ref<InstanceType<typeof PromiseModal>>();
 const deletedCategories = ref(false);
 
@@ -116,16 +139,36 @@ const table = useVueTable({
   },
 });
 
-const handleSubmitCategory = async (params: { name: string }) => {
+const handleSubmitCategory = async (
+  params: PartialMarketplaceItemCategory | MarketplaceItemCategory
+) =>
+  isMarketplaceItemCategory(params)
+    ? updateCategory(params)
+    : createCategory(params);
+
+const createCategory = async (params: PartialMarketplaceItemCategory) => {
   try {
     wait.start(Wait.MARKETPLACE_ITEM_CATEGORY_CREATE);
     await apiMarketplaceItemCategoriesCreate(params);
-    createCategoryModal.value = false;
+    categoryModal.value = undefined;
     fetchMarketplaceItemCategories();
   } catch (e) {
     console.error(e);
   } finally {
     wait.end(Wait.MARKETPLACE_ITEM_CATEGORY_CREATE);
+  }
+};
+
+const updateCategory = async (params: MarketplaceItemCategory) => {
+  try {
+    wait.start(Wait.MARKETPLACE_ITEM_CATEGORY_UPDATE);
+    await apiMarketplaceItemCategoriesUpdate(params);
+    categoryModal.value = undefined;
+    fetchMarketplaceItemCategories();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ITEM_CATEGORY_UPDATE);
   }
 };
 
