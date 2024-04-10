@@ -1,4 +1,4 @@
-defmodule GrowioWeb.Views.MarketplaceAccountItemCategoryJSON do
+defmodule GrowioWeb.Views.MarketplaceItemCategoryJSON do
   alias Growio.Marketplaces.MarketplaceItemCategory
 
   def render(values) when is_list(values), do: Enum.map(values, &render(&1))

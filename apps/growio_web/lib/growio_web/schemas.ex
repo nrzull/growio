@@ -83,7 +83,7 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule MarketplaceAccountItemCategory do
+  defmodule MarketplaceItemCategory do
     schema(%{
       type: :object,
       properties: %{
@@ -93,7 +93,7 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule MarketplaceAccountItemCategoryCreate do
+  defmodule MarketplaceItemCategoryCreate do
     schema(%{
       type: :object,
       properties: %{
@@ -102,10 +102,10 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule MarketplaceAccountItemCategories do
+  defmodule MarketplaceItemCategories do
     schema(%{
       type: :array,
-      items: MarketplaceAccountItemCategory
+      items: MarketplaceItemCategory
     })
   end
 

@@ -40,18 +40,18 @@ import {
 import Notification from "~/components/Notifications/Notification.vue";
 import CreateCategoryModal from "~/components/Inventory/CreateCategoryModal.vue";
 import {
-  apiMarketplaceAccountItemCategoriesGetAll,
-  apiMarketplaceAccountItemCategoriesCreate,
-} from "~/api/growio/marketplace_account_item_categories";
-import { MarketplaceAccountItemCategory } from "~/api/growio/marketplace_account_item_categories/types";
+  apiMarketplaceItemCategoriesGetAll,
+  apiMarketplaceItemCategoriesCreate,
+} from "~/api/growio/marketplace_item_categories";
+import { MarketplaceItemCategory } from "~/api/growio/marketplace_item_categories/types";
 
-const categories = ref<MarketplaceAccountItemCategory[]>([]);
+const categories = ref<MarketplaceItemCategory[]>([]);
 const createCategoryModal = ref(false);
 
 const isLoading = computed(() =>
   wait.some([
-    Wait.MARKETPLACE_ACCOUNT_ITEM_CATEGORIES_FETCH,
-    Wait.MARKETPLACE_ACCOUNT_ITEM_CATEGORY_CREATE,
+    Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH,
+    Wait.MARKETPLACE_ITEM_CATEGORY_CREATE,
   ])
 );
 
@@ -85,27 +85,27 @@ const table = useVueTable({
 
 const handleSubmitCategory = async (params: { name: string }) => {
   try {
-    wait.start(Wait.MARKETPLACE_ACCOUNT_ITEM_CATEGORY_CREATE);
-    await apiMarketplaceAccountItemCategoriesCreate(params);
+    wait.start(Wait.MARKETPLACE_ITEM_CATEGORY_CREATE);
+    await apiMarketplaceItemCategoriesCreate(params);
     createCategoryModal.value = false;
-    fetchMarketplaceAccountItemCategories();
+    fetchMarketplaceItemCategories();
   } catch (e) {
     console.error(e);
   } finally {
-    wait.end(Wait.MARKETPLACE_ACCOUNT_ITEM_CATEGORY_CREATE);
+    wait.end(Wait.MARKETPLACE_ITEM_CATEGORY_CREATE);
   }
 };
 
-const fetchMarketplaceAccountItemCategories = async () => {
+const fetchMarketplaceItemCategories = async () => {
   try {
-    wait.start(Wait.MARKETPLACE_ACCOUNT_ITEM_CATEGORIES_FETCH);
-    categories.value = await apiMarketplaceAccountItemCategoriesGetAll();
+    wait.start(Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH);
+    categories.value = await apiMarketplaceItemCategoriesGetAll();
   } catch (e) {
     console.error(e);
   } finally {
-    wait.end(Wait.MARKETPLACE_ACCOUNT_ITEM_CATEGORIES_FETCH);
+    wait.end(Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH);
   }
 };
 
-fetchMarketplaceAccountItemCategories();
+fetchMarketplaceItemCategories();
 </script>

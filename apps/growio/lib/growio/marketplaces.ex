@@ -610,6 +610,13 @@ defmodule Growio.Marketplaces do
     |> Repo.all()
   end
 
+  def get_item_category(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
+    MarketplaceItemCategory
+    |> where([category], category.id == ^id)
+    |> where([category], category.marketplace_id == ^initiator.marketplace_id)
+    |> Repo.one()
+  end
+
   def create_item_category(%MarketplaceAccount{} = initiator, %{} = params) do
     with true <-
            Permissions.ok?(
