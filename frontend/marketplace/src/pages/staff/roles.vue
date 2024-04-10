@@ -8,6 +8,14 @@
     @close="activeRole = undefined"
   />
 
+  <PromiseModal ref="deleteRoleModal">
+    <template #heading>Delete role</template>
+    <template #footer="{ resolve, reject }">
+      <Button size="md" type="link-neutral" @click="reject"> Cancel </Button>
+      <Button size="md" @click="resolve"> Confirm </Button>
+    </template>
+  </PromiseModal>
+
   <PageShape>
     <template #heading>
       Roles <template v-if="deletedRoles">(Deleted)</template>
@@ -85,12 +93,15 @@ import {
   addErrorNotification,
 } from "~/composables/notifications";
 import Notification from "~/components/Notifications/Notification.vue";
+import PromiseModal from "~/components/PromiseModal.vue";
 
 const roles = ref<MarketplaceAccountRole[]>([]);
 const deletedRoles = ref(false);
 const activeRole = ref<
   MarketplaceAccountRole | PartialMarketplaceAccountRole
 >();
+
+const deleteRoleModal = ref<InstanceType<typeof PromiseModal>>();
 
 const columnHelper = createColumnHelper<MarketplaceAccountRole>();
 
@@ -183,6 +194,12 @@ const saveRole = async (
 };
 
 const deleteRole = async (role: MarketplaceAccountRole) => {
+  try {
+    await deleteRoleModal.value?.confirm();
+  } catch {
+    return;
+  }
+
   try {
     wait.start(Wait.MARKETPLACE_ACCOUNT_ROLE_DELETE);
     await apiMarketplaceAccountRolesDelete(role);
