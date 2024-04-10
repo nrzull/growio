@@ -105,9 +105,14 @@ const columns = ref([
     header: () => "Description",
   }),
 
-  columnHelper.accessor("actions" as any, {
+  columnHelper.display({
+    id: "actions",
     cell: (info) => info.getValue(),
-    header: () => "",
+    meta: {
+      style: {
+        width: "0",
+      },
+    },
   }),
 ]);
 

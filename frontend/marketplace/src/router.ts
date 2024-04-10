@@ -91,7 +91,7 @@ export const router = createRouter({
 
         {
           path: "",
-          redirect: "/users",
+          redirect: "/staff/users",
         },
       ],
     },

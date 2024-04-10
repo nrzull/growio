@@ -18,6 +18,7 @@
           <th
             v-for="header in headerGroup.headers"
             :key="header.id"
+            :style="getCellStyle(header)"
             :colSpan="header.colSpan"
           >
             <slot
@@ -40,7 +41,11 @@
           :key="row.id"
           @click="clickable ? $emit('click:row', row) : null"
         >
-          <td v-for="cell in row.getVisibleCells()" :key="cell.id">
+          <td
+            v-for="cell in row.getVisibleCells()"
+            :key="cell.id"
+            :style="getCellStyle(cell)"
+          >
             <slot
               :name="prepareSlotName(getAccessorKey(cell))"
               v-bind="{ ctx: cell }"
@@ -62,6 +67,7 @@
           <th
             v-for="header in footerGroup.headers"
             :key="header.id"
+            :style="getCellStyle(header)"
             :colSpan="header.colSpan"
           >
             <slot
@@ -117,7 +123,10 @@ const prepareSlotName = (accessor: string, suffix = "") =>
   [accessor.replace(/\.+/g, "-"), suffix].filter((v) => v).join("-");
 
 const getAccessorKey = (target: Cell<any, any> | Header<any, any>) =>
-  (target.column.columnDef as any).accessorKey;
+  target.id.split("_").reverse()[0];
+
+const getCellStyle = (target: Cell<any, any> | Header<any, any>) =>
+  (target.column.columnDef.meta as any)?.style || {};
 </script>
 
 <style module>
