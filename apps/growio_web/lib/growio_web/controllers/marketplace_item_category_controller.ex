@@ -22,8 +22,10 @@ defmodule GrowioWeb.Controllers.MarketplaceItemCategoryController do
   )
 
   def index(%{assigns: %{marketplace_account: marketplace_account}} = conn, _params) do
+    opts = GrowioWeb.QueryParams.into_keyword(conn.query_params)
+
     with categories when is_list(categories) <-
-           Marketplaces.all_item_categories(marketplace_account) do
+           Marketplaces.all_item_categories(marketplace_account, opts) do
       categories
       |> MarketplaceItemCategoryJSON.render()
       |> then(&Conn.ok(conn, &1))

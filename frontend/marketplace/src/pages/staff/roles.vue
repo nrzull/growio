@@ -242,6 +242,7 @@ fetchRoles();
 .trash {
   height: 32px;
   width: 32px;
+  cursor: pointer;
 }
 
 .trash:hover * {

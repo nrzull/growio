@@ -7,10 +7,24 @@
     @close="createCategoryModal = false"
   />
 
+  <PromiseModal ref="deleteCategoryModal">
+    <template #heading>Delete category</template>
+    <template #footer="{ resolve, reject }">
+      <Button size="md" type="link-neutral" @click="reject"> Cancel </Button>
+      <Button size="md" @click="resolve"> Confirm </Button>
+    </template>
+  </PromiseModal>
+
   <PageShape>
-    <template #heading> Categories </template>
+    <template #heading>
+      Categories <template v-if="deletedCategories">(Deleted)</template>
+    </template>
 
     <template #tools>
+      <Button size="sm" type="link-neutral" @click="toggleDeletedCategories">
+        Toggle deleted categories
+      </Button>
+
       <Button size="sm" :icon="plusSvg" @click="createCategoryModal = true">
         Create
       </Button>
@@ -20,7 +34,16 @@
       v-if="isEmpty"
       :model-value="{ type: 'info', text: 'There are no categories' }"
     />
-    <Table v-else :table="table"> </Table>
+    <Table v-else :table="table">
+      <template #actions="{ ctx }">
+        <div
+          v-if="!deletedCategories"
+          :class="$style.trash"
+          v-html="trashCircleSvg"
+          @click.stop="deleteCategory(ctx.row.original)"
+        ></div>
+      </template>
+    </Table>
   </PageShape>
 </template>
 
@@ -42,11 +65,16 @@ import CreateCategoryModal from "~/components/Inventory/CreateCategoryModal.vue"
 import {
   apiMarketplaceItemCategoriesGetAll,
   apiMarketplaceItemCategoriesCreate,
+  apiMarketplaceItemCategoriesDelete,
 } from "~/api/growio/marketplace_item_categories";
 import { MarketplaceItemCategory } from "~/api/growio/marketplace_item_categories/types";
+import trashCircleSvg from "~/assets/trash-circle.svg?raw";
+import PromiseModal from "~/components/PromiseModal.vue";
 
 const categories = ref<MarketplaceItemCategory[]>([]);
 const createCategoryModal = ref(false);
+const deleteCategoryModal = ref<InstanceType<typeof PromiseModal>>();
+const deletedCategories = ref(false);
 
 const isLoading = computed(() =>
   wait.some([
@@ -65,9 +93,14 @@ const columns = ref([
     header: () => "Name",
   }),
 
-  columnHelper.accessor("actions" as any, {
+  columnHelper.display({
+    id: "actions",
     cell: (info) => info.getValue(),
-    header: () => "",
+    meta: {
+      style: {
+        width: "0",
+      },
+    },
   }),
 ]);
 
@@ -99,7 +132,9 @@ const handleSubmitCategory = async (params: { name: string }) => {
 const fetchMarketplaceItemCategories = async () => {
   try {
     wait.start(Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH);
-    categories.value = await apiMarketplaceItemCategoriesGetAll();
+    categories.value = await apiMarketplaceItemCategoriesGetAll({
+      deleted_at: deletedCategories.value,
+    });
   } catch (e) {
     console.error(e);
   } finally {
@@ -107,5 +142,40 @@ const fetchMarketplaceItemCategories = async () => {
   }
 };
 
+const deleteCategory = async (category: MarketplaceItemCategory) => {
+  try {
+    await deleteCategoryModal.value?.confirm();
+  } catch {
+    return;
+  }
+
+  try {
+    wait.start(Wait.MARKETPLACE_ITEM_CATEGORY_DELETE);
+    await apiMarketplaceItemCategoriesDelete({ item_category_id: category.id });
+    await fetchMarketplaceItemCategories();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ITEM_CATEGORY_DELETE);
+  }
+};
+
+const toggleDeletedCategories = () => {
+  deletedCategories.value = !deletedCategories.value;
+  fetchMarketplaceItemCategories();
+};
+
 fetchMarketplaceItemCategories();
 </script>
+
+<style module>
+.trash {
+  height: 32px;
+  width: 32px;
+  cursor: pointer;
+}
+
+.trash:hover * {
+  fill: var(--color-primary);
+}
+</style>
