@@ -1,8 +1,13 @@
 <template>
   <Modal @close="$emit('close')">
-    <template #heading>Create Item</template>
+    <template v-if="isMarketplaceItem(modelValue)" #heading>
+      Item {{ modelValue.name }}
+    </template>
+    <template v-else #heading> Create item </template>
 
-    <ElementLoader :loading="isLoading" />
+    <template #loader>
+      <ElementLoader :loading="isLoading" />
+    </template>
 
     <div :class="$style.row">
       <TextInput v-model="item.name" placeholder="Name" />
@@ -36,6 +41,7 @@ import { apiMarketplaceItemCategoriesGetAll } from "~/api/growio/marketplace_ite
 import { clone } from "remeda";
 import ElementLoader from "~/components/ElementLoader.vue";
 import { Wait, wait } from "~/composables/wait";
+import { isMarketplaceItem } from "~/api/growio/marketplace_items/utils";
 
 const props = defineProps({
   modelValue: {
@@ -60,7 +66,9 @@ const item = ref<PartialMarketplaceItem | MarketplaceItem>(
 const category = ref<MarketplaceItemCategory>();
 const categories = ref<MarketplaceItemCategory[]>([]);
 
-const isLoading = computed(() => props.loading || wait.some([]));
+const isLoading = computed(
+  () => props.loading || wait.some([Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH])
+);
 
 const fetchCategories = async () => {
   try {

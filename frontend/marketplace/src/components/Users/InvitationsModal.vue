@@ -2,7 +2,9 @@
   <Modal size="lg" @close="$emit('close')">
     <template #heading>Invitations</template>
 
-    <ElementLoader :loading="isLoading" />
+    <template #loader>
+      <ElementLoader :loading="isLoading" />
+    </template>
 
     <Notification
       v-if="isEmpty"

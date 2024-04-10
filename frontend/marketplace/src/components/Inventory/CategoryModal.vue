@@ -5,7 +5,9 @@
     </template>
     <template v-else #heading> Create Category </template>
 
-    <ElementLoader :loading="isLoading" />
+    <template #loader>
+      <ElementLoader :loading="isLoading" />
+    </template>
 
     <div :class="$style.row">
       <TextInput v-model="category.name" placeholder="Name" />

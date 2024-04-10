@@ -1,13 +1,13 @@
 <template>
   <div :class="$style.wrapper" @mousedown.self="$emit('close')">
     <Shape :class="[$style.shape, $style[size]]">
+      <slot name="loader"></slot>
+
       <div :class="$style.heading">
         <slot name="heading"></slot>
       </div>
 
-      <div :class="$style.body">
-        <slot></slot>
-      </div>
+      <slot></slot>
 
       <div :class="$style.footer">
         <slot name="footer"></slot>
@@ -53,14 +53,11 @@ defineProps({
   user-select: none;
 }
 
-.body {
-  position: relative;
-}
-
 .shape {
   display: flex;
   flex-flow: column;
   gap: 24px;
+  position: relative;
 }
 
 .shape.md {
