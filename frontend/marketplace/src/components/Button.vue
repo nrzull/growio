@@ -7,13 +7,14 @@
       { [$style.active]: active },
     ]"
   >
-    <img v-if="icon" :class="$style.icon" :src="icon" />
+    <Icon v-if="icon" :size="size" :value="icon" />
     <slot />
   </button>
 </template>
 
 <script setup lang="ts">
 import { PropType } from "vue";
+import Icon, { Icons } from "~/components/Icon.vue";
 
 defineProps({
   size: {
@@ -32,7 +33,7 @@ defineProps({
   },
 
   icon: {
-    type: String,
+    type: String as PropType<Icons>,
     default: "",
   },
 });
@@ -43,7 +44,6 @@ defineProps({
   all: unset;
   user-select: none;
   box-sizing: border-box;
-
   border: 1px solid transparent;
   border-radius: 6px;
   display: flex;
@@ -62,11 +62,6 @@ defineProps({
   padding: 16px;
 }
 
-.button.lg .icon {
-  height: 16px;
-  min-width: 16px;
-}
-
 .button.md {
   padding: 12px 16px;
   font-size: 14px;
@@ -75,11 +70,6 @@ defineProps({
 .button.sm {
   padding: 8px 12px;
   font-size: 13px;
-}
-
-.button.sm .icon {
-  height: 12px;
-  min-width: 12px;
 }
 
 .button:disabled {

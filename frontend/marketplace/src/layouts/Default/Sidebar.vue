@@ -14,7 +14,7 @@
         :active="isActive"
         @click="navigate"
       >
-        <div :class="$style.icon" v-html="icon"></div>
+        <Icon :class="$style.icon" :value="icon" />
         <div>{{ text }}</div>
       </Button>
     </RouterLink>
@@ -22,26 +22,24 @@
 </template>
 
 <script setup>
-import usersSvg from "~/assets/users.svg?raw";
-import adProductSvg from "~/assets/ad-product.svg?raw";
-import settings01Svg from "~/assets/settings-01.svg?raw";
+import Icon from "~/components/Icon.vue";
 import Button from "~/components/Button.vue";
 
 const buttons = [
   {
-    icon: usersSvg,
+    icon: "users",
     text: "Staff",
     to: "/staff",
   },
 
   {
-    icon: adProductSvg,
+    icon: "adProduct",
     text: "Inventory",
     to: "/inventory",
   },
 
   {
-    icon: settings01Svg,
+    icon: "settings01",
     text: "Settings",
     to: "/settings",
   },

@@ -30,7 +30,7 @@
       <Button
         :disabled="deletedCategories"
         size="sm"
-        :icon="plusSvg"
+        icon="plus"
         @click="categoryModal = buildPartialMarketplaceItemCategory()"
       >
         Create
@@ -48,12 +48,12 @@
       @click:row="categoryModal = $event.original"
     >
       <template #actions="{ ctx }">
-        <div
+        <Icon
           v-if="!deletedCategories"
-          :class="$style.trash"
           @click.stop="deleteCategory(ctx.row.original)"
-          v-html="trashCircleSvg"
-        ></div>
+          clickable
+          value="trashCircle"
+        />
       </template>
     </Table>
   </PageShape>
@@ -66,7 +66,6 @@ import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
 import Table from "~/components/Table.vue";
 import Button from "~/components/Button.vue";
-import plusSvg from "~/assets/plus.svg";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -84,7 +83,7 @@ import {
   MarketplaceItemCategory,
   PartialMarketplaceItemCategory,
 } from "~/api/growio/marketplace_item_categories/types";
-import trashCircleSvg from "~/assets/trash-circle.svg?raw";
+import Icon from "~/components/Icon.vue";
 import PromiseModal from "~/components/PromiseModal.vue";
 import {
   buildPartialMarketplaceItemCategory,

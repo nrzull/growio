@@ -15,7 +15,7 @@
     <template #tools>
       <Button
         size="sm"
-        :icon="plusSvg"
+        icon="plus"
         @click="
           itemModal = buildPartialMarketplaceItem({
             category_id: activeCategory?.id!,
@@ -63,7 +63,7 @@ import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
 import Table from "~/components/Table.vue";
 import Button from "~/components/Button.vue";
-import plusSvg from "~/assets/plus.svg";
+
 import Shape from "~/components/Shape.vue";
 import {
   createColumnHelper,

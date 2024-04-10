@@ -12,7 +12,7 @@
       <Button size="sm" type="link-neutral" @click="invitationsModal = true">
         Invitations
       </Button>
-      <Button size="sm" :icon="plusSvg" @click="inviteUserModal = true">
+      <Button size="sm" icon="plus" @click="inviteUserModal = true">
         Invite
       </Button>
     </template>
@@ -39,7 +39,6 @@ import { apiMarketplaceAccountsGetAll } from "~/api/growio/marketplace_accounts"
 import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
 import Button from "~/components/Button.vue";
-import plusSvg from "~/assets/plus.svg";
 import InviteUserModal from "~/components/Users/InviteUserModal.vue";
 import InvitationsModal from "~/components/Users/InvitationsModal.vue";
 import Notification from "~/components/Notifications/Notification.vue";

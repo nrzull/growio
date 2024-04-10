@@ -28,7 +28,7 @@
 
       <Button
         size="sm"
-        :icon="plusSvg"
+        icon="plus"
         :disabled="deletedRoles"
         @click="activeRole = buildMarketplaceAccountRole()"
       >
@@ -47,12 +47,12 @@
       @click:row="handleClickRole"
     >
       <template #actions="{ ctx }">
-        <div
+        <Icon
           v-if="!deletedRoles"
-          :class="$style.trash"
+          clickable
           @click.stop="deleteRole(ctx.row.original)"
-          v-html="trashCircleSvg"
-        ></div>
+          value="trashCircle"
+        />
       </template>
     </Table>
   </PageShape>
@@ -69,7 +69,6 @@ import {
 import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
 import Button from "~/components/Button.vue";
-import plusSvg from "~/assets/plus.svg";
 import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
 import { wait, Wait } from "~/composables/wait";
 import {
@@ -93,13 +92,13 @@ import {
 } from "~/components/Roles/utils";
 import { PartialMarketplaceAccountRole } from "~/components/Roles/types";
 import { apiMarketplaceAccountRolesCreate } from "~/api/growio/marketplace_account_roles";
-import trashCircleSvg from "~/assets/trash-circle.svg?raw";
 import {
   addSuccessNotification,
   addErrorNotification,
 } from "~/composables/notifications";
 import Notification from "~/components/Notifications/Notification.vue";
 import PromiseModal from "~/components/PromiseModal.vue";
+import Icon from "~/components/Icon.vue";
 
 const roles = ref<MarketplaceAccountRole[]>([]);
 const deletedRoles = ref(false);
@@ -243,15 +242,3 @@ const fetchRoles = async () => {
 
 fetchRoles();
 </script>
-
-<style module>
-.trash {
-  height: 32px;
-  width: 32px;
-  cursor: pointer;
-}
-
-.trash:hover * {
-  fill: var(--color-primary);
-}
-</style>
