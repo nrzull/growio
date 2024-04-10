@@ -3,6 +3,7 @@ defmodule GrowioWeb.Controllers.MarketplaceItemController do
   use OpenApiSpex.ControllerSpecs
   alias GrowioWeb.Conn
   alias GrowioWeb.Schemas
+  alias Growio.Marketplaces.MarketplaceItem
   alias Growio.Marketplaces.MarketplaceItemCategory
   alias GrowioWeb.Views.MarketplaceItemJSON
   alias Growio.Marketplaces
@@ -18,6 +19,9 @@ defmodule GrowioWeb.Controllers.MarketplaceItemController do
 
   operation(:index,
     summary: "show marketplace items",
+    parameters: [
+      category_item_id: [in: :path, description: "category id", type: :integer, example: 1]
+    ],
     responses: [ok: {"", "application/json", Schemas.MarketplaceItems}]
   )
 
@@ -40,6 +44,9 @@ defmodule GrowioWeb.Controllers.MarketplaceItemController do
 
   operation(:create,
     summary: "create marketplace item",
+    parameters: [
+      category_item_id: [in: :path, description: "category id", type: :integer, example: 1]
+    ],
     request_body: {"", "application/json", Schemas.MarketplaceItemCreate, required: true},
     responses: [ok: {"", "application/json", Schemas.MarketplaceItem}]
   )
@@ -59,6 +66,33 @@ defmodule GrowioWeb.Controllers.MarketplaceItemController do
       item
       |> MarketplaceItemJSON.render()
       |> then(&Conn.ok(conn, &1))
+    end
+  end
+
+  operation(:update,
+    summary: "update marketplace item",
+    parameters: [
+      category_item_id: [in: :path, description: "category id", type: :integer, example: 1],
+      id: [in: :path, description: "item id", type: :integer, example: 1]
+    ],
+    request_body: {"", "application/json", Schemas.MarketplaceItem, required: true},
+    responses: [ok: {"", "application/json", Schemas.MarketplaceItem}]
+  )
+
+  def update(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"id" => item_id, "category_item_id" => category_item_id} = params
+      ) do
+    with category_item_id when is_integer(category_item_id) <-
+           String.to_integer(category_item_id),
+         item_id when is_integer(item_id) <- String.to_integer(item_id),
+         category = %MarketplaceItemCategory{} <-
+           Marketplaces.get_item_category(marketplace_account, category_item_id),
+         item = %MarketplaceItem{} <-
+           Marketplaces.get_item(marketplace_account, category, item_id),
+         {:ok, updated_item} <-
+           Marketplaces.update_item(marketplace_account, item, params) do
+      Conn.ok(conn, MarketplaceItemJSON.render(updated_item))
     end
   end
 end

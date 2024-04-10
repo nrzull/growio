@@ -78,7 +78,7 @@ defmodule GrowioWeb.Router do
     resources("/", MarketplaceItemCategoryController, only: [:index, :create, :update, :delete])
 
     resources("/:category_item_id/marketplace_items", MarketplaceItemController,
-      only: [:index, :create]
+      only: [:index, :create, :update]
     )
   end
 

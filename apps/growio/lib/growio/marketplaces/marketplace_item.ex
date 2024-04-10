@@ -7,7 +7,7 @@ defmodule Growio.Marketplaces.MarketplaceItem do
 
   @type t :: %__MODULE__{}
   @required ~w(name)a
-  @optional ~w(amount description deleted_at)a
+  @optional ~w(amount description deleted_at category_id)a
 
   schema "marketplace_items" do
     field(:name, :string)

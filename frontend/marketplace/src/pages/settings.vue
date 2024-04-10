@@ -1,15 +1,15 @@
 <template>
   <teleport to="#top-navigation">
-    <RouterLink to="/settings/general" custom v-slot="{ navigate, isActive }">
+    <RouterLink v-slot="{ navigate, isActive }" to="/settings/general" custom>
       <Button type="neutral" size="sm" :active="isActive" @click="navigate">
         General
       </Button>
     </RouterLink>
 
     <RouterLink
+      v-slot="{ navigate, isActive }"
       to="/settings/subscription"
       custom
-      v-slot="{ navigate, isActive }"
     >
       <Button type="neutral" size="sm" :active="isActive" @click="navigate">
         Subscription

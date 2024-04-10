@@ -6,7 +6,8 @@ defmodule GrowioWeb.Views.MarketplaceItemJSON do
   def render(%MarketplaceItem{} = item) do
     %{
       id: item.id,
-      name: item.name
+      name: item.name,
+      category_id: item.category_id
     }
   end
 

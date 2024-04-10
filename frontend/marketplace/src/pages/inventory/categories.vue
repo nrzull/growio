@@ -3,9 +3,10 @@
 
   <CategoryModal
     v-if="categoryModal"
-    @submit="handleSubmitCategory"
     :model-value="categoryModal"
+    :loading="isLoading"
     @close="categoryModal = undefined"
+    @submit="handleSubmitCategory"
   />
 
   <PromiseModal ref="deleteCategoryModal">
@@ -50,8 +51,8 @@
         <div
           v-if="!deletedCategories"
           :class="$style.trash"
-          v-html="trashCircleSvg"
           @click.stop="deleteCategory(ctx.row.original)"
+          v-html="trashCircleSvg"
         ></div>
       </template>
     </Table>
@@ -103,6 +104,7 @@ const isLoading = computed(() =>
   wait.some([
     Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH,
     Wait.MARKETPLACE_ITEM_CATEGORY_CREATE,
+    Wait.MARKETPLACE_ITEM_CATEGORY_UPDATE,
   ])
 );
 

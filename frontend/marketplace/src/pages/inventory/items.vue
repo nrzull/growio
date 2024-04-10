@@ -1,29 +1,39 @@
 <template>
   <PageLoader :loading="isLoading" />
 
-  <CreateItemModal
-    v-if="createItemModal"
-    @close="createItemModal = false"
-    @submit="handleCreateItem"
+  <ItemModal
+    v-if="itemModal"
+    :model-value="itemModal"
+    :loading="isLoading"
+    @close="itemModal = undefined"
+    @submit="handleSubmitItem"
   />
 
   <PageShape>
     <template #heading> Items </template>
 
     <template #tools>
-      <Button size="sm" :icon="plusSvg" @click="createItemModal = true">
+      <Button
+        size="sm"
+        :icon="plusSvg"
+        @click="
+          itemModal = buildPartialMarketplaceItem({
+            category_id: activeCategory?.id!,
+          })
+        "
+      >
         Create
       </Button>
     </template>
 
     <div :class="[$style.grid, { [$style.empty]: !categories.length }]">
-      <Shape type="secondary" :class="$style.aside" v-if="categories.length">
+      <Shape v-if="categories.length" type="secondary" :class="$style.aside">
         <Button
           v-for="category in categories"
+          :key="category.id"
           size="md"
           :active="activeCategory?.id === category.id"
           type="neutral"
-          :key="category.id"
           @click="activeCategory = category"
         >
           {{ category.name }}
@@ -34,7 +44,13 @@
           v-if="isEmpty"
           :model-value="{ type: 'info', text: 'There are no items' }"
         />
-        <Table v-else :table="table"> </Table>
+        <Table
+          v-else
+          :table="table"
+          clickable
+          @click:row="itemModal = $event.original"
+        >
+        </Table>
       </div>
     </div>
   </PageShape>
@@ -57,23 +73,29 @@ import {
 import Notification from "~/components/Notifications/Notification.vue";
 import { apiMarketplaceItemCategoriesGetAll } from "~/api/growio/marketplace_item_categories";
 import { MarketplaceItemCategory } from "~/api/growio/marketplace_item_categories/types";
-import { MarketplaceItem } from "~/api/growio/marketplace_items/types";
+import {
+  MarketplaceItem,
+  PartialMarketplaceItem,
+} from "~/api/growio/marketplace_items/types";
 import {
   apiMarketplaceItemsGetAll,
   apiMarketplaceItemsCreate,
+  apiMarketplaceItemsUpdate,
 } from "~/api/growio/marketplace_items";
-import { IdParam } from "~/api/types";
-import CreateItemModal from "~/components/Inventory/CreateItemModal.vue";
+import ItemModal from "~/components/Inventory/ItemModal.vue";
+import { buildPartialMarketplaceItem } from "~/api/growio/marketplace_items/utils";
+import { isMarketplaceItem } from "~/api/growio/marketplace_items/utils";
 
 const items = ref<MarketplaceItem[]>([]);
 const categories = ref<MarketplaceItemCategory[]>([]);
 const activeCategory = ref<MarketplaceItemCategory>();
-const createItemModal = ref(false);
+const itemModal = ref<PartialMarketplaceItem | MarketplaceItem>();
 
 const isLoading = computed(() =>
   wait.some([
     Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH,
     Wait.MARKETPLACE_ITEM_CREATE,
+    Wait.MARKETPLACE_ITEM_UPDATE,
   ])
 );
 
@@ -108,10 +130,10 @@ const table = useVueTable({
 const fetchMarketplaceItemCategories = async () => {
   try {
     wait.start(Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH);
+
     categories.value = await apiMarketplaceItemCategoriesGetAll({
       deleted_at: false,
     });
-
     activeCategory.value = categories.value[0];
   } catch (e) {
     console.error(e);
@@ -137,24 +159,40 @@ const fetchMarketplaceItems = async (
   }
 };
 
-const handleCreateItem = async (params: {
-  name: string;
-  category_id: IdParam;
-}) => {
+const handleSubmitItem = async (
+  params: PartialMarketplaceItem | MarketplaceItem
+) => (isMarketplaceItem(params) ? updateItem(params) : createItem(params));
+
+const createItem = async (params: PartialMarketplaceItem) => {
   try {
     wait.start(Wait.MARKETPLACE_ITEM_CREATE);
 
-    await apiMarketplaceItemsCreate({
-      category_item_id: params.category_id,
-      item: params,
-    });
+    await apiMarketplaceItemsCreate(params);
 
-    createItemModal.value = false;
+    itemModal.value = undefined;
     await fetchMarketplaceItems();
   } catch (e) {
     console.error(e);
   } finally {
     wait.end(Wait.MARKETPLACE_ITEM_CREATE);
+  }
+};
+
+const updateItem = async (params: MarketplaceItem) => {
+  try {
+    wait.start(Wait.MARKETPLACE_ITEM_UPDATE);
+
+    await apiMarketplaceItemsUpdate({
+      item: params,
+      category_id: itemModal.value.category_id,
+    });
+
+    itemModal.value = undefined;
+    await fetchMarketplaceItems();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ITEM_UPDATE);
   }
 };
 

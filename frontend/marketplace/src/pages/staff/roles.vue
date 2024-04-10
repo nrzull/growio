@@ -50,8 +50,8 @@
         <div
           v-if="!deletedRoles"
           :class="$style.trash"
-          v-html="trashCircleSvg"
           @click.stop="deleteRole(ctx.row.original)"
+          v-html="trashCircleSvg"
         ></div>
       </template>
     </Table>

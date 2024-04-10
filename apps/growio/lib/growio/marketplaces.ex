@@ -766,10 +766,8 @@ defmodule Growio.Marketplaces do
 
   def get_item(%MarketplaceItemCategory{} = item_category, item_id) when is_integer(item_id) do
     MarketplaceItem
-    |> where(
-      [item],
-      item.id == ^item_id and item.category_id == ^item_category.id
-    )
+    |> where([item], item.id == ^item_id)
+    |> where([item], item.category_id == ^item_category.id)
     |> Repo.one()
   end
 

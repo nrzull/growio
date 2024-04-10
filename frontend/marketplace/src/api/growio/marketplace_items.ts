@@ -1,5 +1,8 @@
 import { growio } from "~/api/growio";
-import { MarketplaceItem } from "~/api/growio/marketplace_items/types";
+import {
+  MarketplaceItem,
+  PartialMarketplaceItem,
+} from "~/api/growio/marketplace_items/types";
 import { IdParam } from "~/api/types";
 
 export const apiMarketplaceItemsGetAll = (params: {
@@ -16,13 +19,21 @@ export const apiMarketplaceItemsGetAll = (params: {
     .then((r) => r.data);
 };
 
-export const apiMarketplaceItemsCreate = (params: {
-  category_item_id: IdParam;
-  item: { name: string };
-}) =>
+export const apiMarketplaceItemsCreate = (params: PartialMarketplaceItem) =>
   growio
     .post<MarketplaceItem>(
-      `/api/marketplace_item_categories/${params.category_item_id}/marketplace_items`,
+      `/api/marketplace_item_categories/${params.category_id}/marketplace_items`,
+      params
+    )
+    .then((r) => r.data);
+
+export const apiMarketplaceItemsUpdate = (params: {
+  category_id: IdParam;
+  item: MarketplaceItem;
+}) =>
+  growio
+    .patch<MarketplaceItem>(
+      `/api/marketplace_item_categories/${params.category_id}/marketplace_items/${params.item.id}`,
       params.item
     )
     .then((r) => r.data);

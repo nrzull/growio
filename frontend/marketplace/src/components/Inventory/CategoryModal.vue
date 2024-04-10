@@ -1,9 +1,9 @@
 <template>
   <Modal @close="$emit('close')">
-    <template #heading v-if="isMarketplaceItemCategory(modelValue)">
+    <template v-if="isMarketplaceItemCategory(modelValue)" #heading>
       Category {{ modelValue.name }}
     </template>
-    <template #heading v-else> Create Category </template>
+    <template v-else #heading> Create Category </template>
 
     <ElementLoader :loading="isLoading" />
 
