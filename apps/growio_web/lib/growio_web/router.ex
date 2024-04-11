@@ -70,16 +70,13 @@ defmodule GrowioWeb.Router do
 
   scope "/api/marketplace_account_roles" do
     pipe_through([:marketplace_account])
-    resources("/", MarketplaceAccountRoleController, only: [:index, :create, :update, :delete])
+    resources("/", MarketplaceAccountRoleController)
   end
 
   scope "/api/marketplace_item_categories" do
     pipe_through([:marketplace_account])
-    resources("/", MarketplaceItemCategoryController, only: [:index, :create, :update, :delete])
-
-    resources("/:category_item_id/marketplace_items", MarketplaceItemController,
-      only: [:index, :create, :update]
-    )
+    resources("/", MarketplaceItemCategoryController)
+    resources("/:category_item_id/marketplace_items", MarketplaceItemController)
   end
 
   scope "/api/permissions" do

@@ -9,6 +9,14 @@
     @submit="handleSubmitItem"
   />
 
+  <PromiseModal ref="deleteItemModal">
+    <template #heading>Delete item</template>
+    <template #footer="{ resolve, reject }">
+      <Button size="md" type="link-neutral" @click="reject"> Cancel </Button>
+      <Button size="md" @click="resolve"> Confirm </Button>
+    </template>
+  </PromiseModal>
+
   <PageShape>
     <template #heading> Items </template>
 
@@ -50,6 +58,12 @@
           clickable
           @click:row="itemModal = $event.original"
         >
+          <template #actions="{ ctx }">
+            <Icon
+              @click.stop="deleteItem(ctx.row.original)"
+              value="trashCircle"
+            />
+          </template>
         </Table>
       </div>
     </div>
@@ -63,6 +77,8 @@ import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
 import Table from "~/components/Table.vue";
 import Button from "~/components/Button.vue";
+import Icon from "~/components/Icon.vue";
+import PromiseModal from "~/components/PromiseModal.vue";
 
 import Shape from "~/components/Shape.vue";
 import {
@@ -81,6 +97,7 @@ import {
   apiMarketplaceItemsGetAll,
   apiMarketplaceItemsCreate,
   apiMarketplaceItemsUpdate,
+  apiMarketplaceItemsDelete,
 } from "~/api/growio/marketplace_items";
 import ItemModal from "~/components/Inventory/ItemModal.vue";
 import { buildPartialMarketplaceItem } from "~/api/growio/marketplace_items/utils";
@@ -90,12 +107,14 @@ const items = ref<MarketplaceItem[]>([]);
 const categories = ref<MarketplaceItemCategory[]>([]);
 const activeCategory = ref<MarketplaceItemCategory>();
 const itemModal = ref<PartialMarketplaceItem | MarketplaceItem>();
+const deleteItemModal = ref<InstanceType<typeof PromiseModal>>();
 
 const isLoading = computed(() =>
   wait.some([
     Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH,
     Wait.MARKETPLACE_ITEM_CREATE,
     Wait.MARKETPLACE_ITEM_UPDATE,
+    Wait.MARKETPLACE_ITEM_DELETE,
   ])
 );
 
@@ -109,9 +128,14 @@ const columns = ref([
     header: () => "Name",
   }),
 
-  columnHelper.accessor("actions" as any, {
-    cell: (info) => info.getValue(),
-    header: () => "",
+  columnHelper.display({
+    id: "actions",
+
+    meta: {
+      style: {
+        width: "0",
+      },
+    },
   }),
 ]);
 
@@ -193,6 +217,24 @@ const updateItem = async (params: MarketplaceItem) => {
     console.error(e);
   } finally {
     wait.end(Wait.MARKETPLACE_ITEM_UPDATE);
+  }
+};
+
+const deleteItem = async (params: MarketplaceItem) => {
+  try {
+    await deleteItemModal.value?.confirm();
+  } catch {
+    return;
+  }
+
+  try {
+    wait.start(Wait.MARKETPLACE_ITEM_DELETE);
+    await apiMarketplaceItemsDelete(params);
+    await fetchMarketplaceItems();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ITEM_DELETE);
   }
 };
 

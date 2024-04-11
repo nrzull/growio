@@ -1,7 +1,7 @@
 <template>
   <Modal @close="$emit('close')">
     <template v-if="isMarketplaceItem(modelValue)" #heading>
-      Item {{ modelValue.name }}
+      <span>{{ modelValue.name }}</span> <Tag size="sm">Item</Tag>
     </template>
     <template v-else #heading> Create item </template>
 
@@ -42,6 +42,7 @@ import { clone } from "remeda";
 import ElementLoader from "~/components/ElementLoader.vue";
 import { Wait, wait } from "~/composables/wait";
 import { isMarketplaceItem } from "~/api/growio/marketplace_items/utils";
+import Tag from "~/components/Tag.vue";
 
 const props = defineProps({
   modelValue: {

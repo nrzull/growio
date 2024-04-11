@@ -1,7 +1,7 @@
 <template>
   <Modal @close="$emit('close')">
     <template v-if="isMarketplaceItemCategory(modelValue)" #heading>
-      Category {{ modelValue.name }}
+      <span>{{ modelValue.name }}</span> <Tag>Category</Tag>
     </template>
     <template v-else #heading> Create Category </template>
 
@@ -31,6 +31,7 @@ import {
 import { isMarketplaceItemCategory } from "~/api/growio/marketplace_item_categories/utils";
 import ElementLoader from "~/components/ElementLoader.vue";
 import { clone } from "remeda";
+import Tag from "~/components/Tag.vue";
 
 const props = defineProps({
   modelValue: {

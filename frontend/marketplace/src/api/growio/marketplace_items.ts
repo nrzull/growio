@@ -37,3 +37,10 @@ export const apiMarketplaceItemsUpdate = (params: {
       params.item
     )
     .then((r) => r.data);
+
+export const apiMarketplaceItemsDelete = (params: MarketplaceItem) =>
+  growio
+    .delete<MarketplaceItem>(
+      `/api/marketplace_item_categories/${params.category_id}/marketplace_items/${params.id}`
+    )
+    .then((r) => r.data);

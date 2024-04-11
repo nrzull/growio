@@ -51,6 +51,9 @@ defineProps({
 .heading {
   font-size: 21px;
   user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .shape {

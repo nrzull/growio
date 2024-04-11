@@ -45,7 +45,7 @@ defineProps({
 }
 
 .tag.sm {
-  padding: 2px 8px;
+  padding: 3px 8px;
   font-size: 10px;
 }
 
