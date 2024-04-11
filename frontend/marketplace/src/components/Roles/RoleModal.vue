@@ -1,6 +1,13 @@
 <template>
   <Modal size="lg" @close="$emit('close')">
-    <template #heading>{{ role.name || "New Role" }}</template>
+    <template v-if="isMarketplaceAccountRole(role)" #heading>
+      <span>{{ role.name }}</span> <Tag>Role</Tag>
+    </template>
+    <template v-else #heading> New Role </template>
+
+    <template #loader>
+      <ElementLoader :loading="isLoading" />
+    </template>
 
     <div :class="$style.rows">
       <div :class="$style.row">
@@ -33,15 +40,18 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue";
+import { PropType, computed, ref } from "vue";
 import Button from "~/components/Button.vue";
 import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
 import Modal from "~/components/Modal.vue";
-import { PartialMarketplaceAccountRole } from "~/components/Roles/types";
+import { PartialMarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
 import { clone } from "remeda";
 import TextInput from "~/components/TextInput.vue";
 import { apiPermissionsGetAll } from "~/api/growio/permissions";
 import Tag from "~/components/Tag.vue";
+import { wait, Wait } from "~/composables/wait";
+import ElementLoader from "~/components/ElementLoader.vue";
+import { isMarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/utils";
 
 const props = defineProps({
   role: {
@@ -50,12 +60,23 @@ const props = defineProps({
     >,
     required: true,
   },
+
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 defineEmits({
   close: () => true,
   save: (_v: MarketplaceAccountRole | PartialMarketplaceAccountRole) => true,
 });
+
+const isLoading = computed(
+  () =>
+    props.loading ||
+    wait.some([Wait.MARKETPLACE_ACCOUNT_ROLE_PERMISSIONS_FETCH])
+);
 
 const model = ref(clone(props.role));
 
@@ -82,7 +103,18 @@ const toggleAllPermissions = () => {
   }
 };
 
-apiPermissionsGetAll().then((r) => (permissions.value = r));
+const fetchPermissions = async () => {
+  try {
+    wait.start(Wait.MARKETPLACE_ACCOUNT_ROLE_PERMISSIONS_FETCH);
+    permissions.value = await apiPermissionsGetAll();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ACCOUNT_ROLE_PERMISSIONS_FETCH);
+  }
+};
+
+fetchPermissions();
 </script>
 
 <style module>

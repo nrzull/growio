@@ -50,9 +50,9 @@
       <template #actions="{ ctx }">
         <Icon
           v-if="!deletedCategories"
-          @click.stop="deleteCategory(ctx.row.original)"
           clickable
           value="trashCircle"
+          @click.stop="deleteCategory(ctx.row.original)"
         />
       </template>
     </Table>

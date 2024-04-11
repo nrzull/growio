@@ -4,6 +4,7 @@
   <RoleModal
     v-if="activeRole"
     :role="activeRole"
+    :loading="isLoading"
     @save="saveRole"
     @close="activeRole = undefined"
   />
@@ -30,7 +31,7 @@
         size="sm"
         icon="plus"
         :disabled="deletedRoles"
-        @click="activeRole = buildMarketplaceAccountRole()"
+        @click="activeRole = buildPartialMarketplaceAccountRole()"
       >
         Create
       </Button>
@@ -50,8 +51,8 @@
         <Icon
           v-if="!deletedRoles"
           clickable
-          @click.stop="deleteRole(ctx.row.original)"
           value="trashCircle"
+          @click.stop="deleteRole(ctx.row.original)"
         />
       </template>
     </Table>
@@ -87,10 +88,10 @@ import {
 import Table from "~/components/Table.vue";
 import RoleModal from "~/components/Roles/RoleModal.vue";
 import {
-  buildMarketplaceAccountRole,
+  buildPartialMarketplaceAccountRole,
   isMarketplaceAccountRole,
-} from "~/components/Roles/utils";
-import { PartialMarketplaceAccountRole } from "~/components/Roles/types";
+} from "~/api/growio/marketplace_account_roles/utils";
+import { PartialMarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
 import { apiMarketplaceAccountRolesCreate } from "~/api/growio/marketplace_account_roles";
 import {
   addSuccessNotification,

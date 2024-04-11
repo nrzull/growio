@@ -1,7 +1,7 @@
 <template>
   <div
-    v-html="icon"
     :class="[$style.icon, $style[size], { [$style.clickable]: clickable }]"
+    v-html="icon"
   ></div>
 </template>
 

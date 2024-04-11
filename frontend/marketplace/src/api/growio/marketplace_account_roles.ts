@@ -1,6 +1,8 @@
 import { growio } from "~/api/growio";
-import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
-import { PartialMarketplaceAccountRole } from "~/components/Roles/types";
+import {
+  MarketplaceAccountRole,
+  PartialMarketplaceAccountRole,
+} from "~/api/growio/marketplace_account_roles/types";
 
 export const apiMarketplaceAccountRolesGetAll = (
   params: { deleted_at?: boolean } = { deleted_at: false }

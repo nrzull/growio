@@ -5,3 +5,8 @@ export type MarketplaceAccountRole = {
   priority: number;
   permissions?: string[];
 };
+
+export type PartialMarketplaceAccountRole = Pick<
+  MarketplaceAccountRole,
+  "name" | "description" | "permissions"
+>;

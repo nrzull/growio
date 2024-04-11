@@ -60,8 +60,8 @@
         >
           <template #actions="{ ctx }">
             <Icon
-              @click.stop="deleteItem(ctx.row.original)"
               value="trashCircle"
+              @click.stop="deleteItem(ctx.row.original)"
             />
           </template>
         </Table>
