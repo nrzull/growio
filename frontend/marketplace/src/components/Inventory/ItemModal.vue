@@ -20,6 +20,8 @@
       />
     </div>
 
+    <Dropzone v-model="assets" />
+
     <template #footer>
       <Button size="md" @click="$emit('submit', item)">Submit</Button>
     </template>
@@ -43,6 +45,7 @@ import ElementLoader from "~/components/ElementLoader.vue";
 import { Wait, wait } from "~/composables/wait";
 import { isMarketplaceItem } from "~/api/growio/marketplace_items/utils";
 import Tag from "~/components/Tag.vue";
+import Dropzone from "~/components/Dropzone.vue";
 
 const props = defineProps({
   modelValue: {
@@ -60,6 +63,8 @@ const emit = defineEmits({
   close: () => true,
   submit: (_v: PartialMarketplaceItem | MarketplaceItem) => true,
 });
+
+const assets = ref([]);
 
 const item = ref<PartialMarketplaceItem | MarketplaceItem>(
   clone(props.modelValue)
