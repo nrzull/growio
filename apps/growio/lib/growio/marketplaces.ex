@@ -1016,6 +1016,18 @@ defmodule Growio.Marketplaces do
     |> Repo.one()
   end
 
+  def get_account_email_invitation(email, password)
+      when is_bitstring(email) and is_bitstring(password) do
+    now = Utils.naive_utc_now()
+
+    MarketplaceAccountEmailInvitation
+    |> where([a], a.email == ^email)
+    |> where([a], a.password == ^password)
+    |> where([a], a.expired_at > ^now)
+    |> order_by(desc: :id)
+    |> Repo.one()
+  end
+
   def delete_account_email_invitation(%MarketplaceAccountEmailInvitation{} = struct) do
     Repo.delete(struct)
   end

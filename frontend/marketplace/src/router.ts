@@ -18,6 +18,11 @@ export const router = createRouter({
     },
 
     {
+      path: "/invitation/:email/:password",
+      component: () => import("~/pages/invitation.vue"),
+    },
+
+    {
       path: "/",
       component: () => import("~/layouts/Default.vue"),
       beforeEnter: [

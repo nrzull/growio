@@ -39,8 +39,8 @@ import { apiMarketplaceAccountsGetAll } from "~/api/growio/marketplace_accounts"
 import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
 import Button from "~/components/Button.vue";
-import InviteUserModal from "~/components/Users/InviteUserModal.vue";
-import InvitationsModal from "~/components/Users/InvitationsModal.vue";
+import InviteUserModal from "~/components/Staff/InviteUserModal.vue";
+import InvitationsModal from "~/components/Staff/InvitationsModal.vue";
 import Notification from "~/components/Notifications/Notification.vue";
 
 const inviteUserModal = ref(false);

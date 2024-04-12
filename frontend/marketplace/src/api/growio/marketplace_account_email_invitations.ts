@@ -16,3 +16,21 @@ export const apiMarketplaceAccountEmailInvitationsCreate = (params: {
   growio
     .post("/api/marketplace_account_email_invitations", params)
     .then((r) => r.data);
+
+export const apiMarketplaceAccountEmailInvitationsGetReceived = (params: {
+  email: string;
+  password: string;
+}) =>
+  growio
+    .get<MarketplaceAccountEmailInvitation>(
+      `/api/marketplace_account_email_invitations/${params.email}/${params.password}`
+    )
+    .then((r) => r.data);
+
+export const apiMarketplaceAccountEmailInvitationsAcceptReceived = (params: {
+  email: string;
+  password: string;
+}) =>
+  growio.post(
+    `/api/marketplace_account_email_invitations/${params.email}/${params.password}/accept`
+  );

@@ -5,7 +5,9 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountEmailInvitationController do
   alias GrowioWeb.Schemas
   alias Growio.Marketplaces
   alias Growio.Marketplaces.MarketplaceAccountRole
+  alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
   alias GrowioWeb.Views.MarketplaceAccountEmailInvitationJSON
+  alias Growio.Repo
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -49,6 +51,40 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountEmailInvitationController do
       invitation
       |> MarketplaceAccountEmailInvitationJSON.render()
       |> then(&Conn.ok(conn, &1))
+    end
+  end
+
+  operation(:guest_show,
+    summary: "get received email invitation",
+    parameters: [
+      email: [in: :path, description: "email", type: :string],
+      password: [in: :path, description: "password", type: :string]
+    ],
+    responses: [ok: {"", "application/json", Schemas.MarketplaceAccountEmailInvitation}]
+  )
+
+  def guest_show(conn, %{"email" => email, "password" => password}) do
+    with invitation = %MarketplaceAccountEmailInvitation{} <-
+           Marketplaces.get_account_email_invitation(email, password),
+         invitation <- Repo.preload(invitation, role: [:marketplace]) do
+      Conn.ok(conn, MarketplaceAccountEmailInvitationJSON.render(invitation))
+    end
+  end
+
+  operation(:guest_accept,
+    summary: "accept received email invitation",
+    parameters: [
+      email: [in: :path, description: "email", type: :string],
+      password: [in: :path, description: "password", type: :string]
+    ],
+    responses: [ok: ""]
+  )
+
+  def guest_accept(conn, %{"email" => email, "password" => password}) do
+    with %MarketplaceAccountEmailInvitation{} <-
+           Marketplaces.get_account_email_invitation(email, password),
+         {:ok, _} = Marketplaces.use_account_email_invitation(password) do
+      Conn.ok(conn)
     end
   end
 end
