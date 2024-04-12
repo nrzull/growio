@@ -102,6 +102,15 @@ import {
 import ItemModal from "~/components/Inventory/ItemModal.vue";
 import { buildPartialMarketplaceItem } from "~/api/growio/marketplace_items/utils";
 import { isMarketplaceItem } from "~/api/growio/marketplace_items/utils";
+import {
+  MarketplaceItemAsset,
+  PartialMarketplaceItemAsset,
+} from "~/api/growio/marketplace_item_assets/types";
+
+import {
+  apiMarketplaceItemAssetsCreate,
+  apiMarketplaceItemAssetsDelete,
+} from "~/api/growio/marketplace_item_assets";
 
 const items = ref<MarketplaceItem[]>([]);
 const categories = ref<MarketplaceItemCategory[]>([]);
@@ -115,6 +124,8 @@ const isLoading = computed(() =>
     Wait.MARKETPLACE_ITEM_CREATE,
     Wait.MARKETPLACE_ITEM_UPDATE,
     Wait.MARKETPLACE_ITEM_DELETE,
+    Wait.MARKETPLACE_ITEM_ASSET_CREATE,
+    Wait.MARKETPLACE_ITEM_ASSET_DELETE,
   ])
 );
 
@@ -183,15 +194,31 @@ const fetchMarketplaceItems = async (
   }
 };
 
-const handleSubmitItem = async (
-  params: PartialMarketplaceItem | MarketplaceItem
-) => (isMarketplaceItem(params) ? updateItem(params) : createItem(params));
+const handleSubmitItem = async (params: {
+  item: MarketplaceItem | PartialMarketplaceItem;
+  assetsCreate: PartialMarketplaceItemAsset[];
+  assetsDelete: MarketplaceItemAsset[];
+}) =>
+  isMarketplaceItem(params.item)
+    ? updateItem({
+        item: params.item,
+        assetsCreate: params.assetsCreate,
+        assetsDelete: params.assetsDelete,
+      })
+    : createItem({
+        item: params.item,
+        assetsCreate: params.assetsCreate,
+      });
 
-const createItem = async (params: PartialMarketplaceItem) => {
+const createItem = async (params: {
+  item: PartialMarketplaceItem;
+  assetsCreate: PartialMarketplaceItemAsset[];
+}) => {
   try {
     wait.start(Wait.MARKETPLACE_ITEM_CREATE);
 
-    await apiMarketplaceItemsCreate(params);
+    const createdItem = await apiMarketplaceItemsCreate(params.item);
+    await createAssets({ item: createdItem, assets: params.assetsCreate });
 
     itemModal.value = undefined;
     await fetchMarketplaceItems();
@@ -202,14 +229,83 @@ const createItem = async (params: PartialMarketplaceItem) => {
   }
 };
 
-const updateItem = async (params: MarketplaceItem) => {
+const createAssets = async (params: {
+  item: MarketplaceItem;
+  assets: PartialMarketplaceItemAsset[];
+}) => {
+  try {
+    const { item, assets } = params;
+
+    wait.start(Wait.MARKETPLACE_ITEM_ASSET_CREATE);
+
+    const results = await Promise.allSettled(
+      assets.map((v) =>
+        apiMarketplaceItemAssetsCreate({
+          item_id: item.id,
+          category_id: item.category_id,
+          asset: v,
+        })
+      )
+    );
+
+    results.forEach((r) => {
+      if (r.status === "rejected") {
+        console.error(r.reason);
+      }
+    });
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ITEM_ASSET_CREATE);
+  }
+};
+
+const deleteAssets = async (params: {
+  item: MarketplaceItem;
+  assets: MarketplaceItemAsset[];
+}) => {
+  try {
+    const { item, assets } = params;
+
+    const results = await Promise.allSettled(
+      assets.map((v) =>
+        apiMarketplaceItemAssetsDelete({
+          item_id: item.id,
+          category_id: item.category_id,
+          asset: v,
+        })
+      )
+    );
+
+    results.forEach((r) => {
+      if (r.status === "rejected") {
+        console.error(r.reason);
+      }
+    });
+
+    wait.start(Wait.MARKETPLACE_ITEM_ASSET_DELETE);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ITEM_ASSET_DELETE);
+  }
+};
+
+const updateItem = async (params: {
+  item: MarketplaceItem;
+  assetsCreate: PartialMarketplaceItemAsset[];
+  assetsDelete: MarketplaceItemAsset[];
+}) => {
   try {
     wait.start(Wait.MARKETPLACE_ITEM_UPDATE);
 
-    await apiMarketplaceItemsUpdate({
-      item: params,
+    const updatedItem = await apiMarketplaceItemsUpdate({
+      item: params.item,
       category_id: itemModal.value.category_id,
     });
+
+    await createAssets({ item: updatedItem, assets: params.assetsCreate });
+    await deleteAssets({ item: updatedItem, assets: params.assetsDelete });
 
     itemModal.value = undefined;
     await fetchMarketplaceItems();

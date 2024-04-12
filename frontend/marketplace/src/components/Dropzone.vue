@@ -8,32 +8,75 @@
       @change="handleInputChange"
     />
 
-    <slot
-      v-if="proxyModelValue.length || readonly"
-      v-bind="{ files: proxyModelValue }"
-    >
-      <Area :files="proxyModelValue" @remove:file="removeFile" />
+    <slot v-if="model.length || readonly" v-bind="{ files: model }">
+      <Area
+        :track-by="trackBy"
+        :files="model"
+        @remove:file="removeFile"
+        @add:file="inputRef?.click?.()"
+      />
     </slot>
     <Area
       v-else
-      :files="proxyModelValue"
+      :files="model"
+      :track-by="trackBy"
       @click="inputRef?.click?.()"
-      @remove:file="removeFile"
     >
+      <template #placeholder>
+        <slot name="placeholder"></slot>
+      </template>
     </Area>
   </div>
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, computed } from "vue";
+import { PropType, ref, watch } from "vue";
 import { DropzoneFile } from "~/components/Dropzone/types";
-import { intoDropzoneFile } from "~/components/Dropzone/utils";
+import {
+  intoDropzoneFile,
+  fromDropzoneFile,
+} from "~/components/Dropzone/utils";
 import Area from "~/components/Dropzone/Area.vue";
+import {
+  MarketplaceItemAsset,
+  PartialMarketplaceItemAsset,
+} from "~/api/growio/marketplace_item_assets/types";
+import { JSONPath } from "jsonpath-plus";
 
 const props = defineProps({
-  modelValue: {
-    type: Array as PropType<Array<File | DropzoneFile>>,
+  input: {
+    type: Array as PropType<
+      Array<
+        File | DropzoneFile | MarketplaceItemAsset | PartialMarketplaceItemAsset
+      >
+    >,
     default: () => [],
+  },
+
+  output: {
+    type: Array as PropType<
+      Array<MarketplaceItemAsset | PartialMarketplaceItemAsset>
+    >,
+    default: () => [],
+  },
+
+  outputCreate: {
+    type: Array as PropType<
+      Array<MarketplaceItemAsset | PartialMarketplaceItemAsset>
+    >,
+    default: () => [],
+  },
+
+  outputDelete: {
+    type: Array as PropType<
+      Array<MarketplaceItemAsset | PartialMarketplaceItemAsset>
+    >,
+    default: () => [],
+  },
+
+  trackBy: {
+    type: String,
+    default: "src",
   },
 
   readonly: {
@@ -42,29 +85,71 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:model-value"]);
-
-const inputRef = ref<HTMLInputElement>();
-
-const proxyModelValue = computed({
-  get: () => props.modelValue.map(intoDropzoneFile),
-  set: (v) => emit("update:model-value", v),
+const emit = defineEmits({
+  "update:output": (
+    _v: Array<MarketplaceItemAsset | PartialMarketplaceItemAsset>
+  ) => true,
+  "update:outputCreate": (
+    _v: Array<MarketplaceItemAsset | PartialMarketplaceItemAsset>
+  ) => true,
+  "update:outputDelete": (
+    _v: Array<MarketplaceItemAsset | PartialMarketplaceItemAsset>
+  ) => true,
 });
 
-const handleInputChange = (v: any) => {
-  const files = Array.from((v.target.files as FileList) || []);
+const inputRef = ref<HTMLInputElement>();
+const model = ref<DropzoneFile[]>([]);
 
-  if (!files?.length) {
-    return;
-  }
+watch(
+  () => props.output,
+  (output) => {
+    const toCreate = output
+      .filter((v) => !props.input.some((vv) => getKey(vv) === getKey(v)))
+      .map((v) => v as unknown as PartialMarketplaceItemAsset);
 
-  proxyModelValue.value = files.map(intoDropzoneFile);
+    const toDelete = props.input
+      .filter((v) => !output.some((vv) => getKey(vv) === getKey(v)))
+      .map((v) => v as unknown as MarketplaceItemAsset);
+
+    emit("update:outputCreate", toCreate);
+    emit("update:outputDelete", toDelete);
+  },
+  { deep: true }
+);
+
+watch(
+  () => model.value,
+  (v) => emit("update:output", v.map(fromDropzoneFile)),
+  { deep: true }
+);
+
+watch(
+  () => props.input,
+  (v) => (model.value = v.map(intoDropzoneFile)),
+  { deep: true, immediate: true }
+);
+
+const getKey = (v) => {
+  const [result] = JSONPath({ json: v, path: props.trackBy });
+  return result;
+};
+
+const handleInputChange = (v) => {
+  addFiles((v.target.files as FileList) || []);
+};
+
+const addFiles = (files: FileList | File[]) => {
+  console.log(files);
+
+  model.value = model.value.concat(
+    Array.from(files)
+      .map(intoDropzoneFile)
+      .filter((f) => !model.value.some((ff) => ff.name === f.name))
+  );
 };
 
 const removeFile = (v: DropzoneFile) => {
-  proxyModelValue.value = proxyModelValue.value.filter(
-    (vv) => vv.src !== v.src
-  );
+  model.value = model.value.filter((vv) => vv.src !== v.src);
 };
 </script>
 

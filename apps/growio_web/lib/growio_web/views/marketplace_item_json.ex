@@ -3,11 +3,11 @@ defmodule GrowioWeb.Views.MarketplaceItemJSON do
 
   def render(values) when is_list(values), do: Enum.map(values, &render(&1))
 
-  def render(%MarketplaceItem{} = item) do
+  def render(%MarketplaceItem{} = value) do
     %{
-      id: item.id,
-      name: item.name,
-      category_id: item.category_id
+      id: value.id,
+      name: value.name,
+      category_id: value.category_id
     }
   end
 

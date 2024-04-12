@@ -4,13 +4,13 @@ defmodule GrowioWeb.Views.MarketplaceAccountRoleJSON do
 
   def render(values) when is_list(values), do: Enum.map(values, &render(&1))
 
-  def render(%MarketplaceAccountRole{} = role) do
+  def render(%MarketplaceAccountRole{} = value) do
     %{
-      id: role.id,
-      name: role.name,
-      description: role.description,
-      priority: role.priority,
-      permissions: PermissionJSON.render(Map.get(role, :permissions))
+      id: value.id,
+      name: value.name,
+      description: value.description,
+      priority: value.priority,
+      permissions: PermissionJSON.render(Map.get(value, :permissions))
     }
   end
 

@@ -3,10 +3,10 @@ defmodule GrowioWeb.Views.AccountJSON do
 
   def render(values) when is_list(values), do: Enum.map(values, &render(&1))
 
-  def render(%Account{} = account) do
+  def render(%Account{} = value) do
     %{
-      id: account.id,
-      email: account.email
+      id: value.id,
+      email: value.email
     }
   end
 

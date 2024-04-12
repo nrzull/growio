@@ -1,14 +1,14 @@
-defmodule GrowioWeb.Views.MarketplaceAccountEmailInvitationJson do
+defmodule GrowioWeb.Views.MarketplaceAccountEmailInvitationJSON do
   alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
   alias GrowioWeb.Views.MarketplaceAccountRoleJSON
 
   def render(values) when is_list(values), do: Enum.map(values, &render(&1))
 
-  def render(%MarketplaceAccountEmailInvitation{} = invitation) do
+  def render(%MarketplaceAccountEmailInvitation{} = value) do
     %{
-      id: invitation.id,
-      email: invitation.email,
-      role: MarketplaceAccountRoleJSON.render(Map.get(invitation, :role))
+      id: value.id,
+      email: value.email,
+      role: MarketplaceAccountRoleJSON.render(Map.get(value, :role))
     }
   end
 

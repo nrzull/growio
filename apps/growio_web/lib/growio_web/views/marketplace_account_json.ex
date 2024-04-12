@@ -6,12 +6,12 @@ defmodule GrowioWeb.Views.MarketplaceAccountJSON do
 
   def render(values) when is_list(values), do: Enum.map(values, &render(&1))
 
-  def render(%MarketplaceAccount{} = account) do
+  def render(%MarketplaceAccount{} = value) do
     %{
-      id: account.id,
-      role: MarketplaceAccountRoleJSON.render(Map.get(account, :role)),
-      marketplace: MarketplaceJSON.render(Map.get(account, :marketplace)),
-      account: AccountJSON.render(Map.get(account, :account))
+      id: value.id,
+      role: MarketplaceAccountRoleJSON.render(Map.get(value, :role)),
+      marketplace: MarketplaceJSON.render(Map.get(value, :marketplace)),
+      account: AccountJSON.render(Map.get(value, :account))
     }
   end
 

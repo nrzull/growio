@@ -1,41 +1,61 @@
 <template>
   <div :class="[$style.area, { [$style.empty]: !files.length }]">
-    <div v-if="!files.length">Place your files here</div>
+    <slot v-if="!files.length" name="placeholder"> Place your files here </slot>
+    <template v-else>
+      <div :class="$style.actions">
+        <Icon :class="$style.action" value="plus" @click="$emit('add:file')" />
+      </div>
 
-    <div :class="$style.images">
-      <div v-for="(file, i) in files" :key="i" :class="$style.imageWrapper">
-        <div :class="$style.actions">
-          <Icon
-            :class="$style.action"
-            value="trashCircle"
-            @click="$emit('remove:file', file)"
+      <div :class="$style.images">
+        <div
+          v-for="(file, i) in files"
+          :key="getKey(file, i)"
+          :class="$style.imageWrapper"
+        >
+          <div :class="$style.actions">
+            <Icon
+              :class="$style.action"
+              value="trashCircle"
+              @click="$emit('remove:file', file)"
+            />
+          </div>
+
+          <img
+            v-if="file.src"
+            :src="file.src"
+            :class="$style.image"
+            @click="$emit('click:file', file)"
           />
         </div>
-
-        <img
-          v-if="file.src"
-          :src="file.src"
-          :class="$style.image"
-          @click="$emit('click:file', file)"
-        />
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import { JSONPath } from "jsonpath-plus";
 import { PropType } from "vue";
 import { DropzoneFile } from "~/components/Dropzone/types";
 import Icon from "~/components/Icon.vue";
 
-defineProps({
+const props = defineProps({
   files: {
     type: Array as PropType<Array<DropzoneFile>>,
     default: () => [],
   },
+
+  trackBy: {
+    type: String,
+    default: "src",
+  },
 });
 
-defineEmits(["remove:file", "click:file"]);
+defineEmits(["remove:file", "click:file", "add:file"]);
+
+const getKey = (v, fallback) => {
+  const [result] = JSONPath({ json: v, path: props.trackBy });
+  return result || fallback;
+};
 </script>
 
 <style module>
@@ -44,6 +64,7 @@ defineEmits(["remove:file", "click:file"]);
   border: 1px dotted var(--color-gray-100);
   display: flex;
   border-radius: 8px;
+  position: relative;
 }
 
 .images {
@@ -74,9 +95,15 @@ defineEmits(["remove:file", "click:file"]);
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.2s ease;
   opacity: 0;
+  z-index: 1;
 }
 
-.imageWrapper:hover .actions {
+.area:hover > .actions {
+  visibility: visible;
+  opacity: 1;
+}
+
+.imageWrapper:hover > .actions {
   visibility: visible;
   opacity: 1;
 }

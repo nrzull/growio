@@ -5,7 +5,7 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountEmailInvitationController do
   alias GrowioWeb.Schemas
   alias Growio.Marketplaces
   alias Growio.Marketplaces.MarketplaceAccountRole
-  alias GrowioWeb.Views.MarketplaceAccountEmailInvitationJson
+  alias GrowioWeb.Views.MarketplaceAccountEmailInvitationJSON
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -25,7 +25,7 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountEmailInvitationController do
     with invitations when is_list(invitations) <-
            Marketplaces.all_account_email_invitations(marketplace_account) do
       invitations
-      |> MarketplaceAccountEmailInvitationJson.render()
+      |> MarketplaceAccountEmailInvitationJSON.render()
       |> then(&Conn.ok(conn, &1))
     end
   end
@@ -47,7 +47,7 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountEmailInvitationController do
          {:ok, invitation} <-
            Marketplaces.create_account_email_invitation(marketplace_account, role, %{email: email}) do
       invitation
-      |> MarketplaceAccountEmailInvitationJson.render()
+      |> MarketplaceAccountEmailInvitationJSON.render()
       |> then(&Conn.ok(conn, &1))
     end
   end

@@ -20,10 +20,15 @@
       />
     </div>
 
-    <Dropzone v-model="assets" />
+    <Dropzone
+      :input="assetsInput"
+      v-model:output="assetsOutput"
+      v-model:output-create="assetsOutputCreate"
+      v-model:output-delete="assetsOutputDelete"
+    />
 
     <template #footer>
-      <Button size="md" @click="$emit('submit', item)">Submit</Button>
+      <Button size="md" @click="submit">Submit</Button>
     </template>
   </Modal>
 </template>
@@ -46,6 +51,11 @@ import { Wait, wait } from "~/composables/wait";
 import { isMarketplaceItem } from "~/api/growio/marketplace_items/utils";
 import Tag from "~/components/Tag.vue";
 import Dropzone from "~/components/Dropzone.vue";
+import { apiMarketplaceItemAssetsGetAll } from "~/api/growio/marketplace_item_assets";
+import {
+  MarketplaceItemAsset,
+  PartialMarketplaceItemAsset,
+} from "~/api/growio/marketplace_item_assets/types";
 
 const props = defineProps({
   modelValue: {
@@ -61,10 +71,21 @@ const props = defineProps({
 
 const emit = defineEmits({
   close: () => true,
-  submit: (_v: PartialMarketplaceItem | MarketplaceItem) => true,
+  submit: (_v: {
+    item: PartialMarketplaceItem | MarketplaceItem;
+    assetsDelete: MarketplaceItemAsset[];
+    assetsCreate: PartialMarketplaceItemAsset[];
+  }) => true,
 });
 
-const assets = ref([]);
+const assetsInput = ref<
+  Array<MarketplaceItemAsset | PartialMarketplaceItemAsset>
+>([]);
+const assetsOutput = ref<
+  Array<MarketplaceItemAsset | PartialMarketplaceItemAsset>
+>([]);
+const assetsOutputCreate = ref<Array<PartialMarketplaceItemAsset>>([]);
+const assetsOutputDelete = ref<Array<MarketplaceItemAsset>>([]);
 
 const item = ref<PartialMarketplaceItem | MarketplaceItem>(
   clone(props.modelValue)
@@ -73,7 +94,12 @@ const category = ref<MarketplaceItemCategory>();
 const categories = ref<MarketplaceItemCategory[]>([]);
 
 const isLoading = computed(
-  () => props.loading || wait.some([Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH])
+  () =>
+    props.loading ||
+    wait.some([
+      Wait.MARKETPLACE_ITEM_CATEGORIES_FETCH,
+      Wait.MARKETPLACE_ITEM_ASSETS_FETCH,
+    ])
 );
 
 const fetchCategories = async () => {
@@ -96,6 +122,32 @@ const fetchCategories = async () => {
   }
 };
 
+const fetchAssets = async () => {
+  if (!isMarketplaceItem(props.modelValue)) {
+    return;
+  }
+
+  try {
+    wait.start(Wait.MARKETPLACE_ITEM_ASSETS_FETCH);
+    assetsInput.value = await apiMarketplaceItemAssetsGetAll({
+      category_id: props.modelValue.category_id,
+      item_id: props.modelValue.id,
+    });
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ITEM_ASSETS_FETCH);
+  }
+};
+
+const submit = () => {
+  emit("submit", {
+    item: item.value,
+    assetsCreate: assetsOutputCreate.value,
+    assetsDelete: assetsOutputDelete.value,
+  });
+};
+
 watch(
   category,
   (v) => {
@@ -107,6 +159,7 @@ watch(
 );
 
 fetchCategories();
+fetchAssets();
 </script>
 
 <style module>
