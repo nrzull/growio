@@ -6,6 +6,7 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
   alias GrowioWeb.Views.MarketplaceAccountJSON
   alias Growio.Marketplaces
   alias Growio.Repo
+  alias Growio.Marketplaces.MarketplaceAccount
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -27,6 +28,29 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
     |> Enum.map(&Repo.preload(&1, [:marketplace, :role, :account]))
     |> MarketplaceAccountJSON.render()
     |> then(&Conn.ok(conn, &1))
+  end
+
+  operation(:update,
+    summary: "update marketplace account",
+    parameters: [
+      id: [in: :path, description: "id", type: :integer]
+    ],
+    request_body: {"", "application/json", Schemas.MakretplaceAccountUpdate, required: true},
+    responses: [ok: {"", "application/json", Schemas.MarketplaceAccount}]
+  )
+
+  def update(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"id" => id} = params
+      ) do
+    with id when is_integer(id) <- String.to_integer(id),
+         target_account = %MarketplaceAccount{} <-
+           Marketplaces.get_account(marketplace_account, id),
+         {:ok, updated_account} <-
+           Marketplaces.update_account(marketplace_account, target_account, params),
+         updated_account = Repo.preload(updated_account, [:marketplace, :role, :account]) do
+      Conn.ok(conn, MarketplaceAccountJSON.render(updated_account))
+    end
   end
 
   operation(:self,

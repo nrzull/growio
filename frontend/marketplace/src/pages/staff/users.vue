@@ -53,7 +53,10 @@ import {
 import Table from "~/components/Table.vue";
 import { MarketplaceAccount } from "~/api/growio/marketplace_accounts/types";
 import { wait, Wait } from "~/composables/wait";
-import { apiMarketplaceAccountsGetAll } from "~/api/growio/marketplace_accounts";
+import {
+  apiMarketplaceAccountsGetAll,
+  apiMarketplaceAccountsUpdate,
+} from "~/api/growio/marketplace_accounts";
 import { apiMarketplaceAccountEmailInvitationsCreate } from "~/api/growio/marketplace_account_email_invitations";
 import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
@@ -121,7 +124,13 @@ const createInvitation = async (params: { email: string; role_id: number }) => {
 const updateUser = async (params: MarketplaceAccount) => {
   try {
     wait.start(Wait.MARKETPLACE_ACCOUNT_UPDATE);
-    console.log(params);
+
+    await apiMarketplaceAccountsUpdate({
+      id: params.id,
+      role_id: params.role.id,
+    });
+
+    fetchMarketplaceAccounts();
     userModal.value = undefined;
   } catch (e) {
     console.error(e);

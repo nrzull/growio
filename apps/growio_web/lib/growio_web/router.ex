@@ -56,7 +56,7 @@ defmodule GrowioWeb.Router do
     get("/self/active", MarketplaceAccountController, :self_active)
 
     pipe_through([:marketplace_account])
-    get("/", MarketplaceAccountController, :index)
+    resources("/", MarketplaceAccountController, only: [:index, :update])
   end
 
   scope "/api/marketplaces" do

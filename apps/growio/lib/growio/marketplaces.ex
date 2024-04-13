@@ -202,6 +202,13 @@ defmodule Growio.Marketplaces do
     not is_nil(account.blocked_at)
   end
 
+  def get_account(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
+    MarketplaceAccount
+    |> where([account], account.id == ^id)
+    |> where([account], account.marketplace_id == ^initiator.marketplace_id)
+    |> Repo.one()
+  end
+
   def get_account(%Marketplace{} = marketplace, id) when is_integer(id) do
     MarketplaceAccount
     |> where([account], account.id == ^id)
@@ -214,6 +221,23 @@ defmodule Growio.Marketplaces do
     |> where([account], account.id == ^id)
     |> where([account], account.account_id == ^initiator.id)
     |> Repo.one()
+  end
+
+  def update_account(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceAccount{} = target,
+        %{} = params
+      ) do
+    with true <- Permissions.ok?(initiator, target, marketplaces__marketplace_account__update()) do
+      update_account(target, params)
+    else
+      _ -> {:error, "cannot update a user"}
+    end
+  end
+
+  def update_account(%MarketplaceAccount{} = account, %{} = params) do
+    MarketplaceAccount.update_changeset(account, params)
+    |> Repo.update()
   end
 
   def get_account_role(%MarketplaceAccount{} = initiator) do

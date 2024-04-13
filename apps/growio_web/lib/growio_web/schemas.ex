@@ -182,6 +182,16 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
+  defmodule MakretplaceAccountUpdate do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer},
+        role_id: %Schema{type: :integer}
+      }
+    })
+  end
+
   defmodule AuthEmailRequest do
     schema(%{
       type: :object,
