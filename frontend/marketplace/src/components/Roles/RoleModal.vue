@@ -1,13 +1,9 @@
 <template>
-  <Modal size="lg" @close="$emit('close')">
+  <Modal size="lg" @close="$emit('close')" :loading="isLoading">
     <template v-if="isMarketplaceAccountRole(role)" #heading>
       <span>{{ role.name }}</span> <Tag>Role</Tag>
     </template>
     <template v-else #heading> New Role </template>
-
-    <template #loader>
-      <ElementLoader :loading="isLoading" />
-    </template>
 
     <div :class="$style.rows">
       <div :class="$style.row">
@@ -50,7 +46,6 @@ import TextInput from "~/components/TextInput.vue";
 import { apiPermissionsGetAll } from "~/api/growio/permissions";
 import Tag from "~/components/Tag.vue";
 import { wait, Wait } from "~/composables/wait";
-import ElementLoader from "~/components/ElementLoader.vue";
 import { isMarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/utils";
 
 const props = defineProps({

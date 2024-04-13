@@ -1,13 +1,9 @@
 <template>
-  <Modal @close="$emit('close')">
+  <Modal @close="$emit('close')" :loading="isLoading">
     <template v-if="isMarketplaceItem(modelValue)" #heading>
       <span>{{ modelValue.name }}</span> <Tag size="sm">Item</Tag>
     </template>
     <template v-else #heading> Create item </template>
-
-    <template #loader>
-      <ElementLoader :loading="isLoading" />
-    </template>
 
     <div :class="$style.row">
       <TextInput v-model="item.name" placeholder="Name" />
@@ -46,7 +42,6 @@ import {
 } from "~/api/growio/marketplace_items/types";
 import { apiMarketplaceItemCategoriesGetAll } from "~/api/growio/marketplace_item_categories";
 import { clone } from "remeda";
-import ElementLoader from "~/components/ElementLoader.vue";
 import { Wait, wait } from "~/composables/wait";
 import { isMarketplaceItem } from "~/api/growio/marketplace_items/utils";
 import Tag from "~/components/Tag.vue";

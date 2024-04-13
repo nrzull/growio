@@ -12,7 +12,7 @@
       v-bind="$attrs"
       readonly
       :model-value="getLabel(proxyModelValue, labelPath)"
-      @focus="items.length && menuRef.setOpen(true)"
+      @focus="!readonly && items.length && menuRef.setOpen(true)"
       @blur="menuRef.setOpen(false)"
     />
   </Menu>
@@ -39,6 +39,11 @@ const props = defineProps({
   trackBy: {
     type: String,
     default: undefined,
+  },
+
+  readonly: {
+    type: Boolean,
+    default: false,
   },
 
   labelPath: {

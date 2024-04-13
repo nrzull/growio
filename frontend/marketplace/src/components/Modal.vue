@@ -1,7 +1,9 @@
 <template>
   <div :class="$style.wrapper" @mousedown.self="$emit('close')">
     <Shape :class="[$style.shape, $style[size]]">
-      <slot name="loader"></slot>
+      <slot name="loader">
+        <ElementLoader :loading="loading" />
+      </slot>
 
       <div :class="$style.heading">
         <slot name="heading"></slot>
@@ -19,6 +21,7 @@
 <script setup lang="ts">
 import { PropType } from "vue";
 import Shape from "~/components/Shape.vue";
+import ElementLoader from "~/components/ElementLoader.vue";
 
 defineEmits(["close"]);
 
@@ -26,6 +29,11 @@ defineProps({
   size: {
     type: String as PropType<"md" | "lg">,
     default: "md",
+  },
+
+  loading: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>

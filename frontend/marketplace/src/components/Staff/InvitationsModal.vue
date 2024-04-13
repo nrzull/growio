@@ -1,10 +1,6 @@
 <template>
-  <Modal size="lg" @close="$emit('close')">
+  <Modal size="lg" @close="$emit('close')" :loading="isLoading">
     <template #heading>Invitations</template>
-
-    <template #loader>
-      <ElementLoader :loading="isLoading" />
-    </template>
 
     <Notification
       v-if="isEmpty"
@@ -26,7 +22,6 @@ import {
 import { computed, ref } from "vue";
 import Table from "~/components/Table.vue";
 import { wait, Wait } from "~/composables/wait";
-import ElementLoader from "~/components/ElementLoader.vue";
 import Notification from "~/components/Notifications/Notification.vue";
 
 defineEmits(["close"]);

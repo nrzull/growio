@@ -1,11 +1,7 @@
 <template>
-  <div :class="$style.invitation">
+  <div :class="$style.invitation" :loading="isLoading">
     <Modal v-if="invitation">
       <template #heading> Invitation </template>
-
-      <template #loader>
-        <ElementLoader :loading="isLoading" />
-      </template>
 
       <span>
         You were invited to <b>{{ invitation.marketplace.name }}</b> for role
@@ -36,7 +32,6 @@ import { Wait, wait } from "~/composables/wait";
 import { computed, ref } from "vue";
 import { MarketplaceAccountEmailInvitation } from "~/api/growio/marketplace_account_email_invitations/types";
 import Button from "~/components/Button.vue";
-import ElementLoader from "~/components/ElementLoader.vue";
 
 account.value && location.reload();
 apiAuthSignout().catch(console.error);

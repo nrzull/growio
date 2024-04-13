@@ -1,7 +1,20 @@
 <template>
   <PageLoader :loading="isLoading" />
 
-  <InviteUserModal v-if="inviteUserModal" @close="inviteUserModal = false" />
+  <InvitationModal
+    v-if="invitationModal"
+    :loading="isLoading"
+    @close="invitationModal = false"
+    @submit="createInvitation"
+  />
+
+  <UserModal
+    v-if="userModal"
+    :loading="isLoading"
+    :model-value="userModal"
+    @close="userModal = undefined"
+    @submit="updateUser"
+  />
 
   <InvitationsModal v-if="invitationsModal" @close="invitationsModal = false" />
 
@@ -12,7 +25,7 @@
       <Button size="sm" type="link-neutral" @click="invitationsModal = true">
         Invitations
       </Button>
-      <Button size="sm" icon="plus" @click="inviteUserModal = true">
+      <Button size="sm" icon="plus" @click="invitationModal = true">
         Invite
       </Button>
     </template>
@@ -21,7 +34,12 @@
       v-if="isEmpty"
       :model-value="{ type: 'info', text: 'There are no users' }"
     />
-    <Table v-else :table="table" />
+    <Table
+      v-else
+      clickable
+      :table="table"
+      @click:row="userModal = $event.original"
+    />
   </PageShape>
 </template>
 
@@ -36,16 +54,18 @@ import Table from "~/components/Table.vue";
 import { MarketplaceAccount } from "~/api/growio/marketplace_accounts/types";
 import { wait, Wait } from "~/composables/wait";
 import { apiMarketplaceAccountsGetAll } from "~/api/growio/marketplace_accounts";
+import { apiMarketplaceAccountEmailInvitationsCreate } from "~/api/growio/marketplace_account_email_invitations";
 import PageLoader from "~/components/PageLoader.vue";
 import PageShape from "~/components/PageShape.vue";
 import Button from "~/components/Button.vue";
-import InviteUserModal from "~/components/Staff/InviteUserModal.vue";
+import InvitationModal from "~/components/Staff/InvitationModal.vue";
 import InvitationsModal from "~/components/Staff/InvitationsModal.vue";
+import UserModal from "~/components/Staff/UserModal.vue";
 import Notification from "~/components/Notifications/Notification.vue";
 
-const inviteUserModal = ref(false);
+const invitationModal = ref(false);
 const invitationsModal = ref(false);
-
+const userModal = ref<MarketplaceAccount>();
 const marketplaceAccounts = ref<MarketplaceAccount[]>([]);
 
 const columnHelper = createColumnHelper<MarketplaceAccount>();
@@ -74,11 +94,41 @@ const table = useVueTable({
   },
 });
 
-const isLoading = computed(() => wait.some([Wait.MARKETPLACE_ACCOUNTS_FETCH]));
+const isLoading = computed(() =>
+  wait.some([
+    Wait.MARKETPLACE_ACCOUNTS_FETCH,
+    Wait.MARKETPLACE_ACCOUNT_EMAIL_INVITATION_CREATE,
+    Wait.MARKETPLACE_ACCOUNT_UPDATE,
+  ])
+);
 
 const isEmpty = computed(
   () => !isLoading.value && !marketplaceAccounts.value.length
 );
+
+const createInvitation = async (params: { email: string; role_id: number }) => {
+  try {
+    wait.start(Wait.MARKETPLACE_ACCOUNT_EMAIL_INVITATION_CREATE);
+    await apiMarketplaceAccountEmailInvitationsCreate(params);
+    invitationModal.value = false;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ACCOUNT_EMAIL_INVITATION_CREATE);
+  }
+};
+
+const updateUser = async (params: MarketplaceAccount) => {
+  try {
+    wait.start(Wait.MARKETPLACE_ACCOUNT_UPDATE);
+    console.log(params);
+    userModal.value = undefined;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ACCOUNT_UPDATE);
+  }
+};
 
 const fetchMarketplaceAccounts = async () => {
   try {
