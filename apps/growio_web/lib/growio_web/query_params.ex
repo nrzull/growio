@@ -2,10 +2,11 @@ defmodule GrowioWeb.QueryParams do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @fields ~w(deleted_at)a
+  @fields ~w(deleted_at blocked_at)a
 
   embedded_schema do
     field(:deleted_at, :boolean)
+    field(:blocked_at, :boolean)
   end
 
   def into_keyword(%{} = params) do

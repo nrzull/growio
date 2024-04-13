@@ -23,8 +23,10 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
   )
 
   def index(%{assigns: %{marketplace_account: marketplace_account}} = conn, _opts) do
+    opts = GrowioWeb.QueryParams.into_keyword(conn.query_params)
+
     marketplace_account
-    |> Marketplaces.all_accounts()
+    |> Marketplaces.all_accounts(opts)
     |> Enum.map(&Repo.preload(&1, [:marketplace, :role, :account]))
     |> MarketplaceAccountJSON.render()
     |> then(&Conn.ok(conn, &1))
@@ -53,6 +55,26 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
     end
   end
 
+  operation(:delete,
+    summary: "delete marketplace account",
+    parameters: [
+      id: [in: :path, description: "id", type: :integer]
+    ],
+    responses: [ok: {"", "application/json", Schemas.MarketplaceAccount}]
+  )
+
+  def delete(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"id" => id}
+      ) do
+    with id when is_integer(id) <- String.to_integer(id),
+         target_account = %MarketplaceAccount{} <-
+           Marketplaces.get_account(marketplace_account, id),
+         {:ok, deleted_account} <- Marketplaces.block_account(marketplace_account, target_account) do
+      Conn.ok(conn, MarketplaceAccountJSON.render(deleted_account))
+    end
+  end
+
   operation(:self,
     summary: "get self marketplace accounts",
     responses: [ok: {"", "application/json", Schemas.MarketplaceAccounts}]
@@ -75,16 +97,22 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
     active_marketplace_account_id = Conn.get_active_marketplace_account_id(conn)
 
     setup_initial_account = fn ->
-      value =
-        account
-        |> Marketplaces.all_accounts()
-        |> List.first()
-        |> Repo.preload([:marketplace, :role])
-        |> MarketplaceAccountJSON.render()
+      Marketplaces.all_accounts(account, blocked_at: false)
+      |> List.first()
+      |> case do
+        %MarketplaceAccount{} = marketplace_account ->
+          value =
+            marketplace_account
+            |> Repo.preload([:marketplace, :role])
+            |> MarketplaceAccountJSON.render()
 
-      conn
-      |> Conn.set_active_marketplace_account_id(value.id)
-      |> Conn.ok(value)
+          conn
+          |> Conn.set_active_marketplace_account_id(value.id)
+          |> Conn.ok(value)
+
+        _ ->
+          Conn.unauthorized(conn)
+      end
     end
 
     case active_marketplace_account_id do
@@ -92,12 +120,17 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
         setup_initial_account.()
 
       _ ->
-        case Marketplaces.get_account(account, active_marketplace_account_id) do
-          nil ->
+        marketplace_account = Marketplaces.get_account(account, active_marketplace_account_id)
+
+        cond do
+          is_nil(marketplace_account) ->
             setup_initial_account.()
 
-          account ->
-            account
+          Marketplaces.blocked_account?(marketplace_account) ->
+            setup_initial_account.()
+
+          true ->
+            marketplace_account
             |> Repo.preload([:marketplace, :role])
             |> MarketplaceAccountJSON.render()
             |> then(&Conn.ok(conn, &1))

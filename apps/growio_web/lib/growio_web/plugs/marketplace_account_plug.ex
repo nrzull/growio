@@ -11,7 +11,8 @@ defmodule GrowioWeb.Plugs.MarketplaceAccountPlug do
   @impl Plug
   def call(%{assigns: %{account: account}} = conn, _opts) do
     with id when is_integer(id) <- GrowioWeb.Conn.get_active_marketplace_account_id(conn),
-         marketplace_account = %MarketplaceAccount{} <- Marketplaces.get_account(account, id) do
+         marketplace_account = %MarketplaceAccount{} <- Marketplaces.get_account(account, id),
+         false <- Marketplaces.blocked_account?(marketplace_account) do
       assign(conn, :marketplace_account, marketplace_account)
     else
       _ -> GrowioWeb.Conn.unauthorized(conn)

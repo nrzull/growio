@@ -16,6 +16,14 @@
     @submit="updateUser"
   />
 
+  <PromiseModal ref="deleteUserModalRef">
+    <template #heading>Block user</template>
+    <template #footer="{ resolve, reject }">
+      <Button size="md" type="link-neutral" @click="reject"> Cancel </Button>
+      <Button size="md" @click="resolve"> Confirm </Button>
+    </template>
+  </PromiseModal>
+
   <InvitationsModal v-if="invitationsModal" @close="invitationsModal = false" />
 
   <PageShape>
@@ -39,7 +47,15 @@
       clickable
       :table="table"
       @click:row="userModal = $event.original"
-    />
+    >
+      <template #actions="{ ctx }">
+        <Icon
+          @click.stop="blockUser(ctx.row.original)"
+          clickable
+          value="trashCircle"
+        />
+      </template>
+    </Table>
   </PageShape>
 </template>
 
@@ -56,6 +72,7 @@ import { wait, Wait } from "~/composables/wait";
 import {
   apiMarketplaceAccountsGetAll,
   apiMarketplaceAccountsUpdate,
+  apiMarketplaceAccountsBlock,
 } from "~/api/growio/marketplace_accounts";
 import { apiMarketplaceAccountEmailInvitationsCreate } from "~/api/growio/marketplace_account_email_invitations";
 import PageLoader from "~/components/PageLoader.vue";
@@ -65,10 +82,13 @@ import InvitationModal from "~/components/Staff/InvitationModal.vue";
 import InvitationsModal from "~/components/Staff/InvitationsModal.vue";
 import UserModal from "~/components/Staff/UserModal.vue";
 import Notification from "~/components/Notifications/Notification.vue";
+import Icon from "~/components/Icon.vue";
+import PromiseModal from "~/components/PromiseModal.vue";
 
 const invitationModal = ref(false);
 const invitationsModal = ref(false);
 const userModal = ref<MarketplaceAccount>();
+const deleteUserModalRef = ref<InstanceType<typeof PromiseModal>>();
 const marketplaceAccounts = ref<MarketplaceAccount[]>([]);
 
 const columnHelper = createColumnHelper<MarketplaceAccount>();
@@ -82,6 +102,15 @@ const columns = ref([
   columnHelper.accessor("role.name", {
     cell: (info) => info.getValue(),
     header: () => "Role",
+  }),
+
+  columnHelper.display({
+    id: "actions",
+    meta: {
+      style: {
+        width: "0",
+      },
+    },
   }),
 ]);
 
@@ -102,6 +131,7 @@ const isLoading = computed(() =>
     Wait.MARKETPLACE_ACCOUNTS_FETCH,
     Wait.MARKETPLACE_ACCOUNT_EMAIL_INVITATION_CREATE,
     Wait.MARKETPLACE_ACCOUNT_UPDATE,
+    Wait.MARKETPLACE_ACCOUNT_BLOCK,
   ])
 );
 
@@ -136,6 +166,24 @@ const updateUser = async (params: MarketplaceAccount) => {
     console.error(e);
   } finally {
     wait.end(Wait.MARKETPLACE_ACCOUNT_UPDATE);
+  }
+};
+
+const blockUser = async (params: MarketplaceAccount) => {
+  try {
+    await deleteUserModalRef.value?.confirm();
+  } catch {
+    return;
+  }
+
+  try {
+    wait.start(Wait.MARKETPLACE_ACCOUNT_BLOCK);
+    await apiMarketplaceAccountsBlock(params);
+    console.log(params);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_ACCOUNT_BLOCK);
   }
 };
 

@@ -12,9 +12,11 @@ export const apiMarketplaceAccountsGetSelfActive = () =>
     .get<MarketplaceAccount>("/api/marketplace_accounts/self/active")
     .then((r) => r.data);
 
-export const apiMarketplaceAccountsGetAll = () =>
+export const apiMarketplaceAccountsGetAll = (
+  params: { blocked_at?: boolean } = { blocked_at: false }
+) =>
   growio
-    .get<MarketplaceAccount[]>("/api/marketplace_accounts")
+    .get<MarketplaceAccount[]>("/api/marketplace_accounts", { params })
     .then((r) => r.data);
 
 export const apiMarketplaceAccountsUpdate = (params: {
@@ -23,4 +25,9 @@ export const apiMarketplaceAccountsUpdate = (params: {
 }) =>
   growio
     .patch<MarketplaceAccount>(`/api/marketplace_accounts/${params.id}`, params)
+    .then((r) => r.data);
+
+export const apiMarketplaceAccountsBlock = (params: MarketplaceAccount) =>
+  growio
+    .delete<MarketplaceAccount>(`/api/marketplace_accounts/${params.id}`)
     .then((r) => r.data);
