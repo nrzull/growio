@@ -17,6 +17,15 @@ export const apiMarketplaceAccountEmailInvitationsCreate = (params: {
     .post("/api/marketplace_account_email_invitations", params)
     .then((r) => r.data);
 
+export const apiMarketplaceAccountEmailInvitationsDelete = (
+  params: MarketplaceAccountEmailInvitation
+) =>
+  growio
+    .delete<MarketplaceAccountEmailInvitation>(
+      `/api/marketplace_account_email_invitations/${params.id}`
+    )
+    .then((r) => r.data);
+
 export const apiMarketplaceAccountEmailInvitationsGetReceived = (params: {
   email: string;
   password: string;

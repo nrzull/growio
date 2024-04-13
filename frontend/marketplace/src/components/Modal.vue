@@ -22,6 +22,7 @@
 import { PropType } from "vue";
 import Shape from "~/components/Shape.vue";
 import ElementLoader from "~/components/ElementLoader.vue";
+import { useModal } from "~/components/Modal/useModal";
 
 defineEmits(["close"]);
 
@@ -36,6 +37,8 @@ defineProps({
     default: false,
   },
 });
+
+const { zIndex } = useModal();
 </script>
 
 <style module>
@@ -46,7 +49,7 @@ defineProps({
   width: 100vw;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.02);
-  z-index: var(--z-index-modal);
+  z-index: v-bind(zIndex);
   display: flex;
   justify-content: center;
   align-items: center;

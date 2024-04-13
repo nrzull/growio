@@ -7,12 +7,13 @@
 
     <div :class="$style.row">
       <TextInput
-        :readonly="isMarketplaceAccount(modelValue)"
+        :readonly="readonly || isMarketplaceAccount(modelValue)"
         v-model="model.account.email"
         placeholder="Email"
       />
       <SelectInput
         v-model="model.role"
+        :readonly
         placeholder="Role"
         track-by="id"
         label-path="name"
@@ -21,7 +22,12 @@
     </div>
 
     <template #footer>
-      <Button size="md" @click="$emit('submit', model)">Submit</Button>
+      <Button
+        size="md"
+        @click="readonly ? $emit('close') : $emit('submit', model)"
+      >
+        Submit
+      </Button>
     </template>
   </Modal>
 </template>
@@ -47,6 +53,11 @@ const props = defineProps({
   },
 
   loading: {
+    type: Boolean,
+    default: false,
+  },
+
+  readonly: {
     type: Boolean,
     default: false,
   },

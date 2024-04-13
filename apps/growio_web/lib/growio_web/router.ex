@@ -70,7 +70,7 @@ defmodule GrowioWeb.Router do
     post("/:email/:password/accept", MarketplaceAccountEmailInvitationController, :guest_accept)
 
     pipe_through([:marketplace_account])
-    resources("/", MarketplaceAccountEmailInvitationController, only: [:index, :create])
+    resources("/", MarketplaceAccountEmailInvitationController, only: [:index, :create, :delete])
   end
 
   scope "/api/marketplace_account_roles" do

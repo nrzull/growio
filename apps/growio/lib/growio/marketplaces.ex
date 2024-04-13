@@ -1040,6 +1040,13 @@ defmodule Growio.Marketplaces do
     |> Repo.one()
   end
 
+  def get_account_email_invitation(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
+    with true <-
+           Permissions.ok?(initiator, marketplaces__marketplace_account_email_invitation__read()) do
+      Repo.get(MarketplaceAccountEmailInvitation, id)
+    end
+  end
+
   def get_account_email_invitation(email, password)
       when is_bitstring(email) and is_bitstring(password) do
     now = Utils.naive_utc_now()
@@ -1050,6 +1057,21 @@ defmodule Growio.Marketplaces do
     |> where([a], a.expired_at > ^now)
     |> order_by(desc: :id)
     |> Repo.one()
+  end
+
+  def delete_account_email_invitation(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceAccountEmailInvitation{} = struct
+      ) do
+    with true <-
+           Permissions.ok?(
+             initiator,
+             marketplaces__marketplace_account_email_invitation__delete()
+           ) do
+      delete_account_email_invitation(struct)
+    else
+      _ -> {:error, "cannot delete email invitation"}
+    end
   end
 
   def delete_account_email_invitation(%MarketplaceAccountEmailInvitation{} = struct) do

@@ -54,6 +54,26 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountEmailInvitationController do
     end
   end
 
+  operation(:delete,
+    summary: "delete email invitation",
+    parameters: [
+      id: [in: :path, description: "invitation id", type: :integer, example: 1]
+    ],
+    responses: [ok: {"", "application/json", Schemas.MarketplaceAccountEmailInvitation}]
+  )
+
+  def delete(%{assigns: %{marketplace_account: marketplace_account}} = conn, %{
+        "id" => id
+      }) do
+    with id when is_integer(id) <- String.to_integer(id),
+         invitation = %MarketplaceAccountEmailInvitation{} <-
+           Marketplaces.get_account_email_invitation(marketplace_account, id),
+         {:ok, deleted_invitation} <-
+           Marketplaces.delete_account_email_invitation(marketplace_account, invitation) do
+      Conn.ok(conn, MarketplaceAccountEmailInvitationJSON.render(deleted_invitation))
+    end
+  end
+
   operation(:guest_show,
     summary: "get received email invitation",
     parameters: [

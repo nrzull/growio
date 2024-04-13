@@ -12,6 +12,7 @@
     v-if="userModal"
     :loading="isLoading"
     :model-value="userModal"
+    :readonly="userModal.id === marketplaceAccount.id"
     @close="userModal = undefined"
     @submit="updateUser"
   />
@@ -27,9 +28,14 @@
   <InvitationsModal v-if="invitationsModal" @close="invitationsModal = false" />
 
   <PageShape>
-    <template #heading>Users</template>
+    <template #heading>
+      Users <template v-if="blockedUsers">(Blocked)</template>
+    </template>
 
     <template #tools>
+      <Button size="sm" type="link-neutral" @click="toggleBlockedUsers">
+        Toggle blocked users
+      </Button>
       <Button size="sm" type="link-neutral" @click="invitationsModal = true">
         Invitations
       </Button>
@@ -44,14 +50,14 @@
     />
     <Table
       v-else
-      clickable
+      :clickable="!blockedUsers"
       :table="table"
       @click:row="userModal = $event.original"
     >
       <template #actions="{ ctx }">
         <Icon
+          v-if="!blockedUsers && ctx.row.original.id !== marketplaceAccount.id"
           @click.stop="blockUser(ctx.row.original)"
-          clickable
           value="trashCircle"
         />
       </template>
@@ -84,12 +90,14 @@ import UserModal from "~/components/Staff/UserModal.vue";
 import Notification from "~/components/Notifications/Notification.vue";
 import Icon from "~/components/Icon.vue";
 import PromiseModal from "~/components/PromiseModal.vue";
+import { marketplaceAccount } from "~/composables/marketplace-accounts";
 
 const invitationModal = ref(false);
 const invitationsModal = ref(false);
 const userModal = ref<MarketplaceAccount>();
 const deleteUserModalRef = ref<InstanceType<typeof PromiseModal>>();
 const marketplaceAccounts = ref<MarketplaceAccount[]>([]);
+const blockedUsers = ref(false);
 
 const columnHelper = createColumnHelper<MarketplaceAccount>();
 
@@ -169,6 +177,11 @@ const updateUser = async (params: MarketplaceAccount) => {
   }
 };
 
+const toggleBlockedUsers = () => {
+  blockedUsers.value = !blockedUsers.value;
+  fetchMarketplaceAccounts();
+};
+
 const blockUser = async (params: MarketplaceAccount) => {
   try {
     await deleteUserModalRef.value?.confirm();
@@ -190,7 +203,9 @@ const blockUser = async (params: MarketplaceAccount) => {
 const fetchMarketplaceAccounts = async () => {
   try {
     wait.start(Wait.MARKETPLACE_ACCOUNTS_FETCH);
-    marketplaceAccounts.value = await apiMarketplaceAccountsGetAll();
+    marketplaceAccounts.value = await apiMarketplaceAccountsGetAll({
+      blocked_at: blockedUsers.value,
+    });
   } catch (e) {
     console.error(e);
   } finally {
