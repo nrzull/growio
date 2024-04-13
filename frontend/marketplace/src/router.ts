@@ -32,6 +32,21 @@ export const router = createRouter({
       ],
       children: [
         {
+          path: "self",
+          children: [
+            {
+              path: "marketplaces",
+              component: () => import("~/pages/self/marketplaces.vue"),
+            },
+
+            {
+              path: "",
+              redirect: "/self/marketplaces",
+            },
+          ],
+        },
+
+        {
           path: "staff",
           component: () => import("~/pages/staff.vue"),
           children: [

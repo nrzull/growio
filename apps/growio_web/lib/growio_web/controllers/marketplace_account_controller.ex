@@ -137,4 +137,24 @@ defmodule GrowioWeb.Controllers.MarketplaceAccountController do
         end
     end
   end
+
+  operation(:update_self_active,
+    summary: "update self active marketplace account",
+    responses: [ok: {"", "application/json", Schemas.MarketplaceAccount}]
+  )
+
+  def update_self_active(%{assigns: %{account: account}} = conn, %{"id" => id}) do
+    with id when is_integer(id) <- String.to_integer(id),
+         marketplace_account = %MarketplaceAccount{} <- Marketplaces.get_account(account, id),
+         false <- Marketplaces.blocked_account?(marketplace_account) do
+      value =
+        marketplace_account
+        |> Repo.preload([:marketplace, :role])
+        |> MarketplaceAccountJSON.render()
+
+      conn
+      |> Conn.set_active_marketplace_account_id(value.id)
+      |> Conn.ok(value)
+    end
+  end
 end

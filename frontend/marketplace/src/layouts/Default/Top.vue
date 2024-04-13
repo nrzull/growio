@@ -29,6 +29,11 @@ const router = useRouter();
 
 const items = ref<ItemComplex[]>([
   {
+    text: "Marketplaces",
+    action: () => router.push("/self/marketplaces"),
+  },
+
+  {
     text: "Sign-Out",
     action: () => router.push("/auth"),
   },

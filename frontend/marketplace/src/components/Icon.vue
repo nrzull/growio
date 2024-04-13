@@ -12,8 +12,16 @@ import adProduct from "~/assets/ad-product.svg?raw";
 import settings01 from "~/assets/settings-01.svg?raw";
 import plus from "~/assets/plus.svg?raw";
 import trashCircle from "~/assets/trash-circle.svg?raw";
+import arrowRightFromBracket from "~/assets/arrow-right-from-bracket.svg?raw";
 
-const icons = { users, adProduct, settings01, plus, trashCircle } as const;
+const icons = {
+  users,
+  adProduct,
+  settings01,
+  plus,
+  trashCircle,
+  arrowRightFromBracket,
+} as const;
 
 export type Icons = keyof typeof icons;
 
