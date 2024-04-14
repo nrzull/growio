@@ -58,7 +58,10 @@
   background-color: var(--background-color);
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
   display: flex;
   flex-flow: column;
+}
+
+body {
+  overflow: hidden;
 }

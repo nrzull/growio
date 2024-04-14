@@ -20,15 +20,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useFloating, autoUpdate } from "@floating-ui/vue";
+import { ref, computed, PropType } from "vue";
+import { useFloating, autoUpdate, UseFloatingOptions } from "@floating-ui/vue";
+import { mergeDeep } from "remeda";
 
 defineOptions({ inheritAttrs: false });
 
-defineProps({
+const props = defineProps({
   manual: {
     type: Boolean,
     default: false,
+  },
+
+  useFloatingOptions: {
+    type: Object as PropType<UseFloatingOptions>,
+    default: () => ({}),
   },
 });
 
@@ -48,10 +54,18 @@ const minWidth = computed(() => {
   }
 });
 
-const { floatingStyles } = useFloating(triggerRef, floatingRef, {
-  whileElementsMounted: autoUpdate,
-  open,
-});
+const { floatingStyles } = useFloating(
+  triggerRef,
+  floatingRef,
+  mergeDeep(
+    {
+      whileElementsMounted: autoUpdate,
+      open,
+      placement: "bottom-end",
+    } as UseFloatingOptions,
+    props.useFloatingOptions
+  )
+);
 
 defineExpose({ open, setOpen });
 </script>
