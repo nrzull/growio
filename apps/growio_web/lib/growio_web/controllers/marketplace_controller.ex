@@ -26,4 +26,17 @@ defmodule GrowioWeb.Controllers.MarketplaceController do
       Conn.ok(conn, MarketplaceJSON.render(marketplace))
     end
   end
+
+  operation(:self_update,
+    summary: "update marketplace",
+    request_body: {"", "application/json", Schemas.Marketplace, required: true},
+    responses: [ok: {"", "application/json", Schemas.Marketplace}]
+  )
+
+  def self_update(%{assigns: %{marketplace_account: marketplace_account}} = conn, params) do
+    with {:ok, updated_marketplace} <-
+           Marketplaces.update_marketplace(marketplace_account, params) do
+      Conn.ok(conn, MarketplaceJSON.render(updated_marketplace))
+    end
+  end
 end

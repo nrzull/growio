@@ -75,6 +75,21 @@ defmodule Growio.Marketplaces do
     end
   end
 
+  def update_marketplace(%MarketplaceAccount{} = initiator, %{} = params) do
+    with true <- Permissions.ok?(initiator, marketplaces__marketplace__update()) do
+      %MarketplaceAccount{marketplace: marketplace} = Repo.preload(initiator, [:marketplace])
+
+      update_marketplace(marketplace, params)
+    else
+      _ -> {:error, "cannot update a marketplace"}
+    end
+  end
+
+  def update_marketplace(%Marketplace{} = marketplace, %{} = params) do
+    Marketplace.changeset(marketplace, params)
+    |> Repo.update()
+  end
+
   def all_accounts(initiator, opts \\ [])
 
   def all_accounts(%Account{} = initiator, opts) do
