@@ -2,7 +2,7 @@
   <Dropdown
     ref="dropdownRef"
     :manual
-    :class="$style.menu"
+    :class="[$style.menu, $style.menu]"
     @click:trigger="$emit('click:trigger', $event)"
   >
     <template #trigger>
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, PropType, computed } from "vue";
+import { ref, computed } from "vue";
 import List from "~/components/Menu/List.vue";
 import Dropdown from "~/components/Dropdown.vue";
 import { itemsProp } from "~/components/Menu/utils";

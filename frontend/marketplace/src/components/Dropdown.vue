@@ -12,7 +12,7 @@
       v-if="open"
       ref="floatingRef"
       :style="floatingStyles"
-      :class="$style.floating"
+      :class="[$style.floating, $attrs.class]"
     >
       <slot></slot>
     </div>
@@ -22,6 +22,8 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useFloating, autoUpdate } from "@floating-ui/vue";
+
+defineOptions({ inheritAttrs: false });
 
 defineProps({
   manual: {
