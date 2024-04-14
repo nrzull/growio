@@ -19,7 +19,7 @@
 
   <PageShape>
     <template #heading>
-      Categories <template v-if="deletedCategories">(Deleted)</template>
+      Categories <Tag v-if="deletedCategories">Deleted</Tag>
     </template>
 
     <template #tools>
@@ -39,7 +39,7 @@
 
     <Notification
       v-if="isEmpty"
-      :model-value="{ type: 'info', text: 'There are no categories' }"
+      :model-value="{ type: 'info', text: 'There is no categories' }"
     />
     <Table
       v-else
@@ -89,6 +89,7 @@ import {
   buildPartialMarketplaceItemCategory,
   isMarketplaceItemCategory,
 } from "~/api/growio/marketplace_item_categories/utils";
+import Tag from "~/components/Tag.vue";
 
 const categories = ref<MarketplaceItemCategory[]>([]);
 

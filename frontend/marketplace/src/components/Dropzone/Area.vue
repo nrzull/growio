@@ -61,10 +61,11 @@ const getKey = (v, fallback) => {
 <style module>
 .area {
   height: 200px;
-  border: 1px dotted var(--color-gray-100);
   display: flex;
-  border-radius: 8px;
   position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background-color: var(--color-gray-10);
 }
 
 .images {

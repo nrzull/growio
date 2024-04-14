@@ -28,9 +28,7 @@
   <InvitationsModal v-if="invitationsModal" @close="invitationsModal = false" />
 
   <PageShape>
-    <template #heading>
-      Users <template v-if="blockedUsers">(Blocked)</template>
-    </template>
+    <template #heading> Users <Tag v-if="blockedUsers">Blocked</Tag> </template>
 
     <template #tools>
       <Button size="sm" type="link-neutral" @click="toggleBlockedUsers">
@@ -46,7 +44,7 @@
 
     <Notification
       v-if="isEmpty"
-      :model-value="{ type: 'info', text: 'There are no users' }"
+      :model-value="{ type: 'info', text: 'There is no users' }"
     />
     <Table
       v-else
@@ -91,6 +89,7 @@ import Notification from "~/components/Notifications/Notification.vue";
 import Icon from "~/components/Icon.vue";
 import PromiseModal from "~/components/PromiseModal.vue";
 import { marketplaceAccount } from "~/composables/marketplace-accounts";
+import Tag from "~/components/Tag.vue";
 
 const invitationModal = ref(false);
 const invitationsModal = ref(false);

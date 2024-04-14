@@ -33,6 +33,9 @@ import Shape from "~/components/Shape.vue";
 
 .heading {
   font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .tools {

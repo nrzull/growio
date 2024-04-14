@@ -50,7 +50,7 @@
       <div>
         <Notification
           v-if="isEmpty"
-          :model-value="{ type: 'info', text: 'There are no items' }"
+          :model-value="{ type: 'info', text: 'There is no items' }"
         />
         <Table
           v-else
@@ -131,7 +131,7 @@ const isLoading = computed(() =>
 
 const isEmpty = computed(() => !isLoading.value && !items.value.length);
 
-const columnHelper = createColumnHelper<any>();
+const columnHelper = createColumnHelper<MarketplaceItem>();
 
 const columns = ref([
   columnHelper.accessor("name", {

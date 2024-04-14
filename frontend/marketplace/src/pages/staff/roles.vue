@@ -18,9 +18,7 @@
   </PromiseModal>
 
   <PageShape>
-    <template #heading>
-      Roles <template v-if="deletedRoles">(Deleted)</template>
-    </template>
+    <template #heading> Roles <Tag v-if="deletedRoles">Deleted</Tag> </template>
 
     <template #tools>
       <Button size="sm" type="link-neutral" @click="toggleDeletedRoles">
@@ -39,7 +37,7 @@
 
     <Notification
       v-if="isEmpty"
-      :model-value="{ type: 'info', text: 'There are no roles' }"
+      :model-value="{ type: 'info', text: 'There is no roles' }"
     />
     <Table
       v-else
@@ -100,6 +98,7 @@ import {
 import Notification from "~/components/Notifications/Notification.vue";
 import PromiseModal from "~/components/PromiseModal.vue";
 import Icon from "~/components/Icon.vue";
+import Tag from "~/components/Tag.vue";
 
 const roles = ref<MarketplaceAccountRole[]>([]);
 const deletedRoles = ref(false);

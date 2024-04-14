@@ -159,7 +159,8 @@ fetchAssets();
 
 <style module>
 .row {
-  display: flex;
+  display: grid;
   gap: 8px;
+  grid-template-columns: 1fr 1fr;
 }
 </style>
