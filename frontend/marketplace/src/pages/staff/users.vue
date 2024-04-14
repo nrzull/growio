@@ -57,8 +57,8 @@
       <template #actions="{ ctx }">
         <Icon
           v-if="!blockedUsers && ctx.row.original.id !== marketplaceAccount.id"
-          @click.stop="blockUser(ctx.row.original)"
           value="trashCircle"
+          @click.stop="blockUser(ctx.row.original)"
         />
       </template>
     </Table>

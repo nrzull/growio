@@ -7,7 +7,7 @@
     </template>
   </PromiseModal>
 
-  <Modal size="lg" @close="$emit('close')" :loading="isLoading">
+  <Modal size="lg" :loading="isLoading" @close="$emit('close')">
     <template #heading>Invitations</template>
 
     <Notification

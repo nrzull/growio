@@ -9,9 +9,9 @@
       </span>
 
       <template #footer>
-        <Button :disabled="isLoading" size="md" @click="acceptInvitation"
-          >Accept</Button
-        >
+        <Button :disabled="isLoading" size="md" @click="acceptInvitation">
+          Accept
+        </Button>
       </template>
     </Modal>
     <LoaderIcon v-else />

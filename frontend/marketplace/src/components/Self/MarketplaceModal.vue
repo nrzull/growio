@@ -1,5 +1,5 @@
 <template>
-  <Modal @close="$emit('close')" :loading="isLoading">
+  <Modal :loading="isLoading" @close="$emit('close')">
     <template #heading>Create Marketplace</template>
 
     <div :class="$style.row">

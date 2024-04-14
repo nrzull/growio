@@ -103,6 +103,7 @@ const isInvalid = computed(() =>
   transition: border-color 0.2s ease;
   z-index: var(--z-index-text-input);
   position: relative;
+  background-color: var(--color-gray-10);
 }
 
 .textInput.invalid {
@@ -122,9 +123,9 @@ const isInvalid = computed(() =>
   top: 50%;
   transform: translateY(-50%);
   left: 16px;
-  z-index: var(--z-index-text-input-placeholder);
   transition: all 0.2s ease;
   font-size: 14px;
+  z-index: var(--z-index-text-input-placeholder);
 }
 
 .placeholder.invalid {
@@ -132,11 +133,12 @@ const isInvalid = computed(() =>
 }
 
 .placeholder.focused {
-  top: 0;
-  z-index: var(--z-index-text-input-placeholder-focused);
-  background-color: #fff;
+  top: 0px;
   left: 12px;
-  padding: 0 4px;
+  line-height: 1;
+  padding: 0 2px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #fff 60%, transparent 40%);
 }
 
 .errors {

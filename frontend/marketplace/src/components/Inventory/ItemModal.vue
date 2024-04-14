@@ -1,5 +1,5 @@
 <template>
-  <Modal @close="$emit('close')" :loading="isLoading">
+  <Modal :loading="isLoading" @close="$emit('close')">
     <template v-if="isMarketplaceItem(modelValue)" #heading>
       <span>{{ modelValue.name }}</span> <Tag size="sm">Item</Tag>
     </template>
@@ -17,10 +17,10 @@
     </div>
 
     <Dropzone
-      :input="assetsInput"
       v-model:output="assetsOutput"
       v-model:output-create="assetsOutputCreate"
       v-model:output-delete="assetsOutputDelete"
+      :input="assetsInput"
     />
 
     <template #footer>

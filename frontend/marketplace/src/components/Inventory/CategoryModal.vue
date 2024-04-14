@@ -1,5 +1,5 @@
 <template>
-  <Modal @close="$emit('close')" :loading="isLoading">
+  <Modal :loading="isLoading" @close="$emit('close')">
     <template v-if="isMarketplaceItemCategory(modelValue)" #heading>
       <span>{{ modelValue.name }}</span> <Tag>Category</Tag>
     </template>

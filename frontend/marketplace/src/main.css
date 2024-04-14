@@ -7,15 +7,16 @@
   --z-index-modal: 100;
   --z-index-page-loader: 95;
   --z-index-menu: 90;
-  --z-index-text-input-placeholder-focused: 3;
+
+  --z-index-text-input-placeholder: 3;
   --z-index-text-input: 2;
-  --z-index-text-input-placeholder: 1;
   --z-index-negative: -1;
 
   --color-red: hsl(0, 80%, 70%);
   --color-green: hsl(130, 40%, 60%);
   --color-black: hsl(0, 0%, 7%);
   --color-white: hsl(0, 0%, 100%);
+  --color-gray-10: hsl(0, 0%, 98%);
   --color-gray-50: hsl(0, 0%, 95%);
   --color-gray-100: hsl(0, 0%, 90%);
   --color-gray-200: hsl(0, 0%, 80%);

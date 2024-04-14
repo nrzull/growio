@@ -1,9 +1,9 @@
 <template>
-  <Modal @close="$emit('close')" :loading="isLoading">
-    <template #heading v-if="!!modelValue.id">
+  <Modal :loading="isLoading" @close="$emit('close')">
+    <template v-if="!!modelValue.id" #heading>
       <span>{{ modelValue.email }}</span> <Tag>Invitation</Tag>
     </template>
-    <template #heading v-else> Invite User </template>
+    <template v-else #heading> Invite User </template>
 
     <div :class="$style.row">
       <TextInput v-model="model.email" placeholder="Email" />

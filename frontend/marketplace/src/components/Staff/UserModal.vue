@@ -1,14 +1,14 @@
 <template>
-  <Modal @close="$emit('close')" :loading="isLoading">
-    <template #heading v-if="isMarketplaceAccount(modelValue)">
+  <Modal :loading="isLoading" @close="$emit('close')">
+    <template v-if="isMarketplaceAccount(modelValue)" #heading>
       <span>{{ modelValue.account.email }}</span> <Tag>User</Tag>
     </template>
-    <template #heading v-else> Create User </template>
+    <template v-else #heading> Create User </template>
 
     <div :class="$style.row">
       <TextInput
-        :readonly="readonly || isMarketplaceAccount(modelValue)"
         v-model="model.account.email"
+        :readonly="readonly || isMarketplaceAccount(modelValue)"
         placeholder="Email"
       />
       <SelectInput

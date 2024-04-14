@@ -7,11 +7,11 @@
     <div :class="$style.body">
       <div :class="$style.grid">
         <div :class="$style.row">
-          <TextInput placeholder="Name" v-model="model.name" />
+          <TextInput v-model="model.name" placeholder="Name" />
           <SelectInput
+            v-model="model.currency"
             placeholder="Currency"
             :items="currencyOptions"
-            v-model="model.currency"
           />
         </div>
       </div>
