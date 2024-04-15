@@ -446,7 +446,11 @@ defmodule Growio.Marketplaces do
       primary_account_role?(role) ->
         {:error, "cannot delete primary role"}
 
-      Repo.exists?(where(MarketplaceAccount, [acc], acc.role_id == ^role.id)) ->
+      Repo.exists?(
+        MarketplaceAccount
+        |> where([acc], acc.role_id == ^role.id)
+        |> where([acc], is_nil(acc.blocked_at))
+      ) ->
         {:error, "there is accounts that use current role"}
 
       not is_nil(role.deleted_at) ->
