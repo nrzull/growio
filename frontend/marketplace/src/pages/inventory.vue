@@ -15,6 +15,16 @@
         Categories
       </Button>
     </RouterLink>
+
+    <RouterLink
+      v-slot="{ navigate, isActive }"
+      to="/inventory/warehouses"
+      custom
+    >
+      <Button type="neutral" size="sm" :active="isActive" @click="navigate">
+        Warehouses
+      </Button>
+    </RouterLink>
   </teleport>
 
   <RouterView />
