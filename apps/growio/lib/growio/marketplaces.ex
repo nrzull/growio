@@ -750,6 +750,21 @@ defmodule Growio.Marketplaces do
 
   def all_items(a, b \\ [])
 
+  def all_items(
+        %MarketplaceAccount{} = initiator,
+        opts
+      ) do
+    with true <-
+           Permissions.ok?(initiator, marketplaces__marketplace_item__read()) do
+      all_item_categories(initiator)
+      |> Enum.reduce([], fn category, acc ->
+        acc ++ all_items(category, opts)
+      end)
+    else
+      _ -> {:error, "cannot get all items"}
+    end
+  end
+
   def all_items(%MarketplaceItemCategory{} = item_category, opts) do
     MarketplaceItem
     |> where([item], item.category_id == ^item_category.id)
@@ -802,6 +817,26 @@ defmodule Growio.Marketplaces do
          true <-
            Permissions.ok?(initiator, marketplaces__marketplace_item__read()) do
       get_item(item_category, item_id)
+    else
+      _ -> {:error, "cannot get an item"}
+    end
+  end
+
+  def get_item(
+        %MarketplaceAccount{} = initiator,
+        item_id
+      )
+      when is_integer(item_id) do
+    with true <-
+           Permissions.ok?(
+             initiator,
+             marketplaces__marketplace_item__read()
+           ) do
+      MarketplaceItem
+      |> join(:left, [item], category in assoc(item, :category))
+      |> where([_, category], category.marketplace_id == ^initiator.marketplace_id)
+      |> where([item], item.id == ^item_id)
+      |> Repo.one()
     else
       _ -> {:error, "cannot get an item"}
     end

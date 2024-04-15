@@ -285,4 +285,34 @@ defmodule GrowioWeb.Schemas do
       }
     })
   end
+
+  defmodule MarketplaceWarehouseItem do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer},
+        quantity: %Schema{type: :integer, nullable: true},
+        infinity: %Schema{type: :boolean, nullable: true},
+        marketplace_item: MarketplaceItem
+      }
+    })
+  end
+
+  defmodule MarketplaceWarehouseItems do
+    schema(%{
+      type: :array,
+      items: MarketplaceWarehouseItem
+    })
+  end
+
+  defmodule MarketplaceWarehouseItemCreate do
+    schema(%{
+      type: :object,
+      properties: %{
+        quantity: %Schema{type: :integer},
+        infinity: %Schema{type: :boolean},
+        marketplace_item_id: %Schema{type: :integer}
+      }
+    })
+  end
 end

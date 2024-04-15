@@ -5,6 +5,18 @@ import {
 } from "~/api/growio/marketplace_items/types";
 import { IdParam } from "~/api/types";
 
+export const apiMarketplaceItemsSelfGetAll = (params: {
+  deleted_at?: boolean;
+}) => {
+  const { deleted_at = false } = params;
+
+  return growio
+    .get<MarketplaceItem[]>(`/api/marketplace_items`, {
+      params: { deleted_at },
+    })
+    .then((r) => r.data);
+};
+
 export const apiMarketplaceItemsGetAll = (params: {
   category_item_id: IdParam;
   deleted_at?: boolean;

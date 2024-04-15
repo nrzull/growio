@@ -6,7 +6,7 @@ defmodule Growio.Marketplaces.MarketplaceWarehouseItem do
 
   @type t :: %__MODULE__{}
   @required ~w()a
-  @optional ~w(infinity quantity)a
+  @optional ~w(infinity quantity marketplace_item_id)a
 
   schema "marketplace_warehouse_items" do
     field(:infinity, :boolean)

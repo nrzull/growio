@@ -17,6 +17,22 @@ defmodule GrowioWeb.Controllers.MarketplaceItemController do
 
   tags(["marketplace_items"])
 
+  operation(:self_index,
+    summary: "show all marketplace items",
+    responses: [ok: {"", "application/json", Schemas.MarketplaceItems}]
+  )
+
+  def self_index(%{assigns: %{marketplace_account: marketplace_account}} = conn, _params) do
+    opts = GrowioWeb.QueryParams.into_keyword(conn.query_params)
+
+    with items when is_list(items) <-
+           Marketplaces.all_items(marketplace_account, opts) do
+      items
+      |> MarketplaceItemJSON.render()
+      |> then(&Conn.ok(conn, &1))
+    end
+  end
+
   operation(:index,
     summary: "show marketplace items",
     parameters: [

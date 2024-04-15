@@ -6,5 +6,12 @@ export type MarketplaceWarehouseItem = {
   infinity: boolean;
   quantity: number;
   marketplace_item: MarketplaceItem;
+  marketplace_item_id?: number;
   warehouse: MarketplaceWarehouse;
+};
+
+export type PartialMarketplaceWarehouseItem = {
+  infinity: boolean;
+  quantity: number;
+  marketplace_item_id: number;
 };
