@@ -1228,6 +1228,19 @@ defmodule Growio.Marketplaces do
     |> Repo.update()
   end
 
+  def delete_warehouse(%MarketplaceAccount{} = initiator, %MarketplaceWarehouse{} = warehouse) do
+    with true <- Permissions.ok?(initiator, marketplaces__warehouse__delete()),
+         false <-
+           Repo.exists?(
+             MarketplaceWarehouseItem
+             |> where([item], item.warehouse_id == ^warehouse.id)
+           ) do
+      Repo.delete(warehouse)
+    else
+      _ -> {:error, "cannot delete a warehouse"}
+    end
+  end
+
   def all_warehouse_items(%MarketplaceAccount{} = initiator, %MarketplaceWarehouse{} = warehouse) do
     with true <- Permissions.ok?(initiator, warehouse, marketplaces__warehouse__read()) do
       all_warehouse_items(warehouse)

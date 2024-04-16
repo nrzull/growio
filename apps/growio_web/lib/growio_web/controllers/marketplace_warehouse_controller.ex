@@ -60,4 +60,25 @@ defmodule GrowioWeb.Controllers.MarketplaceWarehouseController do
       Conn.ok(conn, MarketplaceWarehouseJSON.render(updated_warehouse))
     end
   end
+
+  operation(:delete,
+    summary: "delete marketplace warehouse",
+    parameters: [
+      id: [in: :path, description: "warehouse id", type: :integer]
+    ],
+    responses: [ok: {"", "application/json", Schemas.MarketplaceWarehouse}]
+  )
+
+  def delete(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"id" => id}
+      ) do
+    with id when is_integer(id) <- String.to_integer(id),
+         warehouse = %MarketplaceWarehouse{} <-
+           Marketplaces.get_warehouse(marketplace_account, id),
+         {:ok, deleted_warehouse} <-
+           Marketplaces.delete_warehouse(marketplace_account, warehouse) do
+      Conn.ok(conn, MarketplaceWarehouseJSON.render(deleted_warehouse))
+    end
+  end
 end

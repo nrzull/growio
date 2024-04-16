@@ -23,3 +23,8 @@ export const apiMarketplaceWarehousesUpdate = (params: MarketplaceWarehouse) =>
       params
     )
     .then((r) => r.data);
+
+export const apiMarketplaceWarehousesDelete = (params: MarketplaceWarehouse) =>
+  growio
+    .delete<MarketplaceWarehouse>(`/api/marketplace_warehouses/${params.id}`)
+    .then((r) => r.data);

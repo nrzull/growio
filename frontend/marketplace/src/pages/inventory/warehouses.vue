@@ -130,6 +130,7 @@ import {
   apiMarketplaceWarehousesGetAll,
   apiMarketplaceWarehousesCreate,
   apiMarketplaceWarehousesUpdate,
+  apiMarketplaceWarehousesDelete,
 } from "~/api/growio/marketplace_warehouses";
 import {
   apiMarketplaceWarehouseItemsCreate,
@@ -352,6 +353,21 @@ const deleteWarehouse = async (params: MarketplaceWarehouse) => {
     await deleteWarehouseModalRef.value?.confirm();
   } catch {
     return;
+  }
+
+  try {
+    wait.start(Wait.MARKETPLACE_WAREHOUSE_DELETE);
+    const deletedWarehouse = await apiMarketplaceWarehousesDelete(params);
+
+    await fetchWarehouses();
+
+    if (activeWarehouse.value?.id === deletedWarehouse.id) {
+      activeWarehouse.value = warehouses.value[0];
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_WAREHOUSE_DELETE);
   }
 };
 
