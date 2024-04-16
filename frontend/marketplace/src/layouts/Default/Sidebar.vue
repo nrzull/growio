@@ -21,11 +21,11 @@
   </div>
 </template>
 
-<script setup>
-import Icon from "~/components/Icon.vue";
+<script setup lang="ts">
+import Icon, { Icons } from "~/components/Icon.vue";
 import Button from "~/components/Button.vue";
 
-const buttons = [
+const buttons: Array<{ icon: Icons; text: string; to: string }> = [
   {
     icon: "users",
     text: "Staff",
@@ -39,9 +39,33 @@ const buttons = [
   },
 
   {
+    icon: "storeSolid",
+    text: "Markets",
+    to: "/markets",
+  },
+
+  {
+    icon: "order",
+    text: "Orders",
+    to: "/orders",
+  },
+
+  {
+    icon: "support",
+    text: "Support",
+    to: "/support",
+  },
+
+  {
     icon: "settings01",
     text: "Settings",
     to: "/settings",
+  },
+
+  {
+    icon: "analytics",
+    text: "Stats",
+    to: "/stats",
   },
 ];
 </script>

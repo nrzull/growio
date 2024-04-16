@@ -115,6 +115,26 @@ export const router = createRouter({
         },
 
         {
+          path: "markets",
+          component: () => import("~/pages/markets.vue"),
+        },
+
+        {
+          path: "orders",
+          component: () => import("~/pages/orders.vue"),
+        },
+
+        {
+          path: "stats",
+          component: () => import("~/pages/stats.vue"),
+        },
+
+        {
+          path: "support",
+          component: () => import("~/pages/support.vue"),
+        },
+
+        {
           path: "",
           redirect: "/staff/users",
         },

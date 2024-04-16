@@ -14,6 +14,10 @@ import plus from "~/assets/plus.svg?raw";
 import trashCircle from "~/assets/trash-circle.svg?raw";
 import arrowRightFromBracket from "~/assets/arrow-right-from-bracket.svg?raw";
 import chevronDown from "~/assets/chevron-down.svg?raw";
+import storeSolid from "~/assets/store-solid.svg?raw";
+import order from "~/assets/order.svg?raw";
+import analytics from "~/assets/analytics.svg?raw";
+import support from "~/assets/support.svg?raw";
 
 const icons = {
   users,
@@ -23,6 +27,10 @@ const icons = {
   trashCircle,
   arrowRightFromBracket,
   chevronDown,
+  storeSolid,
+  order,
+  analytics,
+  support,
 } as const;
 
 export type Icons = keyof typeof icons;
