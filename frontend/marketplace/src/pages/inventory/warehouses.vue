@@ -17,6 +17,14 @@
     @submit="handleSubmitWarehouseItem"
   />
 
+  <PromiseModal ref="deleteWarehouseItemModalRef">
+    <template #heading>Delete warehouse item</template>
+    <template #footer="{ resolve, reject }">
+      <Button size="md" type="link-neutral" @click="reject"> Cancel </Button>
+      <Button size="md" @click="resolve"> Confirm </Button>
+    </template>
+  </PromiseModal>
+
   <PageShape>
     <template #heading> Warehouses </template>
 
@@ -59,7 +67,14 @@
           :table
           clickable
           @click:row="warehouseItemModal = $event.original"
-        />
+        >
+          <template #actions="{ ctx }">
+            <Icon
+              value="trashCircle"
+              @click.stop="deleteItem(ctx.row.original)"
+            />
+          </template>
+        </Table>
       </div>
     </div>
   </PageShape>
@@ -90,6 +105,7 @@ import {
 } from "~/api/growio/marketplace_warehouses";
 import {
   apiMarketplaceWarehouseItemsCreate,
+  apiMarketplaceWarehouseItemsDelete,
   apiMarketplaceWarehouseItemsGetAll,
   apiMarketplaceWarehouseItemsUpdate,
 } from "~/api/growio/marketplace_warehouse_items";
@@ -104,10 +120,22 @@ import {
   buildPartialMarketplaceWarehouseItem,
   isMarketplaceWarehouseItem,
 } from "~/api/growio/marketplace_warehouse_items/utils";
+import PromiseModal from "~/components/PromiseModal.vue";
+import Icon from "~/components/Icon.vue";
 
 const activeWarehouse = ref();
 const warehouses = ref<MarketplaceWarehouse[]>([]);
 const warehouseItems = ref<MarketplaceWarehouseItem[]>([]);
+
+const warehouseModal = ref<
+  MarketplaceWarehouse | PartialMarketplaceWarehouse
+>();
+
+const warehouseItemModal = ref<
+  MarketplaceWarehouseItem | PartialMarketplaceWarehouseItem
+>();
+
+const deleteWarehouseItemModalRef = ref<InstanceType<typeof PromiseModal>>();
 
 watch(
   activeWarehouse,
@@ -129,14 +157,6 @@ watch(
   { deep: true }
 );
 
-const warehouseModal = ref<
-  MarketplaceWarehouse | PartialMarketplaceWarehouse
->();
-
-const warehouseItemModal = ref<
-  MarketplaceWarehouseItem | PartialMarketplaceWarehouseItem
->();
-
 const isLoading = computed(() =>
   wait.some([
     Wait.MARKETPLACE_WAREHOUSES_FETCH,
@@ -144,6 +164,7 @@ const isLoading = computed(() =>
     Wait.MARKETPLACE_WAREHOUSE_ITEMS_FETCH,
     Wait.MARKETPLACE_WAREHOUSE_ITEM_CREATE,
     Wait.MARKETPLACE_WAREHOUSE_ITEM_UPDATE,
+    Wait.MARKETPLACE_WAREHOUSE_ITEM_DELETE,
   ])
 );
 
@@ -236,6 +257,27 @@ const createItem = async (params: PartialMarketplaceWarehouseItem) => {
     console.error(e);
   } finally {
     wait.end(Wait.MARKETPLACE_WAREHOUSE_ITEM_CREATE);
+  }
+};
+
+const deleteItem = async (params: MarketplaceWarehouseItem) => {
+  try {
+    await deleteWarehouseItemModalRef.value?.confirm();
+  } catch {
+    return;
+  }
+
+  try {
+    wait.start(Wait.MARKETPLACE_WAREHOUSE_ITEM_DELETE);
+    await apiMarketplaceWarehouseItemsDelete({
+      warehouse_id: activeWarehouse.value.id,
+      item: params,
+    });
+    await fetchMarketplaceWarehouseItems(activeWarehouse.value);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_WAREHOUSE_ITEM_DELETE);
   }
 };
 

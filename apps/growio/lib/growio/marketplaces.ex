@@ -1305,6 +1305,14 @@ defmodule Growio.Marketplaces do
     |> Repo.update()
   end
 
+  def delete_warehouse_item(%MarketplaceAccount{} = initiator, %MarketplaceWarehouseItem{} = item) do
+    with true <- Permissions.ok?(initiator, marketplaces__warehouse_item__delete()) do
+      Repo.delete(item)
+    else
+      _ -> {:error, "cannot delete warehouse item"}
+    end
+  end
+
   def create_subscription(
         %Marketplace{} = marketplace,
         %Subscription{} = subscription,

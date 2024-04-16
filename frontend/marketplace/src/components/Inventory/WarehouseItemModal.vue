@@ -11,6 +11,7 @@
       <SelectInput
         v-model="selectedItem"
         :items="items"
+        :readonly="isMarketplaceWarehouseItem(modelValue)"
         track-by="id"
         label-path="name"
         placeholder="Item"

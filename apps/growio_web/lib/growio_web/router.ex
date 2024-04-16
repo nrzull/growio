@@ -111,7 +111,7 @@ defmodule GrowioWeb.Router do
     resources("/", MarketplaceWarehouseController, only: [:index, :create])
 
     resources("/:warehouse_id/marketplace_warehouse_items", MarketplaceWarehouseItemController,
-      only: [:index, :create, :update]
+      only: [:index, :create, :update, :delete]
     )
   end
 
