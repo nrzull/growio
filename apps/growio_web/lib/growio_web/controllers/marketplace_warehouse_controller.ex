@@ -5,6 +5,7 @@ defmodule GrowioWeb.Controllers.MarketplaceWarehouseController do
   alias GrowioWeb.Schemas
   alias GrowioWeb.Views.MarketplaceWarehouseJSON
   alias Growio.Marketplaces
+  alias Growio.Marketplaces.MarketplaceWarehouse
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -35,6 +36,28 @@ defmodule GrowioWeb.Controllers.MarketplaceWarehouseController do
   def create(%{assigns: %{marketplace_account: marketplace_account}} = conn, params) do
     with {:ok, warehouse} <- Marketplaces.create_warehouse(marketplace_account, params) do
       Conn.ok(conn, MarketplaceWarehouseJSON.render(warehouse))
+    end
+  end
+
+  operation(:update,
+    summary: "update marketplace warehouse",
+    parameters: [
+      id: [in: :path, description: "warehouse id", type: :integer, example: 1]
+    ],
+    request_body: {"", "application/json", Schemas.MarketplaceWarehouse, required: true},
+    responses: [ok: {"", "application/json", Schemas.MarketplaceWarehouse}]
+  )
+
+  def update(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"id" => id} = params
+      ) do
+    with id when is_integer(id) <- String.to_integer(id),
+         warehouse = %MarketplaceWarehouse{} <-
+           Marketplaces.get_warehouse(marketplace_account, id),
+         {:ok, updated_warehouse} <-
+           Marketplaces.update_warehouse(marketplace_account, warehouse, params) do
+      Conn.ok(conn, MarketplaceWarehouseJSON.render(updated_warehouse))
     end
   end
 end

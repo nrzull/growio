@@ -15,3 +15,11 @@ export const apiMarketplaceWarehousesCreate = (
   growio
     .post<MarketplaceWarehouse>("/api/marketplace_warehouses", params)
     .then((r) => r.data);
+
+export const apiMarketplaceWarehousesUpdate = (params: MarketplaceWarehouse) =>
+  growio
+    .patch<MarketplaceWarehouse>(
+      `/api/marketplace_warehouses/${params.id}`,
+      params
+    )
+    .then((r) => r.data);

@@ -13,6 +13,7 @@ import settings01 from "~/assets/settings-01.svg?raw";
 import plus from "~/assets/plus.svg?raw";
 import trashCircle from "~/assets/trash-circle.svg?raw";
 import arrowRightFromBracket from "~/assets/arrow-right-from-bracket.svg?raw";
+import chevronDown from "~/assets/chevron-down.svg?raw";
 
 const icons = {
   users,
@@ -21,6 +22,7 @@ const icons = {
   plus,
   trashCircle,
   arrowRightFromBracket,
+  chevronDown,
 } as const;
 
 export type Icons = keyof typeof icons;

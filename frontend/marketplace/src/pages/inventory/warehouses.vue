@@ -4,7 +4,7 @@
   <WarehouseModal
     v-if="warehouseModal"
     @close="warehouseModal = undefined"
-    @submit="createWarehouse"
+    @submit="handleSubmitWarehouse"
     :loading="isLoading"
     :model-value="warehouseModal"
   />
@@ -25,8 +25,35 @@
     </template>
   </PromiseModal>
 
+  <PromiseModal ref="deleteWarehouseModalRef">
+    <template #heading>Delete warehouse</template>
+    <template #footer="{ resolve, reject }">
+      <Button size="md" type="link-neutral" @click="reject"> Cancel </Button>
+      <Button size="md" @click="resolve"> Confirm </Button>
+    </template>
+  </PromiseModal>
+
   <PageShape>
-    <template #heading> Warehouses </template>
+    <template #heading>
+      <span v-if="activeWarehouse">
+        <Menu
+          track-by="title"
+          label-path="title"
+          :items="[
+            { title: 'Edit', action: () => (warehouseModal = activeWarehouse) },
+            { title: 'Delete', action: () => deleteWarehouse(activeWarehouse) },
+          ]"
+          :use-floating-options="{ placement: 'bottom-start' }"
+          @click:item="($event as any).action?.()"
+        >
+          <div :class="$style.warehouseTitle">
+            {{ activeWarehouse.name }}
+            <Icon value="chevronDown" />
+          </div>
+        </Menu>
+      </span>
+      <span v-else>Warehouses</span>
+    </template>
 
     <template #tools>
       <Menu
@@ -102,6 +129,7 @@ import {
 import {
   apiMarketplaceWarehousesGetAll,
   apiMarketplaceWarehousesCreate,
+  apiMarketplaceWarehousesUpdate,
 } from "~/api/growio/marketplace_warehouses";
 import {
   apiMarketplaceWarehouseItemsCreate,
@@ -115,7 +143,10 @@ import {
 } from "~/api/growio/marketplace_warehouse_items/types";
 import WarehouseModal from "~/components/Inventory/WarehouseModal.vue";
 import WarehouseItemModal from "~/components/Inventory/WarehouseItemModal.vue";
-import { buildPartialMarketplaceWarehouse } from "~/api/growio/marketplace_warehouses/utils";
+import {
+  buildPartialMarketplaceWarehouse,
+  isMarketplaceWarehouse,
+} from "~/api/growio/marketplace_warehouses/utils";
 import {
   buildPartialMarketplaceWarehouseItem,
   isMarketplaceWarehouseItem,
@@ -123,7 +154,7 @@ import {
 import PromiseModal from "~/components/PromiseModal.vue";
 import Icon from "~/components/Icon.vue";
 
-const activeWarehouse = ref();
+const activeWarehouse = ref<MarketplaceWarehouse>();
 const warehouses = ref<MarketplaceWarehouse[]>([]);
 const warehouseItems = ref<MarketplaceWarehouseItem[]>([]);
 
@@ -136,6 +167,7 @@ const warehouseItemModal = ref<
 >();
 
 const deleteWarehouseItemModalRef = ref<InstanceType<typeof PromiseModal>>();
+const deleteWarehouseModalRef = ref<InstanceType<typeof PromiseModal>>();
 
 watch(
   activeWarehouse,
@@ -218,6 +250,10 @@ const table = useVueTable({
   },
 });
 
+const handleSubmitWarehouse = (
+  v: PartialMarketplaceWarehouse | MarketplaceWarehouse
+) => (isMarketplaceWarehouse(v) ? updateWarehouse(v) : createWarehouse(v));
+
 const handleSubmitWarehouseItem = (
   v: PartialMarketplaceWarehouseItem | MarketplaceWarehouseItem
 ) => (isMarketplaceWarehouseItem(v) ? updateItem(v) : createItem(v));
@@ -298,6 +334,27 @@ const createWarehouse = async (params: PartialMarketplaceWarehouse) => {
   }
 };
 
+const updateWarehouse = async (params: MarketplaceWarehouse) => {
+  try {
+    wait.start(Wait.MARKETPLACE_WAREHOUSE_UPDATE);
+    await apiMarketplaceWarehousesUpdate(params);
+    await fetchWarehouses();
+    warehouseModal.value = undefined;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_WAREHOUSE_UPDATE);
+  }
+};
+
+const deleteWarehouse = async (params: MarketplaceWarehouse) => {
+  try {
+    await deleteWarehouseModalRef.value?.confirm();
+  } catch {
+    return;
+  }
+};
+
 const fetchWarehouses = async () => {
   try {
     wait.start(Wait.MARKETPLACE_WAREHOUSES_FETCH);
@@ -338,5 +395,16 @@ fetchWarehouses();
   gap: 4px;
   padding: 4px;
   height: max-content;
+}
+
+.warehouseTitle {
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+}
+
+.warehouseTitle svg {
+  width: 12px;
+  height: 12px;
 }
 </style>

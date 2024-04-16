@@ -3,6 +3,7 @@
     ref="dropdownRef"
     :manual
     :class="[$style.menu, $style.menu]"
+    :use-floating-options="useFloatingOptions"
     @click:trigger="$emit('click:trigger', $event)"
   >
     <template #trigger>
@@ -20,11 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, PropType } from "vue";
 import List from "~/components/Menu/List.vue";
 import Dropdown from "~/components/Dropdown.vue";
 import { itemsProp } from "~/components/Menu/utils";
 import { Item } from "~/components/Menu/types";
+import { UseFloatingOptions } from "@floating-ui/vue";
 
 defineProps({
   items: itemsProp,
@@ -47,6 +49,11 @@ defineProps({
   manual: {
     type: Boolean,
     default: false,
+  },
+
+  useFloatingOptions: {
+    type: Object as PropType<UseFloatingOptions>,
+    default: undefined,
   },
 });
 
