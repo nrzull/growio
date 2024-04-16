@@ -443,6 +443,9 @@ defmodule Growio.Marketplaces do
 
   def delete_account_role(%MarketplaceAccountRole{} = role) do
     cond do
+      not is_nil(role.deleted_at) ->
+        {:error, "the role is already deleted"}
+
       primary_account_role?(role) ->
         {:error, "cannot delete primary role"}
 
@@ -453,8 +456,11 @@ defmodule Growio.Marketplaces do
       ) ->
         {:error, "there is accounts that use current role"}
 
-      not is_nil(role.deleted_at) ->
-        {:error, "the role is already deleted"}
+      Repo.exists?(
+        MarketplaceAccountEmailInvitation
+        |> where([invitation], invitation.role_id == ^role.id)
+      ) ->
+        {:error, "there is email invitations that use current role"}
 
       true ->
         update_account_role(role, %{deleted_at: Utils.naive_utc_now()})
