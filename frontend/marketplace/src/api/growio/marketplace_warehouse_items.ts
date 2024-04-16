@@ -24,3 +24,14 @@ export const apiMarketplaceWarehouseItemsCreate = (params: {
       params.item
     )
     .then((r) => r.data);
+
+export const apiMarketplaceWarehouseItemsUpdate = (params: {
+  warehouse_id: IdParam;
+  item: PartialMarketplaceWarehouseItem & { id: IdParam };
+}) =>
+  growio
+    .patch<MarketplaceWarehouseItem>(
+      `/api/marketplace_warehouses/${params.warehouse_id}/marketplace_warehouse_items/${params.item.id}`,
+      params.item
+    )
+    .then((r) => r.data);

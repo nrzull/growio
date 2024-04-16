@@ -9,6 +9,7 @@ defmodule GrowioWeb.Views.MarketplaceWarehouseItemJSON do
       id: value.id,
       infinity: value.infinity,
       quantity: value.quantity,
+      marketplace_item_id: value.marketplace_item_id,
       marketplace_item:
         if marketplace_item = get_in(value, [Access.key(:marketplace_item)]) do
           MarketplaceItemJSON.render(marketplace_item)

@@ -6,6 +6,7 @@ defmodule GrowioWeb.Controllers.MarketplaceWarehouseItemController do
   alias GrowioWeb.Views.MarketplaceWarehouseItemJSON
   alias Growio.Marketplaces
   alias Growio.Marketplaces.MarketplaceItem
+  alias Growio.Marketplaces.MarketplaceWarehouseItem
   alias Growio.Marketplaces.MarketplaceWarehouse
 
   plug(OpenApiSpex.Plug.CastAndValidate,
@@ -52,9 +53,6 @@ defmodule GrowioWeb.Controllers.MarketplaceWarehouseItemController do
         %{"warehouse_id" => warehouse_id, "marketplace_item_id" => marketplace_item_id} = params
       ) do
     with warehouse_id when is_integer(warehouse_id) <- String.to_integer(warehouse_id),
-         marketplace_item_id when is_integer(marketplace_item_id) <-
-           (is_integer(marketplace_item_id) && marketplace_item_id) ||
-             String.to_integer(marketplace_item_id),
          warehouse = %MarketplaceWarehouse{} <-
            Marketplaces.get_warehouse(marketplace_account, warehouse_id),
          marketplace_item = %MarketplaceItem{} <-
@@ -67,6 +65,31 @@ defmodule GrowioWeb.Controllers.MarketplaceWarehouseItemController do
              params
            ) do
       Conn.ok(conn, MarketplaceWarehouseItemJSON.render(created_item))
+    end
+  end
+
+  operation(:update,
+    summary: "update marketplace warehouse item",
+    parameters: [
+      warehouse_id: [in: :path, description: "warehouse id", type: :integer],
+      id: [in: :path, description: "warehouse item id", type: :integer]
+    ],
+    request_body:
+      {"", "application/json", Schemas.MarketplaceWarehouseItemUpdate, required: true},
+    responses: [ok: {"", "application/json", Schemas.MarketplaceWarehouseItem}]
+  )
+
+  def update(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"warehouse_id" => warehouse_id, "id" => id} = params
+      ) do
+    with warehouse_id when is_integer(warehouse_id) <- String.to_integer(warehouse_id),
+         id when is_integer(id) <- String.to_integer(id),
+         item = %MarketplaceWarehouseItem{} <-
+           Marketplaces.get_warehouse_item(marketplace_account, id),
+         {:ok, updated_item} <-
+           Marketplaces.update_warehouse_item(marketplace_account, item, params) do
+      Conn.ok(conn, MarketplaceWarehouseItemJSON.render(updated_item))
     end
   end
 end

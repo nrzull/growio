@@ -1241,6 +1241,19 @@ defmodule Growio.Marketplaces do
     |> Repo.all()
   end
 
+  def get_warehouse_item(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
+    with true <- Permissions.ok?(initiator, marketplaces__warehouse_item__read()) do
+      MarketplaceWarehouseItem
+      |> join(:left, [item], warehouse in assoc(item, :warehouse))
+      |> where([_, warehouse], warehouse.marketplace_id == ^initiator.marketplace_id)
+      |> where([item], item.id == ^id)
+      |> preload([:marketplace_item])
+      |> Repo.one()
+    else
+      _ -> {:error, "cannot get warehouse item"}
+    end
+  end
+
   def create_warehouse_item(
         %MarketplaceAccount{} = initiator,
         %MarketplaceWarehouse{} = warehouse,

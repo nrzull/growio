@@ -14,7 +14,7 @@
     :model-value="warehouseItemModal"
     :loading="isLoading"
     @close="warehouseItemModal = undefined"
-    @submit="createItem"
+    @submit="handleSubmitWarehouseItem"
   />
 
   <PageShape>
@@ -54,7 +54,12 @@
           v-if="isEmptyItems"
           :model-value="{ type: 'info', text: 'There is no items' }"
         />
-        <Table v-else :table />
+        <Table
+          v-else
+          :table
+          clickable
+          @click:row="warehouseItemModal = $event.original"
+        />
       </div>
     </div>
   </PageShape>
@@ -86,6 +91,7 @@ import {
 import {
   apiMarketplaceWarehouseItemsCreate,
   apiMarketplaceWarehouseItemsGetAll,
+  apiMarketplaceWarehouseItemsUpdate,
 } from "~/api/growio/marketplace_warehouse_items";
 import {
   MarketplaceWarehouseItem,
@@ -94,7 +100,10 @@ import {
 import WarehouseModal from "~/components/Inventory/WarehouseModal.vue";
 import WarehouseItemModal from "~/components/Inventory/WarehouseItemModal.vue";
 import { buildPartialMarketplaceWarehouse } from "~/api/growio/marketplace_warehouses/utils";
-import { buildPartialMarketplaceWarehouseItem } from "~/api/growio/marketplace_warehouse_items/utils";
+import {
+  buildPartialMarketplaceWarehouseItem,
+  isMarketplaceWarehouseItem,
+} from "~/api/growio/marketplace_warehouse_items/utils";
 
 const activeWarehouse = ref();
 const warehouses = ref<MarketplaceWarehouse[]>([]);
@@ -133,6 +142,8 @@ const isLoading = computed(() =>
     Wait.MARKETPLACE_WAREHOUSES_FETCH,
     Wait.MARKETPLACE_WAREHOUSE_CREATE,
     Wait.MARKETPLACE_WAREHOUSE_ITEMS_FETCH,
+    Wait.MARKETPLACE_WAREHOUSE_ITEM_CREATE,
+    Wait.MARKETPLACE_WAREHOUSE_ITEM_UPDATE,
   ])
 );
 
@@ -186,12 +197,34 @@ const table = useVueTable({
   },
 });
 
+const handleSubmitWarehouseItem = (
+  v: PartialMarketplaceWarehouseItem | MarketplaceWarehouseItem
+) => (isMarketplaceWarehouseItem(v) ? updateItem(v) : createItem(v));
+
 const handleCreateItem = () => {
   warehouseItemModal.value = buildPartialMarketplaceWarehouseItem();
 };
 
+const updateItem = async (params: MarketplaceWarehouseItem) => {
+  try {
+    wait.start(Wait.MARKETPLACE_WAREHOUSE_ITEM_UPDATE);
+    await apiMarketplaceWarehouseItemsUpdate({
+      warehouse_id: activeWarehouse.value.id,
+      item: params,
+    });
+    await fetchMarketplaceWarehouseItems(activeWarehouse.value);
+    warehouseItemModal.value = undefined;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_WAREHOUSE_ITEM_UPDATE);
+  }
+};
+
 const createItem = async (params: PartialMarketplaceWarehouseItem) => {
   try {
+    wait.start(Wait.MARKETPLACE_WAREHOUSE_ITEM_CREATE);
+
     await apiMarketplaceWarehouseItemsCreate({
       warehouse_id: activeWarehouse.value.id,
       item: params,
@@ -202,6 +235,7 @@ const createItem = async (params: PartialMarketplaceWarehouseItem) => {
   } catch (e) {
     console.error(e);
   } finally {
+    wait.end(Wait.MARKETPLACE_WAREHOUSE_ITEM_CREATE);
   }
 };
 

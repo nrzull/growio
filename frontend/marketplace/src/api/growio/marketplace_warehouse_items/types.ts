@@ -6,12 +6,11 @@ export type MarketplaceWarehouseItem = {
   infinity: boolean;
   quantity: number;
   marketplace_item: MarketplaceItem;
-  marketplace_item_id?: number;
+  marketplace_item_id: number;
   warehouse: MarketplaceWarehouse;
 };
 
-export type PartialMarketplaceWarehouseItem = {
-  infinity: boolean;
-  quantity: number;
-  marketplace_item_id: number;
-};
+export type PartialMarketplaceWarehouseItem = Pick<
+  MarketplaceWarehouseItem,
+  "infinity" | "quantity" | "marketplace_item_id"
+>;
