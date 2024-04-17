@@ -21,11 +21,15 @@ defmodule Growio.MarketplacesFixture do
     result
   end
 
-  def item_category!(%Marketplace{} = marketplace) do
+  def item_category!(%Marketplace{} = marketplace, params \\ %{}) do
     {:ok, result} =
-      Marketplaces.create_item_category(marketplace, %{
-        name: "category #{Utils.gen_integer(1..6)}"
-      })
+      Marketplaces.create_item_category(
+        marketplace,
+        Map.merge(
+          %{name: "category #{Utils.gen_integer(1..6)}"},
+          params
+        )
+      )
 
     result
   end

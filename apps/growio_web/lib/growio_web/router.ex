@@ -12,6 +12,7 @@ defmodule GrowioWeb.Router do
   alias GrowioWeb.Controllers.MarketplaceItemController
   alias GrowioWeb.Controllers.MarketplaceMarketController
   alias GrowioWeb.Controllers.MarketplaceMarketItemController
+  alias GrowioWeb.Controllers.MarketplaceItemTreeController
   alias GrowioWeb.Plugs.AuthPlug
   alias GrowioWeb.Plugs.MarketplaceAccountPlug
 
@@ -89,6 +90,11 @@ defmodule GrowioWeb.Router do
   scope "/api/marketplace_items" do
     pipe_through([:marketplace_account])
     get("/", MarketplaceItemController, :self_index)
+  end
+
+  scope "/api/marketplace_items_tree" do
+    pipe_through([:marketplace_account])
+    resources("/", MarketplaceItemTreeController, only: [:index])
   end
 
   scope "/api/marketplace_item_categories" do

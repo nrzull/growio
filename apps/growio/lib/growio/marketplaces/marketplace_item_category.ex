@@ -6,13 +6,14 @@ defmodule Growio.Marketplaces.MarketplaceItemCategory do
 
   @type t :: %__MODULE__{}
   @required ~w(name)a
-  @optional ~w(deleted_at)a
+  @optional ~w(deleted_at parent_id)a
 
   schema "marketplace_item_categories" do
     field(:name, :string)
     field(:deleted_at, :naive_datetime)
 
     belongs_to(:marketplace, Marketplace)
+    belongs_to(:parent, __MODULE__)
     has_many(:items, MarketplaceItem, foreign_key: :category_id)
 
     timestamps()

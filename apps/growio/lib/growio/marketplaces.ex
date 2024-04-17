@@ -753,6 +753,102 @@ defmodule Growio.Marketplaces do
     end
   end
 
+  def all_items_tree(%MarketplaceAccount{} = initiator, opts \\ []) do
+    with true <-
+           Permissions.ok?(initiator, marketplaces__marketplace_item__read()) do
+      categories =
+        MarketplaceItemCategory
+        |> where([category], is_nil(category.parent_id))
+        |> then(fn query ->
+          case Keyword.get(opts, :deleted_at) do
+            true ->
+              where(query, [category], not is_nil(category.deleted_at))
+
+            false ->
+              where(query, [category], is_nil(category.deleted_at))
+
+            _ ->
+              query
+          end
+        end)
+        |> Repo.all()
+        |> Enum.map(fn category ->
+          items =
+            MarketplaceItem
+            |> where([item], item.category_id == ^category.id)
+            |> then(fn query ->
+              case Keyword.get(opts, :deleted_at) do
+                true ->
+                  where(query, [item], not is_nil(item.deleted_at))
+
+                false ->
+                  where(query, [item], is_nil(item.deleted_at))
+
+                _ ->
+                  query
+              end
+            end)
+            |> Repo.all()
+            |> Enum.map(&Map.from_struct/1)
+
+          category
+          |> Map.from_struct()
+          |> Map.merge(%{children: do_all_items_tree(category, opts) ++ items})
+        end)
+
+      items =
+        MarketplaceItem
+        |> where([item], is_nil(item.category_id))
+        |> Repo.all()
+        |> Enum.map(&Map.from_struct/1)
+
+      categories ++ items
+    else
+      _ -> {:error, "cannot get items tree"}
+    end
+  end
+
+  defp do_all_items_tree(%MarketplaceItemCategory{} = struct, opts) do
+    MarketplaceItemCategory
+    |> where([category], category.parent_id == ^struct.id)
+    |> then(fn query ->
+      case Keyword.get(opts, :deleted_at) do
+        true ->
+          where(query, [category], not is_nil(category.deleted_at))
+
+        false ->
+          where(query, [category], is_nil(category.deleted_at))
+
+        _ ->
+          query
+      end
+    end)
+    |> Repo.all()
+    |> Enum.map(fn value ->
+      items =
+        MarketplaceItem
+        |> where([item], item.category_id == ^value.id)
+        |> then(fn query ->
+          case Keyword.get(opts, :deleted_at) do
+            true ->
+              where(query, [item], not is_nil(item.deleted_at))
+
+            false ->
+              where(query, [item], is_nil(item.deleted_at))
+
+            _ ->
+              query
+          end
+        end)
+        |> Repo.all()
+        |> Enum.map(&Map.from_struct/1)
+
+      value
+      |> Map.from_struct()
+      |> Map.merge(%{children: do_all_items_tree(value, opts) ++ items})
+    end)
+  end
+
   def all_items(a, b \\ [])
 
   def all_items(

@@ -6,7 +6,8 @@ defmodule GrowioWeb.Views.MarketplaceItemCategoryJSON do
   def render(%MarketplaceItemCategory{} = value) do
     %{
       id: value.id,
-      name: value.name
+      name: value.name,
+      parent_id: value.parent_id
     }
   end
 

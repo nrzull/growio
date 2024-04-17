@@ -369,6 +369,36 @@ defmodule Growio.MarketplacesTest do
       assert c2.id == c2_id
     end
 
+    test "get item tree" do
+      %{marketplace: marketplace, marketplace_account: marketplace_account} =
+        MarketplacesFixture.marketplace!(AccountsFixture.account!())
+
+      root = MarketplacesFixture.item_category!(marketplace)
+      root_id = Map.get(root, :id)
+
+      root_child = MarketplacesFixture.item_category!(marketplace, %{parent_id: root.id})
+      root_child_id = Map.get(root_child, :id)
+
+      root_child_child =
+        MarketplacesFixture.item_category!(marketplace, %{parent_id: root_child.id})
+
+      root_item = MarketplacesFixture.item!(root)
+      root_item_id = Map.get(root_item, :id)
+      MarketplacesFixture.item!(root_child)
+      MarketplacesFixture.item!(root_child_child)
+
+      [
+        %{
+          id: ^root_id,
+          children: [%{id: ^root_child_id, children: [_ | _]}, %{id: ^root_item_id}]
+        }
+        | _
+      ] =
+        Marketplaces.all_items_tree(marketplace_account, deleted_at: false)
+
+      [] = Marketplaces.all_items_tree(marketplace_account, deleted_at: true)
+    end
+
     test "create an item" do
       %{marketplace: marketplace, marketplace_account: marketplace_account} =
         MarketplacesFixture.marketplace!(AccountsFixture.account!())

@@ -8,5 +8,9 @@ defmodule Growio.Repo.Migrations.CreateMarketplaceItemCategories do
       add(:marketplace_id, references(:marketplaces), null: false)
       timestamps()
     end
+
+    alter table(:marketplace_item_categories) do
+      add(:parent_id, references(:marketplace_item_categories))
+    end
   end
 end
