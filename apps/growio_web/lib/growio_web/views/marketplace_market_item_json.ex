@@ -1,10 +1,10 @@
-defmodule GrowioWeb.Views.MarketplaceWarehouseItemJSON do
-  alias Growio.Marketplaces.MarketplaceWarehouseItem
+defmodule GrowioWeb.Views.MarketplaceMarketItemJSON do
+  alias Growio.Marketplaces.MarketplaceMarketItem
   alias GrowioWeb.Views.MarketplaceItemJSON
 
   def render(values) when is_list(values), do: Enum.map(values, &render(&1))
 
-  def render(%MarketplaceWarehouseItem{} = value) do
+  def render(%MarketplaceMarketItem{} = value) do
     %{
       id: value.id,
       infinity: value.infinity,

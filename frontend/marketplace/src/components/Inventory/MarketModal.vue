@@ -1,17 +1,17 @@
 <template>
   <Modal :loading="isLoading" @close="$emit('close')">
-    <template v-if="isMarketplaceWarehouse(modelValue)" #heading>
-      <span>{{ modelValue.name }}</span> <Tag>Warehouse</Tag>
+    <template v-if="isMarketplaceMarket(modelValue)" #heading>
+      <span>{{ modelValue.name }}</span> <Tag>Market</Tag>
     </template>
-    <template v-else #heading> Create Warehouse </template>
+    <template v-else #heading> Create Market </template>
 
     <div :class="$style.row">
-      <TextInput v-model="warehouse.name" placeholder="Name" />
-      <TextInput v-model="warehouse.address" placeholder="Address" />
+      <TextInput v-model="market.name" placeholder="Name" />
+      <TextInput v-model="market.address" placeholder="Address" />
     </div>
 
     <template #footer>
-      <Button size="md" @click="$emit('submit', warehouse)">Submit</Button>
+      <Button size="md" @click="$emit('submit', market)">Submit</Button>
     </template>
   </Modal>
 </template>
@@ -21,19 +21,17 @@ import { PropType, computed, ref } from "vue";
 import Modal from "~/components/Modal.vue";
 import TextInput from "~/components/TextInput.vue";
 import Button from "~/components/Button.vue";
-import { isMarketplaceWarehouse } from "~/api/growio/marketplace_warehouses/utils";
+import { isMarketplaceMarket } from "~/api/growio/marketplace_markets/utils";
 import { clone } from "remeda";
 import Tag from "~/components/Tag.vue";
 import {
-  MarketplaceWarehouse,
-  PartialMarketplaceWarehouse,
-} from "~/api/growio/marketplace_warehouses/types";
+  MarketplaceMarket,
+  PartialMarketplaceMarket,
+} from "~/api/growio/marketplace_markets/types";
 
 const props = defineProps({
   modelValue: {
-    type: Object as PropType<
-      PartialMarketplaceWarehouse | MarketplaceWarehouse
-    >,
+    type: Object as PropType<PartialMarketplaceMarket | MarketplaceMarket>,
     required: true,
   },
 
@@ -45,13 +43,13 @@ const props = defineProps({
 
 const isLoading = computed(() => props.loading);
 
-const warehouse = ref<PartialMarketplaceWarehouse | MarketplaceWarehouse>(
+const market = ref<PartialMarketplaceMarket | MarketplaceMarket>(
   clone(props.modelValue)
 );
 
 const emit = defineEmits({
   close: () => true,
-  submit: (_v: PartialMarketplaceWarehouse | MarketplaceWarehouse) => true,
+  submit: (_v: PartialMarketplaceMarket | MarketplaceMarket) => true,
 });
 </script>
 

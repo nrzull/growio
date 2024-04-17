@@ -1,16 +1,16 @@
 import { MarketplaceItem } from "~/api/growio/marketplace_items/types";
-import { MarketplaceWarehouse } from "~/api/growio/marketplace_warehouses/types";
+import { MarketplaceMarket } from "~/api/growio/marketplace_markets/types";
 
-export type MarketplaceWarehouseItem = {
+export type MarketplaceMarketItem = {
   id: number;
   infinity: boolean;
   quantity: number;
   marketplace_item: MarketplaceItem;
   marketplace_item_id: number;
-  warehouse: MarketplaceWarehouse;
+  market: MarketplaceMarket;
 };
 
-export type PartialMarketplaceWarehouseItem = Pick<
-  MarketplaceWarehouseItem,
+export type PartialMarketplaceMarketItem = Pick<
+  MarketplaceMarketItem,
   "infinity" | "quantity" | "marketplace_item_id"
 >;

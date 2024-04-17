@@ -82,11 +82,6 @@ export const router = createRouter({
             },
 
             {
-              path: "warehouses",
-              component: () => import("~/pages/inventory/warehouses.vue"),
-            },
-
-            {
               path: "",
               redirect: "/inventory/items",
             },

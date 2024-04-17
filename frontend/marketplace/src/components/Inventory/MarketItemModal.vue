@@ -1,17 +1,17 @@
 <template>
   <Modal :loading="isLoading" @close="$emit('close')">
-    <template v-if="isMarketplaceWarehouseItem(modelValue)" #heading>
+    <template v-if="isMarketplaceMarketItem(modelValue)" #heading>
       <span>{{ modelValue.marketplace_item.name }}</span>
-      <Tag>Warehouse Item</Tag>
+      <Tag>Market Item</Tag>
     </template>
-    <template v-else #heading> Create Warehouse Item </template>
+    <template v-else #heading> Create Market Item </template>
 
     <div :class="$style.row">
-      <TextInput v-model="warehouseItem.quantity" placeholder="Quantity" />
+      <TextInput v-model="marketItem.quantity" placeholder="Quantity" />
       <SelectInput
         v-model="selectedItem"
         :items="items"
-        :readonly="isMarketplaceWarehouseItem(modelValue)"
+        :readonly="isMarketplaceMarketItem(modelValue)"
         track-by="id"
         label-path="name"
         placeholder="Item"
@@ -19,7 +19,7 @@
     </div>
 
     <template #footer>
-      <Button size="md" @click="$emit('submit', warehouseItem)">Submit</Button>
+      <Button size="md" @click="$emit('submit', marketItem)">Submit</Button>
     </template>
   </Modal>
 </template>
@@ -30,21 +30,21 @@ import Modal from "~/components/Modal.vue";
 import TextInput from "~/components/TextInput.vue";
 import SelectInput from "~/components/SelectInput.vue";
 import Button from "~/components/Button.vue";
-import { isMarketplaceWarehouseItem } from "~/api/growio/marketplace_warehouse_items/utils";
+import { isMarketplaceMarketItem } from "~/api/growio/marketplace_market_items/utils";
 import { wait, Wait } from "~/composables/wait";
 import { clone } from "remeda";
 import Tag from "~/components/Tag.vue";
 import {
-  MarketplaceWarehouseItem,
-  PartialMarketplaceWarehouseItem,
-} from "~/api/growio/marketplace_warehouse_items/types";
+  MarketplaceMarketItem,
+  PartialMarketplaceMarketItem,
+} from "~/api/growio/marketplace_market_items/types";
 import { apiMarketplaceItemsSelfGetAll } from "~/api/growio/marketplace_items";
 import { MarketplaceItem } from "~/api/growio/marketplace_items/types";
 
 const props = defineProps({
   modelValue: {
     type: Object as PropType<
-      PartialMarketplaceWarehouseItem | MarketplaceWarehouseItem
+      PartialMarketplaceMarketItem | MarketplaceMarketItem
     >,
     required: true,
   },
@@ -59,16 +59,16 @@ const isLoading = computed(
   () => props.loading || wait.some([Wait.MARKETPLACE_ITEMS_FETCH])
 );
 
-const warehouseItem = ref<
-  PartialMarketplaceWarehouseItem | MarketplaceWarehouseItem
->(clone(props.modelValue));
+const marketItem = ref<PartialMarketplaceMarketItem | MarketplaceMarketItem>(
+  clone(props.modelValue)
+);
 
 const selectedItem = ref<MarketplaceItem>();
 
 watch(
   selectedItem,
   (v) => {
-    warehouseItem.value.marketplace_item_id = v.id;
+    marketItem.value.marketplace_item_id = v.id;
   },
   { deep: true }
 );
@@ -77,8 +77,7 @@ const items = ref<MarketplaceItem[]>([]);
 
 const emit = defineEmits({
   close: () => true,
-  submit: (_v: PartialMarketplaceWarehouseItem | MarketplaceWarehouseItem) =>
-    true,
+  submit: (_v: PartialMarketplaceMarketItem | MarketplaceMarketItem) => true,
 });
 
 const fetchItems = async () => {
@@ -92,8 +91,8 @@ const fetchItems = async () => {
   }
 };
 
-if (isMarketplaceWarehouseItem(warehouseItem.value)) {
-  selectedItem.value = warehouseItem.value.marketplace_item;
+if (isMarketplaceMarketItem(marketItem.value)) {
+  selectedItem.value = marketItem.value.marketplace_item;
 }
 
 fetchItems();

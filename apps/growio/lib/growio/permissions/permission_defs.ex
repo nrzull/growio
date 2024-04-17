@@ -21,6 +21,6 @@ defmodule Growio.Permissions.PermissionDefs do
   permissions("marketplaces", "marketplace_item_category")
   permissions("marketplaces", "marketplace_item_asset")
   permissions("marketplaces", "marketplace_account_email_invitation")
-  permissions("marketplaces", "warehouse")
-  permissions("marketplaces", "warehouse_item")
+  permissions("marketplaces", "market")
+  permissions("marketplaces", "market_item")
 end

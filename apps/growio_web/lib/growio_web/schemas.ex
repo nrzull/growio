@@ -258,7 +258,7 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule MarketplaceWarehouse do
+  defmodule MarketplaceMarket do
     schema(%{
       type: :object,
       properties: %{
@@ -269,14 +269,14 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule MarketplaceWarehouses do
+  defmodule MarketplaceMarkets do
     schema(%{
       type: :array,
-      items: MarketplaceWarehouse
+      items: MarketplaceMarket
     })
   end
 
-  defmodule MarketplaceWarehouseCreate do
+  defmodule MarketplaceMarketCreate do
     schema(%{
       type: :object,
       properties: %{
@@ -286,7 +286,7 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule MarketplaceWarehouseItem do
+  defmodule MarketplaceMarketItem do
     schema(%{
       type: :object,
       properties: %{
@@ -299,14 +299,14 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule MarketplaceWarehouseItems do
+  defmodule MarketplaceMarketItems do
     schema(%{
       type: :array,
-      items: MarketplaceWarehouseItem
+      items: MarketplaceMarketItem
     })
   end
 
-  defmodule MarketplaceWarehouseItemCreate do
+  defmodule MarketplaceMarketItemCreate do
     schema(%{
       type: :object,
       properties: %{
@@ -317,7 +317,7 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule MarketplaceWarehouseItemUpdate do
+  defmodule MarketplaceMarketItemUpdate do
     schema(%{
       type: :object,
       properties: %{

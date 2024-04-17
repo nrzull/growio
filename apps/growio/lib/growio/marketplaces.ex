@@ -19,8 +19,8 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceItemVariant
   alias Growio.Marketplaces.MarketplaceItemAsset
   alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
-  alias Growio.Marketplaces.MarketplaceWarehouse
-  alias Growio.Marketplaces.MarketplaceWarehouseItem
+  alias Growio.Marketplaces.MarketplaceMarket
+  alias Growio.Marketplaces.MarketplaceMarketItem
   alias Growio.Marketplaces.MarketplaceSubscription
 
   def get_marketplace_by(:id, id) do
@@ -1177,158 +1177,158 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def all_warehouses(%MarketplaceAccount{} = initiator) do
-    with true <- Permissions.ok?(initiator, marketplaces__warehouse__read()),
+  def all_markets(%MarketplaceAccount{} = initiator) do
+    with true <- Permissions.ok?(initiator, marketplaces__market__read()),
          initiator = Repo.preload(initiator, [:marketplace]) do
-      all_warehouses(initiator.marketplace)
+      all_markets(initiator.marketplace)
     else
-      _ -> {:error, "cannot get all warehouses"}
+      _ -> {:error, "cannot get all markets"}
     end
   end
 
-  def all_warehouses(%Marketplace{} = marketplace) do
-    MarketplaceWarehouse
-    |> where([warehouse], warehouse.marketplace_id == ^marketplace.id)
+  def all_markets(%Marketplace{} = marketplace) do
+    MarketplaceMarket
+    |> where([market], market.marketplace_id == ^marketplace.id)
     |> Repo.all()
   end
 
-  def get_warehouse(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
-    with true <- Permissions.ok?(initiator, marketplaces__warehouse__read()),
-         warehouse = %MarketplaceWarehouse{} <- get_warehouse(id),
-         true <- Permissions.ok?(initiator, warehouse) do
-      warehouse
+  def get_market(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
+    with true <- Permissions.ok?(initiator, marketplaces__market__read()),
+         market = %MarketplaceMarket{} <- get_market(id),
+         true <- Permissions.ok?(initiator, market) do
+      market
     else
-      _ -> {:error, "cannot get all warehouses"}
+      _ -> {:error, "cannot get all markets"}
     end
   end
 
-  def get_warehouse(id) when is_integer(id) do
-    Repo.get(MarketplaceWarehouse, id)
+  def get_market(id) when is_integer(id) do
+    Repo.get(MarketplaceMarket, id)
   end
 
-  def create_warehouse(%MarketplaceAccount{} = initiator, %{} = params) do
-    with true <- Permissions.ok?(initiator, marketplaces__warehouse__create()),
+  def create_market(%MarketplaceAccount{} = initiator, %{} = params) do
+    with true <- Permissions.ok?(initiator, marketplaces__market__create()),
          initiator = Repo.preload(initiator, [:marketplace]) do
-      create_warehouse(initiator.marketplace, params)
+      create_market(initiator.marketplace, params)
     end
   end
 
-  def create_warehouse(%Marketplace{} = marketplace, %{} = params) do
-    MarketplaceWarehouse.changeset(params)
+  def create_market(%Marketplace{} = marketplace, %{} = params) do
+    MarketplaceMarket.changeset(params)
     |> Changeset.put_assoc(:marketplace, marketplace)
     |> Repo.insert()
   end
 
-  def update_warehouse(
+  def update_market(
         %MarketplaceAccount{} = initiator,
-        %MarketplaceWarehouse{} = warehouse,
+        %MarketplaceMarket{} = market,
         %{} = params
       ) do
-    with true <- Permissions.ok?(initiator, warehouse, marketplaces__warehouse__update()) do
-      update_warehouse(warehouse, params)
+    with true <- Permissions.ok?(initiator, market, marketplaces__market__update()) do
+      update_market(market, params)
     end
   end
 
-  def update_warehouse(%MarketplaceWarehouse{} = warehouse, %{} = params) do
-    MarketplaceWarehouse.changeset(warehouse, params)
+  def update_market(%MarketplaceMarket{} = market, %{} = params) do
+    MarketplaceMarket.changeset(market, params)
     |> Repo.update()
   end
 
-  def delete_warehouse(%MarketplaceAccount{} = initiator, %MarketplaceWarehouse{} = warehouse) do
-    with true <- Permissions.ok?(initiator, marketplaces__warehouse__delete()),
+  def delete_market(%MarketplaceAccount{} = initiator, %MarketplaceMarket{} = market) do
+    with true <- Permissions.ok?(initiator, marketplaces__market__delete()),
          false <-
            Repo.exists?(
-             MarketplaceWarehouseItem
-             |> where([item], item.warehouse_id == ^warehouse.id)
+             MarketplaceMarketItem
+             |> where([item], item.market_id == ^market.id)
            ) do
-      Repo.delete(warehouse)
+      Repo.delete(market)
     else
-      _ -> {:error, "cannot delete a warehouse"}
+      _ -> {:error, "cannot delete a market"}
     end
   end
 
-  def all_warehouse_items(%MarketplaceAccount{} = initiator, %MarketplaceWarehouse{} = warehouse) do
-    with true <- Permissions.ok?(initiator, warehouse, marketplaces__warehouse__read()) do
-      all_warehouse_items(warehouse)
+  def all_market_items(%MarketplaceAccount{} = initiator, %MarketplaceMarket{} = market) do
+    with true <- Permissions.ok?(initiator, market, marketplaces__market__read()) do
+      all_market_items(market)
     end
   end
 
-  def all_warehouse_items(%MarketplaceWarehouse{} = warehouse) do
-    MarketplaceWarehouseItem
-    |> where([item], item.warehouse_id == ^warehouse.id)
+  def all_market_items(%MarketplaceMarket{} = market) do
+    MarketplaceMarketItem
+    |> where([item], item.market_id == ^market.id)
     |> preload([:marketplace_item])
     |> Repo.all()
   end
 
-  def get_warehouse_item(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
-    with true <- Permissions.ok?(initiator, marketplaces__warehouse_item__read()) do
-      MarketplaceWarehouseItem
-      |> join(:left, [item], warehouse in assoc(item, :warehouse))
-      |> where([_, warehouse], warehouse.marketplace_id == ^initiator.marketplace_id)
+  def get_market_item(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
+    with true <- Permissions.ok?(initiator, marketplaces__market_item__read()) do
+      MarketplaceMarketItem
+      |> join(:left, [item], market in assoc(item, :market))
+      |> where([_, market], market.marketplace_id == ^initiator.marketplace_id)
       |> where([item], item.id == ^id)
       |> preload([:marketplace_item])
       |> Repo.one()
     else
-      _ -> {:error, "cannot get warehouse item"}
+      _ -> {:error, "cannot get market item"}
     end
   end
 
-  def create_warehouse_item(
+  def create_market_item(
         %MarketplaceAccount{} = initiator,
-        %MarketplaceWarehouse{} = warehouse,
+        %MarketplaceMarket{} = market,
         %MarketplaceItem{} = marketplace_item,
         %{} = params
       ) do
-    with true <- Permissions.ok?(initiator, warehouse, marketplaces__warehouse_item__create()),
+    with true <- Permissions.ok?(initiator, market, marketplaces__market_item__create()),
          true <- Permissions.ok?(initiator, marketplace_item) do
-      create_warehouse_item(warehouse, marketplace_item, params)
+      create_market_item(market, marketplace_item, params)
     end
   end
 
-  def create_warehouse_item(
-        %MarketplaceWarehouse{} = warehouse,
+  def create_market_item(
+        %MarketplaceMarket{} = market,
         %MarketplaceItem{} = marketplace_item,
         %{} = params
       ) do
-    with changeset = %Changeset{valid?: true} <- MarketplaceWarehouseItem.changeset(params),
+    with changeset = %Changeset{valid?: true} <- MarketplaceMarketItem.changeset(params),
          marketplace_item = Repo.preload(marketplace_item, [:category]),
-         true <- warehouse.marketplace_id == marketplace_item.category.marketplace_id,
+         true <- market.marketplace_id == marketplace_item.category.marketplace_id,
          false <-
            Repo.exists?(
-             MarketplaceWarehouseItem
+             MarketplaceMarketItem
              |> where([item], item.marketplace_item_id == ^marketplace_item.id)
-             |> where([item], item.warehouse_id == ^warehouse.id)
+             |> where([item], item.market_id == ^market.id)
            ) do
       changeset
-      |> Changeset.put_assoc(:warehouse, warehouse)
+      |> Changeset.put_assoc(:market, market)
       |> Changeset.put_assoc(:marketplace_item, marketplace_item)
       |> Repo.insert()
     else
       {:error, _} = v -> v
-      _ -> {:error, "cannot create a warehouse item"}
+      _ -> {:error, "cannot create a market item"}
     end
   end
 
-  def update_warehouse_item(
+  def update_market_item(
         %MarketplaceAccount{} = initiator,
-        %MarketplaceWarehouseItem{} = item,
+        %MarketplaceMarketItem{} = item,
         %{} = params
       ) do
-    with true <- Permissions.ok?(initiator, item, marketplaces__warehouse_item__update()) do
-      update_warehouse_item(item, params)
+    with true <- Permissions.ok?(initiator, item, marketplaces__market_item__update()) do
+      update_market_item(item, params)
     end
   end
 
-  def update_warehouse_item(%MarketplaceWarehouseItem{} = item, %{} = params) do
-    MarketplaceWarehouseItem.changeset(item, params)
+  def update_market_item(%MarketplaceMarketItem{} = item, %{} = params) do
+    MarketplaceMarketItem.changeset(item, params)
     |> Repo.update()
   end
 
-  def delete_warehouse_item(%MarketplaceAccount{} = initiator, %MarketplaceWarehouseItem{} = item) do
-    with true <- Permissions.ok?(initiator, marketplaces__warehouse_item__delete()) do
+  def delete_market_item(%MarketplaceAccount{} = initiator, %MarketplaceMarketItem{} = item) do
+    with true <- Permissions.ok?(initiator, marketplaces__market_item__delete()) do
       Repo.delete(item)
     else
-      _ -> {:error, "cannot delete warehouse item"}
+      _ -> {:error, "cannot delete market item"}
     end
   end
 

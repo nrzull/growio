@@ -37,10 +37,10 @@ defmodule Growio.MarketplacesFixture do
     result
   end
 
-  def warehouse!(%Marketplace{} = marketplace) do
+  def market!(%Marketplace{} = marketplace) do
     {:ok, result} =
-      Marketplaces.create_warehouse(marketplace, %{
-        name: "warehouse #{Utils.gen_integer(1..6)}"
+      Marketplaces.create_market(marketplace, %{
+        name: "market #{Utils.gen_integer(1..6)}"
       })
 
     result
