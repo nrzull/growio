@@ -36,27 +36,17 @@
       </thead>
 
       <tbody v-if="table.getRowModel().rows.length" :class="$style.body">
-        <tr
-          v-for="row in table.getRowModel().rows"
-          :key="row.id"
-          @click="clickable ? $emit('click:row', row) : null"
+        <Rows
+          :table
+          :children-path
+          :clickable
+          :expander-path
+          @click:row="$emit('click:row', $event)"
         >
-          <td
-            v-for="cell in row.getVisibleCells()"
-            :key="cell.id"
-            :style="getCellStyle(cell)"
-          >
-            <slot
-              :name="prepareSlotName(getAccessorKey(cell))"
-              v-bind="{ ctx: cell }"
-            >
-              <FlexRender
-                :render="cell.column.columnDef.cell"
-                :props="cell.getContext()"
-              />
-            </slot>
-          </td>
-        </tr>
+          <template v-for="sl in Object.keys($slots)" #[sl]="{ ...params }">
+            <slot :name="sl" v-bind="{ ...params }"></slot>
+          </template>
+        </Rows>
       </tbody>
 
       <tfoot v-if="table.getFooterGroups().length">
@@ -90,13 +80,13 @@
 <script setup lang="ts">
 import { PropType } from "vue";
 import Shape from "~/components/Shape.vue";
+import { useVueTable, FlexRender, Row } from "@tanstack/vue-table";
+import Rows from "~/components/Table/Rows.vue";
 import {
-  useVueTable,
-  FlexRender,
-  Cell,
-  Header,
-  Row,
-} from "@tanstack/vue-table";
+  prepareSlotName,
+  getAccessorKey,
+  getCellStyle,
+} from "~/components/Table/utils";
 
 defineProps({
   table: {
@@ -113,20 +103,21 @@ defineProps({
     type: Boolean,
     default: false,
   },
+
+  expanderPath: {
+    type: String,
+    default: undefined,
+  },
+
+  childrenPath: {
+    type: String,
+    default: undefined,
+  },
 });
 
 defineEmits({
   "click:row": (_v: Row<any>) => true,
 });
-
-const prepareSlotName = (accessor: string, suffix = "") =>
-  [accessor.replace(/\.+/g, "-"), suffix].filter((v) => v).join("-");
-
-const getAccessorKey = (target: Cell<any, any> | Header<any, any>) =>
-  target.id.split("_").reverse()[0];
-
-const getCellStyle = (target: Cell<any, any> | Header<any, any>) =>
-  (target.column.columnDef.meta as any)?.style || {};
 </script>
 
 <style module>
