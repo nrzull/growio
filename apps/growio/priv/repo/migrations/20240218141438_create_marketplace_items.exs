@@ -1,4 +1,4 @@
-defmodule Growio.Repo.Migrations.CreateMarketplaceItemsAndVariants do
+defmodule Growio.Repo.Migrations.CreateMarketplaceItems do
   use Ecto.Migration
 
   def change do
@@ -11,10 +11,8 @@ defmodule Growio.Repo.Migrations.CreateMarketplaceItemsAndVariants do
       timestamps()
     end
 
-    create table(:marketplace_item_variants) do
-      add(:item_id, references(:marketplace_items), null: false)
-      add(:variant_id, references(:marketplace_items), null: false)
-      timestamps()
+    alter table(:marketplace_items) do
+      add(:origin_id, references(:marketplace_items))
     end
   end
 end

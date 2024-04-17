@@ -8,7 +8,6 @@ defmodule Growio.MarketplacesTest do
   alias Growio.Marketplaces.MarketplaceAccountRole
   alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Marketplaces.MarketplaceItem
-  alias Growio.Marketplaces.MarketplaceItemVariant
   alias Growio.Marketplaces.MarketplaceItemAsset
   alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
   alias Growio.Marketplaces.MarketplaceMarket
@@ -377,18 +376,14 @@ defmodule Growio.MarketplacesTest do
       c1 = MarketplacesFixture.item_category!(marketplace)
       c2 = MarketplacesFixture.item_category!(marketplace)
 
-      {:ok, %{item: %MarketplaceItem{} = item1}} =
+      {:ok, %MarketplaceItem{} = item1} =
         Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
-      {:ok,
-       %{
-         item: %MarketplaceItem{} = _,
-         variant: %MarketplaceItemVariant{} = _
-       }} =
-        Marketplaces.create_item(marketplace_account, c1, %{name: "item2", variant_of: item1.id})
+      {:ok, %MarketplaceItem{}} =
+        Marketplaces.create_item(marketplace_account, c1, %{name: "item2", origin_id: item1.id})
 
-      {:error, _} =
-        Marketplaces.create_item(marketplace_account, c2, %{name: "name3", variant_of: item1.id})
+      {:ok, %MarketplaceItem{}} =
+        Marketplaces.create_item(marketplace_account, c2, %{name: "name3", origin_id: item1.id})
     end
 
     test "update an item" do
@@ -399,7 +394,7 @@ defmodule Growio.MarketplacesTest do
 
       c1 = MarketplacesFixture.item_category!(marketplace)
 
-      {:ok, %{item: %MarketplaceItem{} = item1}} =
+      {:ok, %MarketplaceItem{} = item1} =
         Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
       {:ok, updated_item} =
@@ -414,7 +409,7 @@ defmodule Growio.MarketplacesTest do
 
       c1 = MarketplacesFixture.item_category!(marketplace)
 
-      {:ok, %{item: %MarketplaceItem{} = item1}} =
+      {:ok, %MarketplaceItem{} = item1} =
         Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
       {:ok, %MarketplaceItem{deleted_at: deleted_at}} =
@@ -432,7 +427,7 @@ defmodule Growio.MarketplacesTest do
 
       c1 = MarketplacesFixture.item_category!(marketplace)
 
-      {:ok, %{item: %MarketplaceItem{} = item1}} =
+      {:ok, %MarketplaceItem{} = item1} =
         Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
       {:ok, %MarketplaceItemAsset{}} =
@@ -454,7 +449,7 @@ defmodule Growio.MarketplacesTest do
 
       c1 = MarketplacesFixture.item_category!(marketplace)
 
-      {:ok, %{item: %MarketplaceItem{} = item1}} =
+      {:ok, %MarketplaceItem{} = item1} =
         Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
       {:ok, _} =
@@ -478,7 +473,7 @@ defmodule Growio.MarketplacesTest do
 
       c1 = MarketplacesFixture.item_category!(marketplace)
 
-      {:ok, %{item: %MarketplaceItem{} = item1}} =
+      {:ok, %MarketplaceItem{} = item1} =
         Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
       {:ok, asset} =
@@ -499,7 +494,7 @@ defmodule Growio.MarketplacesTest do
 
       c1 = MarketplacesFixture.item_category!(marketplace)
 
-      {:ok, %{item: %MarketplaceItem{} = item1}} =
+      {:ok, %MarketplaceItem{} = item1} =
         Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
       {:ok, asset} =
@@ -524,7 +519,7 @@ defmodule Growio.MarketplacesTest do
 
       c1 = MarketplacesFixture.item_category!(marketplace)
 
-      {:ok, %{item: %MarketplaceItem{} = item1}} =
+      {:ok, %MarketplaceItem{} = item1} =
         Marketplaces.create_item(marketplace_account, c1, %{name: "item1"})
 
       {:ok, asset} =
@@ -645,7 +640,7 @@ defmodule Growio.MarketplacesTest do
 
       market = MarketplacesFixture.market!(marketplace)
       category = MarketplacesFixture.item_category!(marketplace)
-      %{item: item} = MarketplacesFixture.item!(category)
+      item = MarketplacesFixture.item!(category)
 
       {:ok, %MarketplaceMarketItem{}} =
         Marketplaces.create_market_item(marketplace_account, market, item, %{
@@ -660,8 +655,8 @@ defmodule Growio.MarketplacesTest do
 
       market = MarketplacesFixture.market!(marketplace)
       category = MarketplacesFixture.item_category!(marketplace)
-      %{item: item1} = MarketplacesFixture.item!(category)
-      %{item: item2} = MarketplacesFixture.item!(category)
+      item1 = MarketplacesFixture.item!(category)
+      item2 = MarketplacesFixture.item!(category)
 
       {:ok, market_item1} =
         Marketplaces.create_market_item(marketplace_account, market, item1, %{
@@ -693,7 +688,7 @@ defmodule Growio.MarketplacesTest do
 
       market = MarketplacesFixture.market!(marketplace)
       category = MarketplacesFixture.item_category!(marketplace)
-      %{item: item1} = MarketplacesFixture.item!(category)
+      item1 = MarketplacesFixture.item!(category)
 
       {:ok, market_item} =
         Marketplaces.create_market_item(marketplace_account, market, item1, %{

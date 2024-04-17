@@ -77,7 +77,7 @@ defmodule GrowioWeb.Controllers.MarketplaceItemController do
            String.to_integer(category_id),
          category = %MarketplaceItemCategory{} <-
            Marketplaces.get_item_category(marketplace_account, category_id),
-         {:ok, %{item: item}} <-
+         {:ok, item} <-
            Marketplaces.create_item(marketplace_account, category, params) do
       item
       |> MarketplaceItemJSON.render()

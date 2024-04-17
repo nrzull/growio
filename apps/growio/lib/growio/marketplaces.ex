@@ -16,7 +16,6 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceAccountRolePermission
   alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Marketplaces.MarketplaceItem
-  alias Growio.Marketplaces.MarketplaceItemVariant
   alias Growio.Marketplaces.MarketplaceItemAsset
   alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
   alias Growio.Marketplaces.MarketplaceMarket
@@ -878,33 +877,10 @@ defmodule Growio.Marketplaces do
   end
 
   def create_item(%MarketplaceItemCategory{} = item_category, %{} = params) do
-    with changeset = %Changeset{valid?: true} <- MarketplaceItem.changeset(params),
-         changeset = Changeset.put_assoc(changeset, :category, item_category) do
-      Multi.new()
-      |> Multi.insert(:item, changeset)
-      |> Multi.run(:variant, fn repo, %{item: item} ->
-        with {:variant_of, variant_of} when is_integer(variant_of) <-
-               {:variant_of, Map.get(params, :variant_of)},
-             original_item = %MarketplaceItem{} <- get_item(item_category, variant_of) do
-          %MarketplaceItemVariant{}
-          |> Changeset.change()
-          |> Changeset.put_assoc(:item, original_item)
-          |> Changeset.put_assoc(:variant, item)
-          |> repo.insert()
-        else
-          {:variant_of, nil} -> {:ok, nil}
-          _ -> {:error, "invalid variant"}
-        end
-      end)
-      |> Repo.transaction()
-      |> case do
-        {:ok, _} = v -> v
-        _ -> {:error, "cannot create an item"}
-      end
-    else
-      {:error, _} = v -> v
-      _ -> {:error, "cannot create an item"}
-    end
+    params
+    |> MarketplaceItem.changeset()
+    |> Changeset.put_assoc(:category, item_category)
+    |> Repo.insert()
   end
 
   def update_item(%MarketplaceAccount{} = initiator, %MarketplaceItem{} = item, %{} = params) do
