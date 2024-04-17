@@ -18,6 +18,7 @@ import storeSolid from "~/assets/store-solid.svg?raw";
 import order from "~/assets/order.svg?raw";
 import analytics from "~/assets/analytics.svg?raw";
 import support from "~/assets/support.svg?raw";
+import editRegular from "~/assets/edit-regular.svg?raw";
 
 const icons = {
   users,
@@ -31,6 +32,7 @@ const icons = {
   order,
   analytics,
   support,
+  editRegular,
 } as const;
 
 export type Icons = keyof typeof icons;
@@ -71,9 +73,9 @@ const icon = computed(() => icons[props.value]);
 }
 
 .md svg {
-  height: 24px;
-  width: 24px;
-  min-width: 24px;
+  height: 19px;
+  width: 19px;
+  min-width: 19px;
 }
 
 .sm svg {

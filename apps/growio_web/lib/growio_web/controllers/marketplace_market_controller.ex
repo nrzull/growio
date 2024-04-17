@@ -27,6 +27,25 @@ defmodule GrowioWeb.Controllers.MarketplaceMarketController do
     end
   end
 
+  operation(:show,
+    summary: "show marketplace market",
+    parameters: [
+      id: [in: :path, description: "market id", type: :integer]
+    ],
+    responses: [ok: {"", "application/json", Schemas.MarketplaceMarket}]
+  )
+
+  def show(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"id" => id}
+      ) do
+    with id when is_integer(id) <- String.to_integer(id),
+         market = %MarketplaceMarket{} <-
+           Marketplaces.get_market(marketplace_account, id) do
+      Conn.ok(conn, MarketplaceMarketJSON.render(market))
+    end
+  end
+
   operation(:create,
     summary: "create marketplace market",
     request_body: {"", "application/json", Schemas.MarketplaceMarketCreate, required: true},

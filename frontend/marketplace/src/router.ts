@@ -111,7 +111,34 @@ export const router = createRouter({
 
         {
           path: "markets",
-          component: () => import("~/pages/markets.vue"),
+          children: [
+            {
+              path: ":id",
+              component: () => import("~/pages/markets/_id.vue"),
+              children: [
+                {
+                  path: "items",
+                  component: () => import("~/pages/markets/_id/items.vue"),
+                },
+
+                {
+                  path: "integrations",
+                  component: () =>
+                    import("~/pages/markets/_id/integrations.vue"),
+                },
+
+                {
+                  path: "",
+                  redirect: (v) => `/markets/${v.params.id}/items`,
+                },
+              ],
+            },
+
+            {
+              path: "",
+              component: () => import("~/pages/markets.vue"),
+            },
+          ],
         },
 
         {

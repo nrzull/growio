@@ -1,0 +1,128 @@
+<template>
+  <MarketModal
+    v-if="marketModal"
+    @close="marketModal = undefined"
+    @submit="updateMarket"
+    :loading="isLoading"
+    :model-value="marketModal"
+  />
+
+  <RouterView v-slot="{ Component }">
+    <component
+      v-if="market"
+      :is="Component"
+      :loading="isLoading"
+      :market="market"
+      @update:market="fetchMarket"
+    >
+      <template #tabs>
+        <div :class="$style.tabsWrapper">
+          <div :class="$style.tabs">
+            <Button
+              type="neutral"
+              size="md"
+              icon="editRegular"
+              :active="!!marketModal"
+              @click="marketModal = market"
+            >
+              {{ market?.name }}
+            </Button>
+
+            <RouterLink
+              custom
+              :to="`/markets/${marketId}/items`"
+              v-slot="{ navigate, isActive }"
+            >
+              <Button
+                type="neutral"
+                size="md"
+                :active="isActive"
+                @click="navigate"
+              >
+                Items
+              </Button>
+            </RouterLink>
+
+            <RouterLink
+              custom
+              :to="`/markets/${marketId}/integrations`"
+              v-slot="{ navigate, isActive }"
+            >
+              <Button
+                type="neutral"
+                size="md"
+                :active="isActive"
+                @click="navigate"
+              >
+                Integrations
+              </Button>
+            </RouterLink>
+          </div>
+        </div>
+      </template>
+    </component>
+  </RouterView>
+</template>
+
+<script setup lang="ts">
+import { computed, ref } from "vue";
+import {
+  apiMarketplaceMarketsGetOne,
+  apiMarketplaceMarketsUpdate,
+} from "~/api/growio/marketplace_markets";
+import { MarketplaceMarket } from "~/api/growio/marketplace_markets/types";
+import { wait, Wait } from "~/composables/wait";
+import { useRoute } from "vue-router";
+import Button from "~/components/Button.vue";
+import MarketModal from "~/components/Inventory/MarketModal.vue";
+
+const route = useRoute();
+
+const market = ref<MarketplaceMarket>();
+const marketId = computed(() => route.params.id as string);
+const marketModal = ref<MarketplaceMarket>();
+
+const isLoading = computed(() => wait.some([Wait.MARKETPLACE_MARKET_FETCH]));
+
+const fetchMarket = async () => {
+  try {
+    wait.start(Wait.MARKETPLACE_MARKET_FETCH);
+    market.value = await apiMarketplaceMarketsGetOne({
+      market_id: marketId.value,
+    });
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_MARKET_FETCH);
+  }
+};
+
+const updateMarket = async (params: MarketplaceMarket) => {
+  try {
+    wait.start(Wait.MARKETPLACE_MARKET_UPDATE);
+    await apiMarketplaceMarketsUpdate(params);
+    await fetchMarket();
+    marketModal.value = undefined;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    wait.end(Wait.MARKETPLACE_MARKET_UPDATE);
+  }
+};
+
+fetchMarket();
+</script>
+
+<style module>
+.tabsWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.tabs {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+</style>
