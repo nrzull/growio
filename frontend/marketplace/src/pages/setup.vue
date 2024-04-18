@@ -1,13 +1,15 @@
 <template>
-  <PageLoader :loading="true" />
+  <div :class="$style.loader">
+    <LoaderIcon />
+  </div>
 </template>
 
 <script setup lang="ts">
-import PageLoader from "~/components/PageLoader.vue";
 import { apiMarketplaceAccountsGetSelf } from "~/api/growio/marketplace_accounts";
 import { account } from "~/composables/account";
 import { apiMarketplacesCreate } from "~/api/growio/marketplaces";
 import { useRouter, useRoute } from "vue-router";
+import LoaderIcon from "~/components/LoaderIcon.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -25,3 +27,12 @@ const redirect = () => router.push((route.query.to as string) || "/");
   }
 })();
 </script>
+
+<style module>
+.loader {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
