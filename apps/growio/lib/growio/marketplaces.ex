@@ -759,6 +759,7 @@ defmodule Growio.Marketplaces do
       categories =
         MarketplaceItemCategory
         |> where([category], is_nil(category.parent_id))
+        |> where([category], category.marketplace_id == ^initiator.marketplace_id)
         |> then(fn query ->
           case Keyword.get(opts, :deleted_at) do
             true ->
@@ -1012,7 +1013,12 @@ defmodule Growio.Marketplaces do
   end
 
   def delete_item(%MarketplaceItem{} = item) do
-    with false <- deleted_item?(item) do
+    with false <- deleted_item?(item),
+         false <-
+           Repo.exists?(
+             MarketplaceMarketItem
+             |> where([market_item], market_item.marketplace_item_id == ^item.id)
+           ) do
       item
       |> Changeset.change()
       |> Changeset.put_change(:deleted_at, Utils.naive_utc_now())
