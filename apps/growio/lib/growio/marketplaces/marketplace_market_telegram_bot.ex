@@ -4,12 +4,10 @@ defmodule Growio.Marketplaces.MarketplaceMarketTelegramBot do
   alias Growio.Marketplaces.MarketplaceMarket
 
   @type t :: %__MODULE__{}
-  @required ~w(name token marketplace_market_id)a
+  @required ~w(token marketplace_market_id)a
   @optional ~w()a
 
   schema "marketplace_market_telegram_bots" do
-    field(:name, :string)
-    field(:description, :string)
     field(:token, :string)
     belongs_to(:marketplace_market, MarketplaceMarket)
 

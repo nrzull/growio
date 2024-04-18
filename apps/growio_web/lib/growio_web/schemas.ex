@@ -333,8 +333,6 @@ defmodule GrowioWeb.Schemas do
       type: :object,
       properties: %{
         id: %Schema{type: :integer},
-        name: %Schema{type: :string},
-        description: %Schema{type: :string, nullable: true},
         token: %Schema{type: :string},
         marketplace_market_id: %Schema{type: :integer}
       }
@@ -345,8 +343,6 @@ defmodule GrowioWeb.Schemas do
     schema(%{
       type: :object,
       properties: %{
-        name: %Schema{type: :string},
-        description: %Schema{type: :string, nullable: true},
         token: %Schema{type: :string}
       }
     })

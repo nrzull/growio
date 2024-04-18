@@ -27,7 +27,7 @@
         :items="createMenuItems"
         @click:item="$event.action?.()"
       >
-        <Button size="sm" icon="plus">Create</Button>
+        <Button size="sm" icon="plus">Connect</Button>
       </Menu>
     </template>
 
@@ -35,13 +35,18 @@
       v-if="isEmpty"
       :model-value="{ text: 'There is no integrations', type: 'info' }"
     />
-    <Table v-else :table clickable>
+    <Table
+      v-else
+      :table
+      clickable
+      @click:row="clickIntegration($event.original)"
+    >
       <template #name="{ ctx }">
-        <Icon
-          v-if="isMarketplaceMarketTelegramBot(ctx.row.original)"
-          value="telegramFilled"
-        />
-        {{ ctx.row.original.name }}
+        <template v-if="isMarketplaceMarketTelegramBot(ctx.row.original)">
+          <Icon value="telegramFilled" />
+          Telegram Bot
+        </template>
+        <template v-else>{{ ctx.row.original }}</template>
       </template>
 
       <template #actions="{ ctx }">
@@ -87,6 +92,7 @@ import {
 } from "@tanstack/vue-table";
 import Icon from "~/components/Icon.vue";
 import PromiseModal from "~/components/PromiseModal.vue";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
   market: {
@@ -99,6 +105,8 @@ const props = defineProps({
     default: false,
   },
 });
+
+const router = useRouter();
 
 const integrations = ref<MarketplaceMarketTelegramBot[]>([]);
 
@@ -141,9 +149,8 @@ const isEmpty = computed(() => !isLoading.value && !integrations.value.length);
 const columnHelper = createColumnHelper<MarketplaceMarketTelegramBot>();
 
 const columns = ref([
-  columnHelper.accessor("name", {
-    cell: (info) => info.getValue(),
-    header: () => "Name",
+  columnHelper.display({
+    id: "name",
   }),
 
   columnHelper.display({
@@ -191,6 +198,11 @@ const createTelegramBot = async (params: MarketplaceMarketTelegramBotNew) => {
     wait.end(Wait.MARKETPLACE_MARKET_TELEGRAM_BOT_CREATE);
   }
 };
+
+const clickIntegration = (params: MarketplaceMarketTelegramBot) =>
+  isMarketplaceMarketTelegramBot(params)
+    ? router.push(`/markets/${props.market.id}/integrations/telegram`)
+    : null;
 
 const deleteIntegration = (params: MarketplaceMarketTelegramBot) =>
   isMarketplaceMarketTelegramBot(params) ? deleteTelegramBot(params) : null;

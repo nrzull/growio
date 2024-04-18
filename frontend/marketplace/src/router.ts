@@ -107,8 +107,28 @@ export const router = createRouter({
 
                 {
                   path: "integrations",
-                  component: () =>
-                    import("~/pages/markets/_id/integrations.vue"),
+                  children: [
+                    {
+                      path: "telegram",
+                      component: () =>
+                        import("~/pages/markets/_id/integrations/telegram.vue"),
+                      children: [
+                        {
+                          path: "",
+                          component: () =>
+                            import(
+                              "~/pages/markets/_id/integrations/telegram/general.vue"
+                            ),
+                        },
+                      ],
+                    },
+
+                    {
+                      path: "",
+                      component: () =>
+                        import("~/pages/markets/_id/integrations.vue"),
+                    },
+                  ],
                 },
 
                 {

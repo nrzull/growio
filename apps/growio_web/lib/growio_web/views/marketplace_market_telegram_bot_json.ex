@@ -6,8 +6,6 @@ defmodule GrowioWeb.Views.MarketplaceMarketTelegramBotJSON do
   def render(%MarketplaceMarketTelegramBot{} = value) do
     %{
       id: value.id,
-      name: value.name,
-      description: value.description,
       token: value.token,
       marketplace_market_id: value.marketplace_market_id
     }

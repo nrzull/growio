@@ -49,12 +49,12 @@ defmodule GrowioWeb.Controllers.MarketplaceMarketTelegramBotController do
 
   def delete(
         %{assigns: %{marketplace_account: marketplace_account}} = conn,
-        %{"market_id" => market_id, "id" => id} = params
+        %{"market_id" => market_id, "id" => id}
       ) do
     with market_id when is_integer(market_id) <- String.to_integer(market_id),
          id when is_integer(id) <- String.to_integer(id),
          market = %MarketplaceMarket{} <-
-           Marketplaces.get_market(marketplace_account, id),
+           Marketplaces.get_market(marketplace_account, market_id),
          {:ok, deleted_telegram_bot} <-
            Marketplaces.delete_market_telegram_bot(marketplace_account, market, id) do
       Conn.ok(conn, MarketplaceMarketTelegramBotJSON.render(deleted_telegram_bot))

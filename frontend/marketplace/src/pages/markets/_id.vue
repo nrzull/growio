@@ -16,49 +16,47 @@
       @update:market="fetchMarket"
     >
       <template #tabs>
-        <div :class="$style.tabsWrapper">
-          <div :class="$style.tabs">
+        <Tabs>
+          <Button
+            type="neutral"
+            size="md"
+            icon="editRegular"
+            :active="!!marketModal"
+            @click="marketModal = market"
+          >
+            {{ market?.name }}
+          </Button>
+
+          <RouterLink
+            custom
+            :to="`/markets/${marketId}/items`"
+            v-slot="{ navigate, isActive }"
+          >
             <Button
               type="neutral"
               size="md"
-              icon="editRegular"
-              :active="!!marketModal"
-              @click="marketModal = market"
+              :active="isActive"
+              @click="navigate"
             >
-              {{ market?.name }}
+              Items
             </Button>
+          </RouterLink>
 
-            <RouterLink
-              custom
-              :to="`/markets/${marketId}/items`"
-              v-slot="{ navigate, isActive }"
+          <RouterLink
+            custom
+            :to="`/markets/${marketId}/integrations`"
+            v-slot="{ navigate, isActive }"
+          >
+            <Button
+              type="neutral"
+              size="md"
+              :active="isActive"
+              @click="navigate"
             >
-              <Button
-                type="neutral"
-                size="md"
-                :active="isActive"
-                @click="navigate"
-              >
-                Items
-              </Button>
-            </RouterLink>
-
-            <RouterLink
-              custom
-              :to="`/markets/${marketId}/integrations`"
-              v-slot="{ navigate, isActive }"
-            >
-              <Button
-                type="neutral"
-                size="md"
-                :active="isActive"
-                @click="navigate"
-              >
-                Integrations
-              </Button>
-            </RouterLink>
-          </div>
-        </div>
+              Integrations
+            </Button>
+          </RouterLink>
+        </Tabs>
       </template>
     </component>
   </RouterView>
@@ -75,6 +73,7 @@ import { wait, Wait } from "~/composables/wait";
 import { useRoute } from "vue-router";
 import Button from "~/components/Button.vue";
 import MarketModal from "~/components/Inventory/MarketModal.vue";
+import Tabs from "~/components/Tabs.vue";
 
 const route = useRoute();
 
@@ -112,17 +111,3 @@ const updateMarket = async (params: MarketplaceMarket) => {
 
 fetchMarket();
 </script>
-
-<style module>
-.tabsWrapper {
-  display: inline-flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.tabs {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-}
-</style>

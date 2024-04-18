@@ -1,19 +1,11 @@
 <template>
   <Modal :loading="isLoading" @close="$emit('close')">
     <template v-if="isMarketplaceMarketTelegramBot(modelValue)" #heading>
-      <span>{{ modelValue.name }}</span> <Tag>Telegram Bot</Tag>
+      Telegram Bot
     </template>
-    <template v-else #heading> Create Telegram Bot </template>
+    <template v-else #heading> Connect Telegram Bot </template>
 
     <div :class="$style.grid">
-      <div :class="$style.row">
-        <TextInput v-model="telegramBot.name" placeholder="Name" />
-        <TextInput
-          v-model="telegramBot.description"
-          placeholder="Description"
-        />
-      </div>
-
       <div :class="$style.row">
         <TextInput
           v-model="telegramBot.token"
@@ -40,7 +32,6 @@ import {
 } from "~/api/growio/marketplace_market_telegram_bots/types";
 import { isMarketplaceMarketTelegramBot } from "~/api/growio/marketplace_market_telegram_bots/utils";
 import { clone } from "remeda";
-import Tag from "~/components/Tag.vue";
 
 const props = defineProps({
   modelValue: {
