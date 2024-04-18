@@ -20,6 +20,7 @@ import analytics from "~/assets/analytics.svg?raw";
 import support from "~/assets/support.svg?raw";
 import editRegular from "~/assets/edit-regular.svg?raw";
 import folderFilled from "~/assets/folder-filled.svg?raw";
+import telegramFilled from "~/assets/telegram-filled.svg?raw";
 
 const icons = {
   users,
@@ -35,6 +36,7 @@ const icons = {
   support,
   editRegular,
   folderFilled,
+  telegramFilled,
 } as const;
 
 export type Icons = keyof typeof icons;

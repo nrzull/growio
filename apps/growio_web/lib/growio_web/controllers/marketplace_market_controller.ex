@@ -6,6 +6,7 @@ defmodule GrowioWeb.Controllers.MarketplaceMarketController do
   alias GrowioWeb.Views.MarketplaceMarketJSON
   alias Growio.Marketplaces
   alias Growio.Marketplaces.MarketplaceMarket
+  alias GrowioWeb.Views.MarketplaceMarketTelegramBotJSON
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -98,6 +99,25 @@ defmodule GrowioWeb.Controllers.MarketplaceMarketController do
          {:ok, deleted_market} <-
            Marketplaces.delete_market(marketplace_account, market) do
       Conn.ok(conn, MarketplaceMarketJSON.render(deleted_market))
+    end
+  end
+
+  operation(:integrations,
+    summary: "get all marketplace market integrations",
+    parameters: [
+      market_id: [in: :path, description: "market id", type: :integer]
+    ],
+    responses: [ok: ""]
+  )
+
+  def integrations(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"market_id" => market_id}
+      ) do
+    with market_id when is_integer(market_id) <- String.to_integer(market_id) do
+      Marketplaces.all_market_telegram_bots(marketplace_account, market_id)
+      |> MarketplaceMarketTelegramBotJSON.render()
+      |> then(&Conn.ok(conn, &1))
     end
   end
 end

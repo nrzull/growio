@@ -4,7 +4,7 @@ defmodule Growio.Marketplaces.MarketplaceMarketTelegramBot do
   alias Growio.Marketplaces.MarketplaceMarket
 
   @type t :: %__MODULE__{}
-  @required ~w(token)a
+  @required ~w(name token marketplace_market_id)a
   @optional ~w()a
 
   schema "marketplace_market_telegram_bots" do

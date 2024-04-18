@@ -4,6 +4,7 @@ import {
 } from "~/api/growio/marketplace_markets/types";
 import { growio } from "~/api/growio";
 import { IdParam } from "~/api/types";
+import { MarketplaceMarketTelegramBot } from "~/api/growio/marketplace_market_telegram_bots/types";
 
 export const apiMarketplaceMarketsGetAll = () =>
   growio
@@ -28,4 +29,13 @@ export const apiMarketplaceMarketsUpdate = (params: MarketplaceMarket) =>
 export const apiMarketplaceMarketsDelete = (params: MarketplaceMarket) =>
   growio
     .delete<MarketplaceMarket>(`/api/marketplace_markets/${params.id}`)
+    .then((r) => r.data);
+
+export const apiMarketplaceMarketsGetAllIntegrations = (
+  params: MarketplaceMarket
+) =>
+  growio
+    .get<MarketplaceMarketTelegramBot[]>(
+      `/api/marketplace_markets/${params.id}/integrations`
+    )
     .then((r) => r.data);

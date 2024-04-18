@@ -13,6 +13,7 @@ defmodule GrowioWeb.Router do
   alias GrowioWeb.Controllers.MarketplaceMarketController
   alias GrowioWeb.Controllers.MarketplaceMarketItemController
   alias GrowioWeb.Controllers.MarketplaceItemTreeController
+  alias GrowioWeb.Controllers.MarketplaceMarketTelegramBotController
   alias GrowioWeb.Plugs.AuthPlug
   alias GrowioWeb.Plugs.MarketplaceAccountPlug
 
@@ -118,6 +119,14 @@ defmodule GrowioWeb.Router do
 
     resources("/:market_id/marketplace_market_items", MarketplaceMarketItemController,
       only: [:index, :create, :update, :delete]
+    )
+
+    get("/:market_id/integrations", MarketplaceMarketController, :integrations)
+
+    resources(
+      "/:market_id/marketplace_market_telegram_bots",
+      MarketplaceMarketTelegramBotController,
+      only: [:create, :delete]
     )
   end
 

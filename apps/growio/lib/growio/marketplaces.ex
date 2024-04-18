@@ -21,6 +21,7 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceMarket
   alias Growio.Marketplaces.MarketplaceMarketItem
   alias Growio.Marketplaces.MarketplaceSubscription
+  alias Growio.Marketplaces.MarketplaceMarketTelegramBot
 
   def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
@@ -1422,5 +1423,54 @@ defmodule Growio.Marketplaces do
     |> Changeset.put_assoc(:marketplace, marketplace)
     |> Changeset.put_assoc(:subscription, subscription)
     |> repo.insert()
+  end
+
+  def all_market_telegram_bots(%MarketplaceAccount{} = initiator, market_id)
+      when is_integer(market_id) do
+    with true <- Permissions.ok?(initiator, marketplaces__market_telegram_bot__read()) do
+      MarketplaceMarketTelegramBot
+      |> join(:left, [bot], market in assoc(bot, :marketplace_market))
+      |> where([_, market], market.marketplace_id == ^initiator.marketplace_id)
+      |> where([bot], bot.marketplace_market_id == ^market_id)
+      |> Repo.all()
+    else
+      _ -> {:error, "cannot get all market telegram bots"}
+    end
+  end
+
+  def create_market_telegram_bot(
+        %MarketplaceAccount{} = initiator,
+        %{} = params
+      ) do
+    with true <- Permissions.ok?(initiator, marketplaces__market_telegram_bot__create()),
+         changeset = %Changeset{valid?: true} <- MarketplaceMarketTelegramBot.changeset(params),
+         {:ok, marketplace_market_id} when is_integer(marketplace_market_id) <-
+           Changeset.fetch_change(changeset, :marketplace_market_id),
+         market = %MarketplaceMarket{} <-
+           get_market(initiator, marketplace_market_id) do
+      changeset
+      |> Changeset.delete_change(:marketplace_market_id)
+      |> Changeset.put_assoc(:marketplace_market, market)
+      |> Repo.insert()
+    else
+      _ -> {:error, "cannot create market telegram bot"}
+    end
+  end
+
+  def delete_market_telegram_bot(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceMarket{} = market,
+        id
+      )
+      when is_integer(id) do
+    with true <- Permissions.ok?(initiator, marketplaces__market_telegram_bot__delete()) do
+      MarketplaceMarketTelegramBot
+      |> where([bot], bot.id == ^id)
+      |> where([bot], bot.marketplace_market_id == ^market.id)
+      |> Repo.one()
+      |> Repo.delete()
+    else
+      _ -> {:error, "cannot delete market telegram bot"}
+    end
   end
 end

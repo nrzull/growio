@@ -327,4 +327,28 @@ defmodule GrowioWeb.Schemas do
       }
     })
   end
+
+  defmodule MarketplaceMarketTelegramBot do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer},
+        name: %Schema{type: :string},
+        description: %Schema{type: :string, nullable: true},
+        token: %Schema{type: :string},
+        marketplace_market_id: %Schema{type: :integer}
+      }
+    })
+  end
+
+  defmodule MarketplaceMarketTelegramBotCreate do
+    schema(%{
+      type: :object,
+      properties: %{
+        name: %Schema{type: :string},
+        description: %Schema{type: :string, nullable: true},
+        token: %Schema{type: :string}
+      }
+    })
+  end
 end
