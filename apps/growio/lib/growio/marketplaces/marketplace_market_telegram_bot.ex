@@ -1,17 +1,17 @@
-defmodule Growio.Marketplaces.MarketplaceTelegramBot do
+defmodule Growio.Marketplaces.MarketplaceMarketTelegramBot do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Growio.Marketplaces.Marketplace
+  alias Growio.Marketplaces.MarketplaceMarket
 
   @type t :: %__MODULE__{}
   @required ~w(token)a
   @optional ~w()a
 
-  schema "marketplace_telegram_bots" do
+  schema "marketplace_market_telegram_bots" do
     field(:name, :string)
     field(:description, :string)
     field(:token, :string)
-    belongs_to(:marketplace, Marketplace)
+    belongs_to(:marketplace_market, MarketplaceMarket)
 
     timestamps()
   end

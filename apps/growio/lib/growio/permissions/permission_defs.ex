@@ -13,7 +13,6 @@ end
 defmodule Growio.Permissions.PermissionDefs do
   import Growio.Permissions.Macro
 
-  permissions("bots", "telegram_bot")
   permissions("marketplaces", "marketplace", ["update"])
   permissions("marketplaces", "marketplace_account")
   permissions("marketplaces", "marketplace_account_role")
@@ -23,4 +22,5 @@ defmodule Growio.Permissions.PermissionDefs do
   permissions("marketplaces", "marketplace_account_email_invitation")
   permissions("marketplaces", "market")
   permissions("marketplaces", "market_item")
+  permissions("marketplaces", "market_telegram_bot")
 end

@@ -91,6 +91,7 @@ const isInvalid = computed(() =>
 .wrapper,
 .textInputWrapper {
   position: relative;
+  flex: 1;
 }
 
 .textInput {

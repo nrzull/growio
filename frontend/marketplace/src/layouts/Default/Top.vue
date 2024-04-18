@@ -6,7 +6,7 @@
       :items="items"
       track-by="text"
       label-path="text"
-      @click:item="isComplex($event) && $event.action?.()"
+      @click:item="$event.action?.()"
     >
       <div :class="$style.profile">
         <div>{{ marketplaceAccount?.marketplace?.name }}</div>
@@ -22,12 +22,10 @@ import { marketplaceAccount } from "~/composables/marketplace-accounts";
 import Menu from "~/components/Menu.vue";
 import Tag from "~/components/Tag.vue";
 import { useRouter } from "vue-router";
-import { ItemComplex } from "~/components/Menu/types";
-import { isComplex } from "~/components/Menu/utils";
 
 const router = useRouter();
 
-const items = ref<ItemComplex[]>([
+const items = ref([
   {
     text: "Marketplaces",
     action: () => router.push("/self/marketplaces"),

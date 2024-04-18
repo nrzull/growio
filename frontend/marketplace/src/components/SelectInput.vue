@@ -25,6 +25,7 @@ import Menu from "~/components/Menu.vue";
 import { Item } from "~/components/Menu/types";
 import { itemsProp } from "~/components/Menu/utils";
 import { getLabel } from "~/components/Menu/utils";
+import { ComponentExposed } from "~/types";
 
 defineOptions({ inheritAttrs: false });
 
@@ -59,7 +60,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update:model-value"]);
 
-const menuRef = ref<InstanceType<typeof Menu>>();
+const menuRef = ref<ComponentExposed<typeof Menu<Item>>>();
 
 const proxyModelValue = computed({
   get: () => props.modelValue,

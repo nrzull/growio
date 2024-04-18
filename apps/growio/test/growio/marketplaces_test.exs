@@ -237,7 +237,7 @@ defmodule Growio.MarketplacesTest do
       assert role.priority == 0
       assert role.name == "test"
 
-      new_permission = PermissionDefs.bots__telegram_bot__create()
+      new_permission = PermissionDefs.marketplaces__market__create()
 
       {:ok, updated_role} =
         Marketplaces.update_account_role(marketplace_account, role2, %{

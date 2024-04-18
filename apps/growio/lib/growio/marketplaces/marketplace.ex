@@ -4,7 +4,6 @@ defmodule Growio.Marketplaces.Marketplace do
   alias Growio.Accounts.Account
   alias Growio.Marketplaces.MarketplaceAccountRole
   alias Growio.Marketplaces.MarketplaceAccount
-  alias Growio.Marketplaces.MarketplaceTelegramBot
   alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Marketplaces.MarketplaceMarket
 
@@ -16,7 +15,6 @@ defmodule Growio.Marketplaces.Marketplace do
     field(:name, :string)
     field(:currency, :string)
 
-    has_many(:telegram_bots, MarketplaceTelegramBot)
     has_many(:account_roles, MarketplaceAccountRole)
     has_many(:item_categories, MarketplaceItemCategory)
     has_many(:markets, MarketplaceMarket)

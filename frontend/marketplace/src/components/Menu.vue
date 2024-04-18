@@ -20,16 +20,18 @@
   </Dropdown>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends Item">
 import { ref, computed, PropType } from "vue";
 import List from "~/components/Menu/List.vue";
 import Dropdown from "~/components/Dropdown.vue";
-import { itemsProp } from "~/components/Menu/utils";
 import { Item } from "~/components/Menu/types";
 import { UseFloatingOptions } from "@floating-ui/vue";
 
 defineProps({
-  items: itemsProp,
+  items: {
+    type: Array as PropType<T[]>,
+    default: () => [],
+  },
 
   trackBy: {
     type: String,
@@ -58,7 +60,7 @@ defineProps({
 });
 
 const emit = defineEmits({
-  "click:item": (_v: Item) => true,
+  "click:item": (_v: T) => true,
   "click:trigger": (_v: boolean) => true,
 });
 
@@ -66,7 +68,7 @@ const dropdownRef = ref<InstanceType<typeof Dropdown>>();
 const open = computed(() => dropdownRef.value?.open);
 const setOpen = computed(() => dropdownRef.value?.setOpen);
 
-const handleClickItem = (v: Item) => {
+const handleClickItem = (v: T) => {
   dropdownRef.value?.setOpen?.(false);
   emit("click:item", v);
 };
