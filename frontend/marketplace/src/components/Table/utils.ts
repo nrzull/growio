@@ -8,3 +8,7 @@ export const getAccessorKey = (target: Cell<any, any> | Header<any, any>) =>
 
 export const getCellStyle = (target: Cell<any, any> | Header<any, any>) =>
   (target.column.columnDef.meta as any)?.style || {};
+
+export const getCellInnerBodyStyle = (
+  target: Cell<any, any> | Header<any, any>
+) => (target.column.columnDef.meta as any)?.innerBodyStyle || {};

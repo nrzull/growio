@@ -6,5 +6,5 @@ export type MarketplaceItemCategory = {
 
 export type PartialMarketplaceItemCategory = Pick<
   MarketplaceItemCategory,
-  "name"
+  "name" | "parent_id"
 >;

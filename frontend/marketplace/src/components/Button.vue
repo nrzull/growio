@@ -72,7 +72,7 @@ defineProps({
   font-size: 13px;
 }
 
-.button:disabled {
+.button:disabled:not(.link-neutral) {
   background-color: var(--color-gray-200);
 }
 

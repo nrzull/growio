@@ -191,7 +191,6 @@ const blockUser = async (params: MarketplaceAccount) => {
   try {
     wait.start(Wait.MARKETPLACE_ACCOUNT_BLOCK);
     await apiMarketplaceAccountsBlock(params);
-    console.log(params);
   } catch (e) {
     console.error(e);
   } finally {

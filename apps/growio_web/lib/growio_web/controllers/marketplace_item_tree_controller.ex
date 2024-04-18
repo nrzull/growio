@@ -24,7 +24,6 @@ defmodule GrowioWeb.Controllers.MarketplaceItemTreeController do
     opts = GrowioWeb.QueryParams.into_keyword(conn.query_params)
 
     with tree when is_list(tree) <- Marketplaces.all_items_tree(marketplace_account, opts) do
-      IO.inspect(tree)
       Conn.ok(conn, MarketplaceItemTreeJSON.render(tree))
     end
   end

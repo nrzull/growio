@@ -19,6 +19,7 @@ import order from "~/assets/order.svg?raw";
 import analytics from "~/assets/analytics.svg?raw";
 import support from "~/assets/support.svg?raw";
 import editRegular from "~/assets/edit-regular.svg?raw";
+import folderFilled from "~/assets/folder-filled.svg?raw";
 
 const icons = {
   users,
@@ -33,6 +34,7 @@ const icons = {
   analytics,
   support,
   editRegular,
+  folderFilled,
 } as const;
 
 export type Icons = keyof typeof icons;

@@ -3,7 +3,7 @@
     <div
       ref="triggerRef"
       :class="$style.trigger"
-      @click="manual ? $emit('click:trigger', !open) : (open = !open)"
+      @click.stop="manual ? $emit('click:trigger', !open) : (open = !open)"
     >
       <slot name="trigger"></slot>
     </div>

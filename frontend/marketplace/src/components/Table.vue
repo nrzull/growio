@@ -40,6 +40,7 @@
           :table
           :children-path
           :clickable
+          :columns
           :expander-path
           @click:row="$emit('click:row', $event)"
         >
@@ -92,6 +93,11 @@ defineProps({
   table: {
     type: Object as PropType<ReturnType<typeof useVueTable<any>>>,
     default: undefined,
+  },
+
+  columns: {
+    type: Array as PropType<any>,
+    default: () => [],
   },
 
   headless: {

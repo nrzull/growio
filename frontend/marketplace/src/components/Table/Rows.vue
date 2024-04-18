@@ -9,14 +9,16 @@
           paddingLeft: i === 0 ? `${16 * level}px` : undefined,
         }"
       >
-        <div :class="$style.tdBody">
-          <Icon
+        <div :class="$style.tdBody" :style="getCellInnerBodyStyle(cell)">
+          <Button
             v-if="expanderPath && expanderPath === getAccessorKey(cell)"
-            value="chevronDown"
             size="sm"
+            icon="chevronDown"
+            type="link-neutral"
             :class="{ [$style.hidden]: !hasChildren(row) }"
             @click.stop="expanded[row.id] = !expanded[row.id]"
-          />
+          >
+          </Button>
 
           <slot
             :name="prepareSlotName(getAccessorKey(cell))"
@@ -58,7 +60,9 @@ import {
   prepareSlotName,
   getAccessorKey,
   getCellStyle,
+  getCellInnerBodyStyle,
 } from "~/components/Table/utils";
+import Button from "~/components/Button.vue";
 
 defineOptions({ name: "Rows", inheritAttrs: false });
 
@@ -66,6 +70,11 @@ const props = defineProps({
   table: {
     type: Object as PropType<ReturnType<typeof useVueTable<any>>>,
     required: true,
+  },
+
+  columns: {
+    type: Array as PropType<any>,
+    default: () => [],
   },
 
   clickable: {
@@ -104,7 +113,7 @@ const createTable = (data: Array<any>) =>
     },
 
     get columns() {
-      return props.table.getAllColumns();
+      return props.columns;
     },
   });
 

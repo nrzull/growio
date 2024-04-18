@@ -139,8 +139,6 @@ const handleInputChange = (v) => {
 };
 
 const addFiles = (files: FileList | File[]) => {
-  console.log(files);
-
   model.value = model.value.concat(
     Array.from(files)
       .map(intoDropzoneFile)
