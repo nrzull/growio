@@ -34,6 +34,7 @@ defmodule GrowioWeb.Controllers.MarketplaceMarketTelegramBotController do
     with market_id when is_integer(market_id) <- String.to_integer(market_id),
          {:ok, %MarketplaceMarketTelegramBot{} = bot} <-
            Marketplaces.create_market_telegram_bot(marketplace_account, params) do
+      GrowioWeb.Interface.telegram_cast({:connect_bot, bot.token})
       Conn.ok(conn, MarketplaceMarketTelegramBotJSON.render(bot))
     end
   end

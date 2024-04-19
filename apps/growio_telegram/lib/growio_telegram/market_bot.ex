@@ -7,13 +7,11 @@ defmodule GrowioTelegram.MarketBot do
 
   def start_bot(token) when is_bitstring(token) do
     bots = [
-      {__MODULE__, token: token, max_bot_concurrency: 999_999}
+      {GrowioTelegram.MarketBot, token: token, max_bot_concurrency: 999_999}
     ]
 
-    DynamicSupervisor.start_child(GrowioTelegram.Supervisor, {
-      Telegram.Poller,
-      bots: bots
-    })
+    GrowioTelegram.DynamicSupervisor
+    |> DynamicSupervisor.start_child({Telegram.Poller, bots: bots})
   end
 
   @impl Telegram.ChatBot

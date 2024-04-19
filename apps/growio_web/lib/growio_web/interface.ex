@@ -21,8 +21,12 @@ defmodule GrowioWeb.Interface do
   end
 
   @impl true
-  def handle_cast(:hello, state) do
-    IO.inspect(["HELLO WORLD from GrowioWeb.Interface"])
+  def handle_cast(_params, state) do
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_call(_params, _from, state) do
     {:noreply, state}
   end
 
