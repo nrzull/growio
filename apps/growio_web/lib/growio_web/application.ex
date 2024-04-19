@@ -12,7 +12,8 @@ defmodule GrowioWeb.Application do
       # Start a worker by calling: GrowioWeb.Worker.start_link(arg)
       # {GrowioWeb.Worker, arg},
       # Start to serve requests, typically the last entry
-      GrowioWeb.Endpoint
+      GrowioWeb.Endpoint,
+      {GrowioWeb.Interface, nil}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
