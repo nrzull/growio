@@ -4,6 +4,7 @@ defmodule Growio.Marketplaces do
   alias Ecto.Changeset
   alias Ecto.Multi
   alias Growio.Utils
+  alias Growio.Cache
   alias Growio.Repo
   alias Growio.Accounts
   alias Growio.Accounts.Account
@@ -22,6 +23,7 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceMarketItem
   alias Growio.Marketplaces.MarketplaceSubscription
   alias Growio.Marketplaces.MarketplaceMarketTelegramBot
+  alias Growio.Marketplaces.MarketplaceMarketTelegramBotCustomer
 
   def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
@@ -1442,6 +1444,27 @@ defmodule Growio.Marketplaces do
     end
   end
 
+  def get_market_telegram_bot(:token, token) do
+    case Cache.get(cache_key_market_telegram_bot(:token, token)) do
+      value when is_struct(value) ->
+        value
+
+      _ ->
+        bot =
+          MarketplaceMarketTelegramBot
+          |> where([bot], bot.token == ^token)
+          |> Repo.one()
+
+        Cache.put(cache_key_market_telegram_bot(:token, token), bot, ttl: :timer.minutes(10))
+
+        bot
+    end
+  end
+
+  def cache_key_market_telegram_bot(:token, token) do
+    "market_telegram_bot/token/#{token}"
+  end
+
   def create_market_telegram_bot(
         %MarketplaceAccount{} = initiator,
         %{} = params
@@ -1476,5 +1499,11 @@ defmodule Growio.Marketplaces do
     else
       _ -> {:error, "cannot delete market telegram bot"}
     end
+  end
+
+  def create_market_telegram_bot_customer(%MarketplaceMarketTelegramBot{} = bot, %{} = params) do
+    MarketplaceMarketTelegramBotCustomer.changeset(params)
+    |> Changeset.put_assoc(:bot, bot)
+    |> Repo.insert()
   end
 end

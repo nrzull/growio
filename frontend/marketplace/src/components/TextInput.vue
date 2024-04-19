@@ -3,11 +3,17 @@
     <div :class="$style.textInputWrapper">
       <label
         v-if="$attrs.placeholder"
+        @click="setFocus(true)"
         :class="[
           $style.placeholder,
           {
             [$style.focused]: focused || modelValue,
             [$style.invalid]: isInvalid,
+            [$style.textable]:
+              !focused &&
+              !modelValue &&
+              !inputAttrs.readonly &&
+              !inputAttrs.disabled,
           },
         ]"
       >
@@ -15,6 +21,7 @@
       </label>
 
       <input
+        ref="inputRef"
         type="text"
         v-bind="inputAttrs"
         :class="[$style.textInput, { [$style.invalid]: isInvalid }]"
@@ -63,11 +70,18 @@ defineEmits(["update:model-value"]);
 
 const attrs = useAttrs() as Record<any, any>;
 
+const inputRef = ref<HTMLInputElement>();
 const focused = ref(false);
 
 const setFocus = (v: boolean) => {
   focused.value = v;
   v ? attrs.onFocus?.(v) : attrs.onBlur?.(v);
+
+  if (v) {
+    inputRef.value?.focus?.();
+  } else {
+    inputRef.value?.blur?.();
+  }
 };
 
 const wrapperAttrs = computed(() =>
@@ -131,6 +145,10 @@ const isInvalid = computed(() =>
 
 .placeholder.invalid {
   color: var(--color-red);
+}
+
+.placeholder.textable {
+  cursor: text;
 }
 
 .placeholder.focused {

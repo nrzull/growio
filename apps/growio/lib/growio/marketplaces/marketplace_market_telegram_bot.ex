@@ -2,6 +2,7 @@ defmodule Growio.Marketplaces.MarketplaceMarketTelegramBot do
   use Ecto.Schema
   import Ecto.Changeset
   alias Growio.Marketplaces.MarketplaceMarket
+  alias Growio.Marketplaces.MarketplaceMarketTelegramBotCustomer
 
   @type t :: %__MODULE__{}
   @required ~w(token marketplace_market_id)a
@@ -10,7 +11,7 @@ defmodule Growio.Marketplaces.MarketplaceMarketTelegramBot do
   schema "marketplace_market_telegram_bots" do
     field(:token, :string)
     belongs_to(:marketplace_market, MarketplaceMarket)
-
+    has_many(:customers, MarketplaceMarketTelegramBotCustomer, foreign_key: :bot_id)
     timestamps()
   end
 

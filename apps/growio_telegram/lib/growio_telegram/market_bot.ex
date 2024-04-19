@@ -3,6 +3,8 @@ defmodule GrowioTelegram.MarketBot do
 
   use Telegram.ChatBot
 
+  alias Growio.Marketplaces
+
   @session_ttl 60 * 1_000
 
   def start_bot(token) when is_bitstring(token) do
@@ -20,14 +22,25 @@ defmodule GrowioTelegram.MarketBot do
   end
 
   @impl Telegram.ChatBot
-  def handle_timeout(token, chat_id, state) do
-    super(token, chat_id, state)
+  def handle_update(
+        %{"message" => %{"text" => "/start", "chat" => %{"id" => chat_id}}} = _,
+        token,
+        state
+      ) do
+    bot = Marketplaces.get_market_telegram_bot(:token, token)
+    Marketplaces.create_market_telegram_bot_customer(bot, %{chat_id: chat_id})
+
+    {:ok, state, @session_ttl}
   end
 
   @impl Telegram.ChatBot
   def handle_update(update, _token, state) do
     IO.inspect(update)
-
     {:ok, state, @session_ttl}
+  end
+
+  @impl Telegram.ChatBot
+  def handle_timeout(token, chat_id, state) do
+    super(token, chat_id, state)
   end
 end

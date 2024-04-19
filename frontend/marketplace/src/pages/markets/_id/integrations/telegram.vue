@@ -13,9 +13,39 @@
             </Button>
           </RouterLink>
 
-          <Button type="neutral" size="md" icon="telegramFilled">
+          <Button type="neutral" size="md" icon="editRegular">
             Telegram Bot
           </Button>
+
+          <RouterLink
+            :to="`/markets/${market.id}/integrations/telegram/general`"
+            custom
+            v-slot="{ navigate, isActive }"
+          >
+            <Button
+              type="neutral"
+              size="md"
+              @click="navigate"
+              :active="isActive"
+            >
+              General
+            </Button>
+          </RouterLink>
+
+          <RouterLink
+            :to="`/markets/${market.id}/integrations/telegram/mailing`"
+            custom
+            v-slot="{ navigate, isActive }"
+          >
+            <Button
+              type="neutral"
+              size="md"
+              @click="navigate"
+              :active="isActive"
+            >
+              Mailing
+            </Button>
+          </RouterLink>
         </Tabs>
       </template>
     </component>
