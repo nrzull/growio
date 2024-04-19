@@ -6,10 +6,14 @@ defmodule Growio.Marketplaces.MarketplaceMarketTelegramBot do
 
   @type t :: %__MODULE__{}
   @required ~w(token marketplace_market_id)a
-  @optional ~w()a
+  @optional ~w(name description short_description welcome_message)a
 
   schema "marketplace_market_telegram_bots" do
     field(:token, :string)
+    field(:name, :string)
+    field(:description, :string)
+    field(:short_description, :string)
+    field(:welcome_message, :string)
     belongs_to(:marketplace_market, MarketplaceMarket)
     has_many(:customers, MarketplaceMarketTelegramBotCustomer, foreign_key: :bot_id)
     timestamps()

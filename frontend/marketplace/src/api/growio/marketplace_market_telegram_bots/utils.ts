@@ -14,4 +14,8 @@ export const buildMarketplaceMarketTelegramBotNew =
   (): MarketplaceMarketTelegramBotNew => ({
     token: undefined,
     marketplace_market_id: undefined,
+    description: undefined,
+    short_description: undefined,
+    name: undefined,
+    welcome_message: undefined,
   });

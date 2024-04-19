@@ -141,6 +141,7 @@ const isInvalid = computed(() =>
   transition: all 0.2s ease;
   font-size: 14px;
   z-index: var(--z-index-text-input-placeholder);
+  user-select: none;
 }
 
 .placeholder.invalid {

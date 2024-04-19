@@ -114,14 +114,6 @@ export const router = createRouter({
                         import("~/pages/markets/_id/integrations/telegram.vue"),
                       children: [
                         {
-                          path: "general",
-                          component: () =>
-                            import(
-                              "~/pages/markets/_id/integrations/telegram/general.vue"
-                            ),
-                        },
-
-                        {
                           path: "mailing",
                           component: () =>
                             import(
@@ -132,7 +124,7 @@ export const router = createRouter({
                         {
                           path: "",
                           redirect: (v) =>
-                            `/markets/${v.params.id}/integrations/telegram/general`,
+                            `/markets/${v.params.id}/integrations/telegram/mailing`,
                         },
                       ],
                     },

@@ -7,10 +7,33 @@
 
     <div :class="$style.grid">
       <div :class="$style.row">
+        <TextInput placeholder="Name" v-model="telegramBot.name" />
+
         <TextInput
           v-model="telegramBot.token"
           type="password"
           placeholder="Token"
+        />
+      </div>
+
+      <div :class="$style.row">
+        <TextInput
+          placeholder="Description on the bot's profile"
+          v-model="telegramBot.short_description"
+        />
+      </div>
+
+      <div :class="$style.row">
+        <TextInput
+          placeholder="Description in the chat with the bot if the chat is empty"
+          v-model="telegramBot.description"
+        />
+      </div>
+
+      <div :class="$style.row">
+        <TextInput
+          placeholder="Welcome Message"
+          v-model="telegramBot.welcome_message"
         />
       </div>
     </div>
