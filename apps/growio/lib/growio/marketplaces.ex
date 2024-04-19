@@ -1425,6 +1425,10 @@ defmodule Growio.Marketplaces do
     |> repo.insert()
   end
 
+  def all_market_telegram_bots() do
+    Repo.all(MarketplaceMarketTelegramBot)
+  end
+
   def all_market_telegram_bots(%MarketplaceAccount{} = initiator, market_id)
       when is_integer(market_id) do
     with true <- Permissions.ok?(initiator, marketplaces__market_telegram_bot__read()) do

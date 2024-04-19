@@ -4,6 +4,8 @@ defmodule GrowioTelegram.Application do
   @moduledoc false
 
   use Application
+  alias Growio.Marketplaces
+  alias GrowioTelegram.MarketBot
 
   @impl true
   def start(_type, _args) do
@@ -12,10 +14,16 @@ defmodule GrowioTelegram.Application do
       {GrowioTelegram.Interface, nil}
     ]
 
-    Supervisor.start_link(
-      children,
-      strategy: :one_for_one,
-      name: GrowioTelegram.Supervisor
-    )
+    result =
+      Supervisor.start_link(
+        children,
+        strategy: :one_for_one,
+        name: GrowioTelegram.Supervisor
+      )
+
+    Marketplaces.all_market_telegram_bots()
+    |> Enum.each(fn bot -> MarketBot.start_bot(bot.token) end)
+
+    result
   end
 end
