@@ -6,7 +6,6 @@ defmodule GrowioWeb.Views.MarketplaceMarketJSON do
   def render(%MarketplaceMarket{} = value) do
     %{
       id: value.id,
-      name: value.name,
       address: value.address
     }
   end

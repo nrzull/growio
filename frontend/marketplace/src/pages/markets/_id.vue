@@ -24,7 +24,7 @@
             :active="!!marketModal"
             @click="marketModal = market"
           >
-            {{ market?.name }}
+            {{ market?.address }}
           </Button>
 
           <RouterLink

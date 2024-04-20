@@ -1,12 +1,11 @@
 <template>
   <Modal :loading="isLoading" @close="$emit('close')">
     <template v-if="isMarketplaceMarket(modelValue)" #heading>
-      <span>{{ modelValue.name }}</span> <Tag>Market</Tag>
+      <span>{{ modelValue.address }}</span> <Tag>Market</Tag>
     </template>
     <template v-else #heading> Create Market </template>
 
     <div :class="$style.row">
-      <TextInput v-model="market.name" placeholder="Name" />
       <TextInput v-model="market.address" placeholder="Address" />
     </div>
 
@@ -55,8 +54,7 @@ const emit = defineEmits({
 
 <style module>
 .row {
-  display: grid;
+  display: flex;
   gap: 8px;
-  grid-template-columns: 1fr 1fr;
 }
 </style>

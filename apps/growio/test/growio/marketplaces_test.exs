@@ -628,15 +628,15 @@ defmodule Growio.MarketplacesTest do
     end
 
     test "create a market" do
-      valid_name = "market"
+      valid_address = "valid_address"
 
       %{marketplace_account: marketplace_account} =
         MarketplacesFixture.marketplace!(AccountsFixture.account!())
 
       {:ok, %MarketplaceMarket{} = market} =
-        Marketplaces.create_market(marketplace_account, %{name: valid_name})
+        Marketplaces.create_market(marketplace_account, %{address: valid_address})
 
-      assert market.name == valid_name
+      assert market.address == valid_address
     end
 
     test "get all markets" do
@@ -651,7 +651,7 @@ defmodule Growio.MarketplacesTest do
     end
 
     test "update a market" do
-      updated_name = "updated name"
+      updated_address = "updated_address"
 
       %{marketplace: marketplace, marketplace_account: marketplace_account} =
         MarketplacesFixture.marketplace!(AccountsFixture.account!())
@@ -659,9 +659,9 @@ defmodule Growio.MarketplacesTest do
       market = MarketplacesFixture.market!(marketplace)
 
       {:ok, market} =
-        Marketplaces.update_market(marketplace_account, market, %{name: updated_name})
+        Marketplaces.update_market(marketplace_account, market, %{address: updated_address})
 
-      assert market.name == updated_name
+      assert market.address == updated_address
     end
 
     test "create a market item" do

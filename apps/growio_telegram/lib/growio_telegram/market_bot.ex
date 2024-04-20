@@ -6,6 +6,7 @@ defmodule GrowioTelegram.MarketBot do
   alias Growio.Marketplaces
   alias GrowioTelegram.MarketBotRegistry
   alias Growio.Marketplaces.MarketplaceMarketTelegramBot
+  alias Growio.Marketplaces.MarketplaceMarketTelegramBotCustomer
 
   @session_ttl 60 * 1_000 * 10
   @max_bot_concurrency 999_999
@@ -82,6 +83,12 @@ defmodule GrowioTelegram.MarketBot do
 
       if is_bitstring(bot.welcome_message) do
         Telegram.Api.request(token, "sendMessage", text: bot.welcome_message, chat_id: chat_id)
+      end
+
+      with customer = %MarketplaceMarketTelegramBotCustomer{} <-
+             Marketplaces.get_market_telegram_bot_customer(bot, chat_id),
+           {:ok, order} = Marketplaces.create_market_order(customer) do
+        Telegram.Api.request(token, "sendMessage", text: order.id, chat_id: chat_id)
       end
     end
 

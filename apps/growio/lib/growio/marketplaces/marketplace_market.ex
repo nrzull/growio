@@ -5,11 +5,10 @@ defmodule Growio.Marketplaces.MarketplaceMarket do
   alias Growio.Marketplaces.MarketplaceMarketItem
 
   @type t :: %__MODULE__{}
-  @required ~w(name)a
-  @optional ~w(address)a
+  @required ~w(address)a
+  @optional ~w()a
 
   schema "marketplace_markets" do
-    field(:name, :string)
     field(:address, :string)
     has_many(:items, MarketplaceMarketItem, foreign_key: :market_id)
     belongs_to(:marketplace, Marketplace)

@@ -24,6 +24,7 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceSubscription
   alias Growio.Marketplaces.MarketplaceMarketTelegramBot
   alias Growio.Marketplaces.MarketplaceMarketTelegramBotCustomer
+  alias Growio.Marketplaces.MarketplaceMarketOrder
 
   def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
@@ -1539,9 +1540,29 @@ defmodule Growio.Marketplaces do
     end
   end
 
+  def get_market_telegram_bot_customer(%MarketplaceMarketTelegramBot{} = bot, chat_id)
+      when is_integer(chat_id) do
+    MarketplaceMarketTelegramBotCustomer
+    |> where([customer], customer.chat_id == ^chat_id)
+    |> where([customer], customer.bot_id == ^bot.id)
+    |> Repo.one()
+  end
+
   def create_market_telegram_bot_customer(%MarketplaceMarketTelegramBot{} = bot, %{} = params) do
     MarketplaceMarketTelegramBotCustomer.changeset(params)
     |> Changeset.put_assoc(:bot, bot)
+    |> Repo.insert()
+  end
+
+  def create_market_order(
+        %MarketplaceMarketTelegramBotCustomer{} = customer,
+        %{} = params \\ %{payload: %{}}
+      ) do
+    market = Repo.preload(customer, bot: [:marketplace_market]).bot.marketplace_market
+
+    MarketplaceMarketOrder.changeset(Map.merge(params, %{status: :init}))
+    |> Changeset.put_assoc(:market, market)
+    |> Changeset.put_assoc(:telegram_bot_customer, customer)
     |> Repo.insert()
   end
 end

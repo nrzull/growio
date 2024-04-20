@@ -1,10 +1,6 @@
 export type MarketplaceMarket = {
   id: number;
-  name: string;
-  address?: string;
+  address: string;
 };
 
-export type PartialMarketplaceMarket = Pick<
-  MarketplaceMarket,
-  "name" | "address"
->;
+export type PartialMarketplaceMarket = Pick<MarketplaceMarket, "address">;

@@ -17,7 +17,7 @@
             v-slot="{ navigate }"
           >
             <Button type="neutral" size="md" icon="arrowBack" @click="navigate">
-              {{ market.name }}
+              {{ market.address }}
             </Button>
           </RouterLink>
 

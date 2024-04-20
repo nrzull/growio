@@ -7,7 +7,6 @@
     <template v-else #heading> Create Market Item </template>
 
     <div :class="$style.row">
-      <TextInput v-model="marketItem.quantity" placeholder="Quantity" />
       <SelectInput
         v-model="selectedItem"
         :items="items"
@@ -16,6 +15,7 @@
         label-path="name"
         placeholder="Item"
       />
+      <TextInput v-model="marketItem.quantity" placeholder="Quantity" />
     </div>
 
     <template #footer>

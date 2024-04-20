@@ -96,11 +96,6 @@ const isEmpty = computed(() => !isLoading.value && !markets.value.length);
 const columnHelper = createColumnHelper<MarketplaceMarket>();
 
 const columns = ref([
-  columnHelper.accessor("name", {
-    cell: (info) => info.getValue(),
-    header: () => "Name",
-  }),
-
   columnHelper.accessor("address", {
     cell: (info) => info.getValue(),
     header: () => "Address",
