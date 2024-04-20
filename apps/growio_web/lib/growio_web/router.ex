@@ -39,6 +39,30 @@ defmodule GrowioWeb.Router do
     plug(MarketplaceAccountPlug)
   end
 
+  if Application.compile_env(:growio_web, :dev_routes) do
+    scope "/dev" do
+      pipe_through([:fetch_session, :protect_from_forgery])
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
+    end
+  end
+
+  if Application.compile_env(:growio_web, :swaggerui_routes) do
+    scope "/swaggerui" do
+      pipe_through([:browser])
+      get("/", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi")
+    end
+
+    scope "/api/openapi" do
+      pipe_through([:guest])
+      get("/", OpenApiSpex.Plug.RenderSpec, [])
+    end
+  end
+
+  scope "/api/permissions" do
+    pipe_through([:account])
+    resources("/", PermissionController, only: [:index])
+  end
+
   scope "/api/auth" do
     pipe_through([:guest])
     post("/email", AuthController, :email)
@@ -128,29 +152,17 @@ defmodule GrowioWeb.Router do
       MarketplaceMarketTelegramBotController,
       only: [:create, :delete]
     )
-  end
 
-  scope "/api/permissions" do
-    pipe_through([:account])
-    resources("/", PermissionController, only: [:index])
-  end
+    get(
+      "/:market_id/marketplace_market_telegram_bot",
+      MarketplaceMarketTelegramBotController,
+      :index_self
+    )
 
-  if Application.compile_env(:growio_web, :dev_routes) do
-    scope "/dev" do
-      pipe_through([:fetch_session, :protect_from_forgery])
-      forward("/mailbox", Plug.Swoosh.MailboxPreview)
-    end
-  end
-
-  if Application.compile_env(:growio_web, :swaggerui_routes) do
-    scope "/swaggerui" do
-      pipe_through([:browser])
-      get("/", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi")
-    end
-
-    scope "/api/openapi" do
-      pipe_through([:guest])
-      get("/", OpenApiSpex.Plug.RenderSpec, [])
-    end
+    patch(
+      "/:market_id/marketplace_market_telegram_bot",
+      MarketplaceMarketTelegramBotController,
+      :update_self
+    )
   end
 end

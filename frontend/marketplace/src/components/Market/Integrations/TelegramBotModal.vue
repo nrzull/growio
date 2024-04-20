@@ -18,14 +18,14 @@
 
       <div :class="$style.row">
         <TextInput
-          placeholder="Description on the bot's profile"
+          placeholder="Short Description"
           v-model="telegramBot.short_description"
         />
       </div>
 
       <div :class="$style.row">
         <TextInput
-          placeholder="Description in the chat with the bot if the chat is empty"
+          placeholder="Description"
           v-model="telegramBot.description"
         />
       </div>

@@ -17,6 +17,55 @@ defmodule GrowioWeb.Controllers.MarketplaceMarketTelegramBotController do
 
   tags(["marketplace_market_telegram_bots"])
 
+  operation(:index_self,
+    summary: "get self marketplace market telegram bot",
+    parameters: [
+      market_id: [in: :path, description: "market id", type: :integer, example: 1]
+    ],
+    responses: [ok: {"", "application/json", Schemas.MarketplaceMarketTelegramBot}]
+  )
+
+  def index_self(%{assigns: %{marketplace_account: marketplace_account}} = conn, %{
+        "market_id" => market_id
+      }) do
+    with market_id when is_integer(market_id) <- String.to_integer(market_id),
+         market = %MarketplaceMarket{} <- Marketplaces.get_market(marketplace_account, market_id),
+         bot = %MarketplaceMarketTelegramBot{} <-
+           Marketplaces.get_market_telegram_bot(marketplace_account, market) do
+      Conn.ok(conn, MarketplaceMarketTelegramBotJSON.render(bot))
+    end
+  end
+
+  operation(:update_self,
+    summary: "update self marketplace market telegram bot",
+    parameters: [
+      market_id: [in: :path, description: "market id", type: :integer]
+    ],
+    request_body: {"", "application/json", Schemas.MarketplaceMarketTelegramBot, required: true},
+    responses: [ok: {"", "application/json", Schemas.MarketplaceMarketTelegramBot}]
+  )
+
+  def update_self(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"market_id" => market_id} = params
+      ) do
+    with market_id when is_integer(market_id) <- String.to_integer(market_id),
+         market = %MarketplaceMarket{} <- Marketplaces.get_market(marketplace_account, market_id),
+         bot = %MarketplaceMarketTelegramBot{} <-
+           Marketplaces.get_market_telegram_bot(marketplace_account, market),
+         {:ok, updated_bot} <-
+           Marketplaces.update_market_telegram_bot(marketplace_account, bot, params) do
+      if bot.token === updated_bot.token do
+        GrowioWeb.Interface.telegram_cast({:update_bot, updated_bot})
+      else
+        GrowioWeb.Interface.telegram_call({:reconnect_bot, bot.token, updated_bot.token})
+        GrowioWeb.Interface.telegram_cast({:update_bot, updated_bot})
+      end
+
+      Conn.ok(conn, MarketplaceMarketTelegramBotJSON.render(updated_bot))
+    end
+  end
+
   operation(:create,
     summary: "create marketplace market telegram bot",
     parameters: [

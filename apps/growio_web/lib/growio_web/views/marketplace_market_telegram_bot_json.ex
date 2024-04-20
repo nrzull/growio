@@ -7,6 +7,10 @@ defmodule GrowioWeb.Views.MarketplaceMarketTelegramBotJSON do
     %{
       id: value.id,
       token: value.token,
+      name: value.name,
+      description: value.description,
+      short_description: value.short_description,
+      welcome_message: value.welcome_message,
       marketplace_market_id: value.marketplace_market_id
     }
   end

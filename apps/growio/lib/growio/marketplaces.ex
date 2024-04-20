@@ -1444,6 +1444,16 @@ defmodule Growio.Marketplaces do
     end
   end
 
+  def get_market_telegram_bot(%MarketplaceAccount{} = initiator, %MarketplaceMarket{} = market) do
+    with true <- Permissions.ok?(initiator, market, marketplaces__market_telegram_bot__read()) do
+      MarketplaceMarketTelegramBot
+      |> where([bot], bot.marketplace_market_id == ^market.id)
+      |> Repo.one()
+    else
+      _ -> {:error, "cannot get market telegram bot"}
+    end
+  end
+
   def get_market_telegram_bot(:token, token) do
     case Cache.get(cache_key_market_telegram_bot(:token, token)) do
       value when is_struct(value) ->
@@ -1459,6 +1469,11 @@ defmodule Growio.Marketplaces do
 
         bot
     end
+  end
+
+  def cache_remove_market_telegram_bot(:token, token) do
+    cache_key_market_telegram_bot(:token, token)
+    |> Cache.delete()
   end
 
   def cache_key_market_telegram_bot(:token, token) do
@@ -1481,6 +1496,29 @@ defmodule Growio.Marketplaces do
       |> Repo.insert()
     else
       _ -> {:error, "cannot create market telegram bot"}
+    end
+  end
+
+  def update_market_telegram_bot(
+        %MarketplaceAccount{} = initiator,
+        %MarketplaceMarketTelegramBot{} = bot,
+        %{} = params
+      ) do
+    with true <- Permissions.ok?(initiator, marketplaces__market_telegram_bot__update()),
+         changeset = %Changeset{valid?: true} <-
+           MarketplaceMarketTelegramBot.changeset(bot, params) do
+      changeset
+      |> Repo.update()
+      |> case do
+        {:ok, _} = v ->
+          cache_remove_market_telegram_bot(:token, bot.token)
+          v
+
+        e ->
+          e
+      end
+    else
+      _ -> {:error, "cannot update market telegram bot"}
     end
   end
 
