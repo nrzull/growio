@@ -10,6 +10,7 @@ defmodule GrowioTelegram.MarketBot do
 
   @session_ttl 60 * 1_000 * 10
   @max_bot_concurrency 999_999
+  @market_url Application.compile_env!(:growio_telegram, :market_url)
 
   def update_bot(%MarketplaceMarketTelegramBot{token: token} = bot) do
     if is_bitstring(bot.description) do
@@ -88,7 +89,14 @@ defmodule GrowioTelegram.MarketBot do
       with customer = %MarketplaceMarketTelegramBotCustomer{} <-
              Marketplaces.get_market_telegram_bot_customer(bot, chat_id),
            {:ok, order} = Marketplaces.create_market_order(customer) do
-        Telegram.Api.request(token, "sendMessage", text: order.id, chat_id: chat_id)
+        query = URI.encode_query(%{"order_id" => order.id})
+
+        text =
+          URI.parse(@market_url)
+          |> URI.append_query(query)
+          |> URI.to_string()
+
+        Telegram.Api.request(token, "sendMessage", text: text, chat_id: chat_id)
       end
     end
 

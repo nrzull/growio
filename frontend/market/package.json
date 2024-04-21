@@ -1,0 +1,14 @@
+{
+  "name": "@growio/market",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "lint": "vue-tsc && eslint 'src/**/*.+(ts|vue)' && stylelint 'src/**/*.+(css|vue)'",
+    "lint:fix": "eslint --fix 'src/**/*.+(ts|vue)' && stylelint --fix 'src/**/*.+(css|vue)'",
+    "vue-tsc": "vue-tsc",
+    "eslint": "eslint",
+    "stylelint": "stylelint"
+  }
+}
