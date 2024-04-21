@@ -34,7 +34,7 @@ import {
   fetchActiveMarketplaceAccount,
 } from "~/composables/marketplace-accounts";
 import { Marketplace } from "~/api/growio/marketplaces/types";
-import { apiMarketplacesUpdateSelf } from "~/api/growio/marketplaces";
+import { apiMarketplaceUpdate } from "~/api/growio/marketplaces";
 import { clone } from "remeda";
 
 const currencyOptions = ["RUB", "KGS"];
@@ -45,7 +45,7 @@ const isLoading = computed(() => wait.some([Wait.MARKETPLACE_UPDATE]));
 const updateMarketplace = async () => {
   try {
     wait.start(Wait.MARKETPLACE_UPDATE);
-    await apiMarketplacesUpdateSelf(model.value);
+    await apiMarketplaceUpdate(model.value);
     await fetchActiveMarketplaceAccount();
   } catch (e) {
     console.error(e);

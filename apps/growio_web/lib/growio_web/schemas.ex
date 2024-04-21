@@ -347,4 +347,24 @@ defmodule GrowioWeb.Schemas do
       }
     })
   end
+
+  defmodule MarketplaceMarketOrder do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :string},
+        status: %Schema{type: :string},
+        payload: %Schema{type: :object},
+        market_id: %Schema{type: :integer},
+        telegram_bot_customer_id: %Schema{type: :integer, nullable: true}
+      }
+    })
+  end
+
+  defmodule MarketplaceMarketOrders do
+    schema(%{
+      type: :array,
+      items: MarketplaceMarketOrder
+    })
+  end
 end

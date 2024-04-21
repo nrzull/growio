@@ -1565,4 +1565,16 @@ defmodule Growio.Marketplaces do
     |> Changeset.put_assoc(:telegram_bot_customer, customer)
     |> Repo.insert()
   end
+
+  def all_market_orders(%MarketplaceAccount{} = initiator) do
+    with true <- Permissions.ok?(initiator, marketplaces__market_order__read()) do
+      MarketplaceMarketOrder
+      |> join(:left, [order], market in assoc(order, :market))
+      |> where([_, market], market.marketplace_id == ^initiator.marketplace_id)
+      |> where([order, market], order.market_id == market.id)
+      |> Repo.all()
+    else
+      _ -> {:error, "cannot get all market orders"}
+    end
+  end
 end
