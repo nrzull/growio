@@ -52,30 +52,30 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { wait, Wait } from "~/composables/wait";
-import PageLoader from "~/components/PageLoader.vue";
-import PageShape from "~/components/PageShape.vue";
-import Button from "~/components/Button.vue";
-import Table from "~/components/Table.vue";
+import { wait, Wait } from "@growio/shared/composables/wait";
+import PageLoader from "@growio/shared/components/PageLoader.vue";
+import PageShape from "@growio/shared/components/PageShape.vue";
+import Button from "@growio/shared/components/Button.vue";
+import Table from "@growio/shared/components/Table.vue";
 import {
   createColumnHelper,
   getCoreRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import Notification from "~/components/Notifications/Notification.vue";
+import Notification from "@growio/shared/components/Notifications/Notification.vue";
 import {
   MarketplaceMarket,
   PartialMarketplaceMarket,
-} from "~/api/growio/marketplace_markets/types";
+} from "@growio/shared/api/growio/marketplace_markets/types";
 import {
   apiMarketplaceMarketsGetAll,
   apiMarketplaceMarketsCreate,
   apiMarketplaceMarketsDelete,
-} from "~/api/growio/marketplace_markets";
+} from "@growio/shared/api/growio/marketplace_markets";
 import MarketModal from "~/components/Inventory/MarketModal.vue";
-import { buildPartialMarketplaceMarket } from "~/api/growio/marketplace_markets/utils";
-import PromiseModal from "~/components/PromiseModal.vue";
-import Icon from "~/components/Icon.vue";
+import { buildPartialMarketplaceMarket } from "@growio/shared/api/growio/marketplace_markets/utils";
+import PromiseModal from "@growio/shared/components/PromiseModal.vue";
+import Icon from "@growio/shared/components/Icon.vue";
 
 const markets = ref<MarketplaceMarket[]>([]);
 

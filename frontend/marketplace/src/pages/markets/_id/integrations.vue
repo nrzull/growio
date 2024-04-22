@@ -63,35 +63,35 @@
 
 <script setup lang="ts">
 import { ref, computed, PropType } from "vue";
-import PageShape from "~/components/PageShape.vue";
-import PageLoader from "~/components/PageLoader.vue";
-import { Wait, wait } from "~/composables/wait";
-import Notification from "~/components/Notifications/Notification.vue";
+import PageShape from "@growio/shared/components/PageShape.vue";
+import PageLoader from "@growio/shared/components/PageLoader.vue";
+import { Wait, wait } from "@growio/shared/composables/wait";
+import Notification from "@growio/shared/components/Notifications/Notification.vue";
 import {
   MarketplaceMarketTelegramBot,
   MarketplaceMarketTelegramBotNew,
-} from "~/api/growio/marketplace_market_telegram_bots/types";
-import Button from "~/components/Button.vue";
-import Menu from "~/components/Menu.vue";
+} from "@growio/shared/api/growio/marketplace_market_telegram_bots/types";
+import Button from "@growio/shared/components/Button.vue";
+import Menu from "@growio/shared/components/Menu.vue";
 import {
   buildMarketplaceMarketTelegramBotNew,
   isMarketplaceMarketTelegramBot,
-} from "~/api/growio/marketplace_market_telegram_bots/utils";
+} from "@growio/shared/api/growio/marketplace_market_telegram_bots/utils";
 import TelegramBotModal from "~/components/Market/Integrations/TelegramBotModal.vue";
-import { apiMarketplaceMarketsGetAllIntegrations } from "~/api/growio/marketplace_markets";
-import { MarketplaceMarket } from "~/api/growio/marketplace_markets/types";
+import { apiMarketplaceMarketsGetAllIntegrations } from "@growio/shared/api/growio/marketplace_markets";
+import { MarketplaceMarket } from "@growio/shared/api/growio/marketplace_markets/types";
 import {
   apiMarketplaceMarketTelegramBotsCreate,
   apiMarketplaceMarketTelegramBotsDelete,
-} from "~/api/growio/marketplace_market_telegram_bots";
-import Table from "~/components/Table.vue";
+} from "@growio/shared/api/growio/marketplace_market_telegram_bots";
+import Table from "@growio/shared/components/Table.vue";
 import {
   createColumnHelper,
   getCoreRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import Icon from "~/components/Icon.vue";
-import PromiseModal from "~/components/PromiseModal.vue";
+import Icon from "@growio/shared/components/Icon.vue";
+import PromiseModal from "@growio/shared/components/PromiseModal.vue";
 import { useRouter } from "vue-router";
 
 const props = defineProps({

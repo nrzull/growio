@@ -17,16 +17,16 @@
 
 <script setup lang="ts">
 import { PropType, computed, ref } from "vue";
-import Modal from "~/components/Modal.vue";
-import TextInput from "~/components/TextInput.vue";
-import Button from "~/components/Button.vue";
-import { isMarketplaceMarket } from "~/api/growio/marketplace_markets/utils";
+import Modal from "@growio/shared/components/Modal.vue";
+import TextInput from "@growio/shared/components/TextInput.vue";
+import Button from "@growio/shared/components/Button.vue";
+import { isMarketplaceMarket } from "@growio/shared/api/growio/marketplace_markets/utils";
 import { clone } from "remeda";
-import Tag from "~/components/Tag.vue";
+import Tag from "@growio/shared/components/Tag.vue";
 import {
   MarketplaceMarket,
   PartialMarketplaceMarket,
-} from "~/api/growio/marketplace_markets/types";
+} from "@growio/shared/api/growio/marketplace_markets/types";
 
 const props = defineProps({
   modelValue: {

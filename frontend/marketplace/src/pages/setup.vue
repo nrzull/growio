@@ -5,11 +5,11 @@
 </template>
 
 <script setup lang="ts">
-import { apiMarketplaceAccountsGetSelf } from "~/api/growio/marketplace_accounts";
+import { apiMarketplaceAccountsGetSelf } from "@growio/shared/api/growio/marketplace_accounts";
 import { account } from "~/composables/account";
-import { apiMarketplacesCreate } from "~/api/growio/marketplaces";
+import { apiMarketplacesCreate } from "@growio/shared/api/growio/marketplaces";
 import { useRouter, useRoute } from "vue-router";
-import LoaderIcon from "~/components/LoaderIcon.vue";
+import LoaderIcon from "@growio/shared/components/LoaderIcon.vue";
 
 const router = useRouter();
 const route = useRoute();

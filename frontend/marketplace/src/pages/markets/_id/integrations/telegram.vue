@@ -53,16 +53,16 @@
 
 <script setup lang="ts">
 import { PropType, ref, computed } from "vue";
-import { MarketplaceMarket } from "~/api/growio/marketplace_markets/types";
-import Button from "~/components/Button.vue";
-import Tabs from "~/components/Tabs.vue";
+import { MarketplaceMarket } from "@growio/shared/api/growio/marketplace_markets/types";
+import Button from "@growio/shared/components/Button.vue";
+import Tabs from "@growio/shared/components/Tabs.vue";
 import TelegramBotModal from "~/components/Market/Integrations/TelegramBotModal.vue";
 import {
   apiMarketplaceMarketTelegramBotGetSelf,
   apiMarketplaceMarketTelegramBotUpdateSelf,
-} from "~/api/growio/marketplace_market_telegram_bots";
-import { MarketplaceMarketTelegramBot } from "~/api/growio/marketplace_market_telegram_bots/types";
-import { wait, Wait } from "~/composables/wait";
+} from "@growio/shared/api/growio/marketplace_market_telegram_bots";
+import { MarketplaceMarketTelegramBot } from "@growio/shared/api/growio/marketplace_market_telegram_bots/types";
+import { wait, Wait } from "@growio/shared/composables/wait";
 
 const props = defineProps({
   market: {

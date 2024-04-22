@@ -1,0 +1,20 @@
+@font-face {
+  font-family: Inter;
+  font-display: auto;
+  font-weight: 400;
+  src: url("@growio/shared/assets/Inter-Regular.ttf");
+}
+
+@font-face {
+  font-family: Inter;
+  font-display: auto;
+  font-weight: 500;
+  src: url("@growio/shared/assets/Inter-Medium.ttf");
+}
+
+@font-face {
+  font-family: Inter;
+  font-display: auto;
+  font-weight: 700;
+  src: url("@growio/shared/assets/Inter-Bold.ttf");
+}

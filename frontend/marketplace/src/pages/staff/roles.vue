@@ -65,11 +65,11 @@ import {
   getCoreRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import PageLoader from "~/components/PageLoader.vue";
-import PageShape from "~/components/PageShape.vue";
-import Button from "~/components/Button.vue";
-import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
-import { wait, Wait } from "~/composables/wait";
+import PageLoader from "@growio/shared/components/PageLoader.vue";
+import PageShape from "@growio/shared/components/PageShape.vue";
+import Button from "@growio/shared/components/Button.vue";
+import { MarketplaceAccountRole } from "@growio/shared/api/growio/marketplace_account_roles/types";
+import { wait, Wait } from "@growio/shared/composables/wait";
 import {
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_CREATED,
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_CREATED_FAILURE,
@@ -77,28 +77,28 @@ import {
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_DELETED_FAILURE,
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_UPDATED,
   NOTIFICATION_MARKETPLACE_ACCOUNT_ROLE_UPDATED_FAILURE,
-} from "~/composables/notifications/constants";
+} from "@growio/shared/composables/notifications/constants";
 import {
   apiMarketplaceAccountRolesGetAll,
   apiMarketplaceAccountRolesUpdate,
   apiMarketplaceAccountRolesDelete,
-} from "~/api/growio/marketplace_account_roles";
-import Table from "~/components/Table.vue";
+} from "@growio/shared/api/growio/marketplace_account_roles";
+import Table from "@growio/shared/components/Table.vue";
 import RoleModal from "~/components/Roles/RoleModal.vue";
 import {
   buildPartialMarketplaceAccountRole,
   isMarketplaceAccountRole,
-} from "~/api/growio/marketplace_account_roles/utils";
-import { PartialMarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
-import { apiMarketplaceAccountRolesCreate } from "~/api/growio/marketplace_account_roles";
+} from "@growio/shared/api/growio/marketplace_account_roles/utils";
+import { PartialMarketplaceAccountRole } from "@growio/shared/api/growio/marketplace_account_roles/types";
+import { apiMarketplaceAccountRolesCreate } from "@growio/shared/api/growio/marketplace_account_roles";
 import {
   addSuccessNotification,
   addErrorNotification,
-} from "~/composables/notifications";
-import Notification from "~/components/Notifications/Notification.vue";
-import PromiseModal from "~/components/PromiseModal.vue";
-import Icon from "~/components/Icon.vue";
-import Tag from "~/components/Tag.vue";
+} from "@growio/shared/composables/notifications";
+import Notification from "@growio/shared/components/Notifications/Notification.vue";
+import PromiseModal from "@growio/shared/components/PromiseModal.vue";
+import Icon from "@growio/shared/components/Icon.vue";
+import Tag from "@growio/shared/components/Tag.vue";
 
 const roles = ref<MarketplaceAccountRole[]>([]);
 const deletedRoles = ref(false);

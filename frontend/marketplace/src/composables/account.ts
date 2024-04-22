@@ -1,6 +1,6 @@
 import { ref } from "vue";
-import { Account } from "~/api/growio/accounts/types";
-import { apiAccountsGetSelf } from "~/api/growio/accounts";
+import { Account } from "@growio/shared/api/growio/accounts/types";
+import { apiAccountsGetSelf } from "@growio/shared/api/growio/accounts";
 
 export const account = ref<Account>();
 

@@ -26,20 +26,20 @@
 
 <script setup lang="ts">
 import { PropType, computed, ref, watch } from "vue";
-import Modal from "~/components/Modal.vue";
-import TextInput from "~/components/TextInput.vue";
-import SelectInput from "~/components/SelectInput.vue";
-import Button from "~/components/Button.vue";
-import { isMarketplaceMarketItem } from "~/api/growio/marketplace_market_items/utils";
-import { wait, Wait } from "~/composables/wait";
+import Modal from "@growio/shared/components/Modal.vue";
+import TextInput from "@growio/shared/components/TextInput.vue";
+import SelectInput from "@growio/shared/components/SelectInput.vue";
+import Button from "@growio/shared/components/Button.vue";
+import { isMarketplaceMarketItem } from "@growio/shared/api/growio/marketplace_market_items/utils";
+import { wait, Wait } from "@growio/shared/composables/wait";
 import { clone } from "remeda";
-import Tag from "~/components/Tag.vue";
+import Tag from "@growio/shared/components/Tag.vue";
 import {
   MarketplaceMarketItem,
   PartialMarketplaceMarketItem,
-} from "~/api/growio/marketplace_market_items/types";
-import { apiMarketplaceItemsSelfGetAll } from "~/api/growio/marketplace_items";
-import { MarketplaceItem } from "~/api/growio/marketplace_items/types";
+} from "@growio/shared/api/growio/marketplace_market_items/types";
+import { apiMarketplaceItemsSelfGetAll } from "@growio/shared/api/growio/marketplace_items";
+import { MarketplaceItem } from "@growio/shared/api/growio/marketplace_items/types";
 
 const props = defineProps({
   modelValue: {

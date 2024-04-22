@@ -70,26 +70,26 @@ import {
   getCoreRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import Table from "~/components/Table.vue";
-import { MarketplaceAccount } from "~/api/growio/marketplace_accounts/types";
-import { wait, Wait } from "~/composables/wait";
+import Table from "@growio/shared/components/Table.vue";
+import { MarketplaceAccount } from "@growio/shared/api/growio/marketplace_accounts/types";
+import { wait, Wait } from "@growio/shared/composables/wait";
 import {
   apiMarketplaceAccountsGetAll,
   apiMarketplaceAccountsUpdate,
   apiMarketplaceAccountsBlock,
-} from "~/api/growio/marketplace_accounts";
-import { apiMarketplaceAccountEmailInvitationsCreate } from "~/api/growio/marketplace_account_email_invitations";
-import PageLoader from "~/components/PageLoader.vue";
-import PageShape from "~/components/PageShape.vue";
-import Button from "~/components/Button.vue";
+} from "@growio/shared/api/growio/marketplace_accounts";
+import { apiMarketplaceAccountEmailInvitationsCreate } from "@growio/shared/api/growio/marketplace_account_email_invitations";
+import PageLoader from "@growio/shared/components/PageLoader.vue";
+import PageShape from "@growio/shared/components/PageShape.vue";
+import Button from "@growio/shared/components/Button.vue";
 import InvitationModal from "~/components/Staff/InvitationModal.vue";
 import InvitationsModal from "~/components/Staff/InvitationsModal.vue";
 import UserModal from "~/components/Staff/UserModal.vue";
-import Notification from "~/components/Notifications/Notification.vue";
-import Icon from "~/components/Icon.vue";
-import PromiseModal from "~/components/PromiseModal.vue";
+import Notification from "@growio/shared/components/Notifications/Notification.vue";
+import Icon from "@growio/shared/components/Icon.vue";
+import PromiseModal from "@growio/shared/components/PromiseModal.vue";
 import { marketplaceAccount } from "~/composables/marketplace-accounts";
-import Tag from "~/components/Tag.vue";
+import Tag from "@growio/shared/components/Tag.vue";
 
 const invitationModal = ref(false);
 const invitationsModal = ref(false);

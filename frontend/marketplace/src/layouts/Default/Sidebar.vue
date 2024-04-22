@@ -22,8 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import Icon, { Icons } from "~/components/Icon.vue";
-import Button from "~/components/Button.vue";
+import Icon, { Icons } from "@growio/shared/components/Icon.vue";
+import Button from "@growio/shared/components/Button.vue";
 
 const buttons: Array<{ icon: Icons; text: string; to: string }> = [
   {

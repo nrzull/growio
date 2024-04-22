@@ -13,10 +13,10 @@
 </template>
 
 <script setup lang="ts">
-import Modal from "~/components/Modal.vue";
+import Modal from "@growio/shared/components/Modal.vue";
 import { computed, ref } from "vue";
-import Button from "~/components/Button.vue";
-import TextInput from "~/components/TextInput.vue";
+import Button from "@growio/shared/components/Button.vue";
+import TextInput from "@growio/shared/components/TextInput.vue";
 
 const props = defineProps({
   loading: {

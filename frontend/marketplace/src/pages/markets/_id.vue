@@ -67,13 +67,13 @@ import { computed, ref } from "vue";
 import {
   apiMarketplaceMarketsGetOne,
   apiMarketplaceMarketsUpdate,
-} from "~/api/growio/marketplace_markets";
-import { MarketplaceMarket } from "~/api/growio/marketplace_markets/types";
-import { wait, Wait } from "~/composables/wait";
+} from "@growio/shared/api/growio/marketplace_markets";
+import { MarketplaceMarket } from "@growio/shared/api/growio/marketplace_markets/types";
+import { wait, Wait } from "@growio/shared/composables/wait";
 import { useRoute } from "vue-router";
-import Button from "~/components/Button.vue";
+import Button from "@growio/shared/components/Button.vue";
 import MarketModal from "~/components/Inventory/MarketModal.vue";
-import Tabs from "~/components/Tabs.vue";
+import Tabs from "@growio/shared/components/Tabs.vue";
 
 const route = useRoute();
 

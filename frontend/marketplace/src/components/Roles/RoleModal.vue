@@ -37,16 +37,16 @@
 
 <script setup lang="ts">
 import { PropType, computed, ref } from "vue";
-import Button from "~/components/Button.vue";
-import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
-import Modal from "~/components/Modal.vue";
-import { PartialMarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
+import Button from "@growio/shared/components/Button.vue";
+import { MarketplaceAccountRole } from "@growio/shared/api/growio/marketplace_account_roles/types";
+import Modal from "@growio/shared/components/Modal.vue";
+import { PartialMarketplaceAccountRole } from "@growio/shared/api/growio/marketplace_account_roles/types";
 import { clone } from "remeda";
-import TextInput from "~/components/TextInput.vue";
-import { apiPermissionsGetAll } from "~/api/growio/permissions";
-import Tag from "~/components/Tag.vue";
-import { wait, Wait } from "~/composables/wait";
-import { isMarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/utils";
+import TextInput from "@growio/shared/components/TextInput.vue";
+import { apiPermissionsGetAll } from "@growio/shared/api/growio/permissions";
+import Tag from "@growio/shared/components/Tag.vue";
+import { wait, Wait } from "@growio/shared/composables/wait";
+import { isMarketplaceAccountRole } from "@growio/shared/api/growio/marketplace_account_roles/utils";
 
 const props = defineProps({
   role: {

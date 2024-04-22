@@ -17,4 +17,5 @@ export default {
   "apps/**/*.(ex|exs)": () => ["mix test"],
   ...buildFrontendRules("marketplace"),
   ...buildFrontendRules("market"),
+  ...buildFrontendRules("shared"),
 };

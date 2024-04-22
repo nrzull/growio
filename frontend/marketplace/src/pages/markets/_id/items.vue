@@ -54,11 +54,11 @@ import { computed, PropType, ref } from "vue";
 import {
   MarketplaceMarketItem,
   PartialMarketplaceMarketItem,
-} from "~/api/growio/marketplace_market_items/types";
-import { MarketplaceMarket } from "~/api/growio/marketplace_markets/types";
-import PageLoader from "~/components/PageLoader.vue";
-import { wait, Wait } from "~/composables/wait";
-import PromiseModal from "~/components/PromiseModal.vue";
+} from "@growio/shared/api/growio/marketplace_market_items/types";
+import { MarketplaceMarket } from "@growio/shared/api/growio/marketplace_markets/types";
+import PageLoader from "@growio/shared/components/PageLoader.vue";
+import { wait, Wait } from "@growio/shared/composables/wait";
+import PromiseModal from "@growio/shared/components/PromiseModal.vue";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -67,19 +67,19 @@ import {
 import {
   buildPartialMarketplaceMarketItem,
   isMarketplaceMarketItem,
-} from "~/api/growio/marketplace_market_items/utils";
+} from "@growio/shared/api/growio/marketplace_market_items/utils";
 import {
   apiMarketplaceMarketItemsCreate,
   apiMarketplaceMarketItemsDelete,
   apiMarketplaceMarketItemsGetAll,
   apiMarketplaceMarketItemsUpdate,
-} from "~/api/growio/marketplace_market_items";
+} from "@growio/shared/api/growio/marketplace_market_items";
 import MarketItemModal from "~/components/Inventory/MarketItemModal.vue";
-import PageShape from "~/components/PageShape.vue";
-import Button from "~/components/Button.vue";
-import Table from "~/components/Table.vue";
-import Icon from "~/components/Icon.vue";
-import Notification from "~/components/Notifications/Notification.vue";
+import PageShape from "@growio/shared/components/PageShape.vue";
+import Button from "@growio/shared/components/Button.vue";
+import Table from "@growio/shared/components/Table.vue";
+import Icon from "@growio/shared/components/Icon.vue";
+import Notification from "@growio/shared/components/Notifications/Notification.vue";
 
 defineOptions({ inheritAttrs: false });
 

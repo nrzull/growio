@@ -32,26 +32,26 @@
 
 <script setup lang="ts">
 import { PropType, computed, ref, watch } from "vue";
-import Modal from "~/components/Modal.vue";
-import TextInput from "~/components/TextInput.vue";
-import SelectInput from "~/components/SelectInput.vue";
-import Button from "~/components/Button.vue";
-import { MarketplaceItemCategory } from "~/api/growio/marketplace_item_categories/types";
+import Modal from "@growio/shared/components/Modal.vue";
+import TextInput from "@growio/shared/components/TextInput.vue";
+import SelectInput from "@growio/shared/components/SelectInput.vue";
+import Button from "@growio/shared/components/Button.vue";
+import { MarketplaceItemCategory } from "@growio/shared/api/growio/marketplace_item_categories/types";
 import {
   MarketplaceItem,
   PartialMarketplaceItem,
-} from "~/api/growio/marketplace_items/types";
-import { apiMarketplaceItemCategoriesGetAll } from "~/api/growio/marketplace_item_categories";
+} from "@growio/shared/api/growio/marketplace_items/types";
+import { apiMarketplaceItemCategoriesGetAll } from "@growio/shared/api/growio/marketplace_item_categories";
 import { clone } from "remeda";
-import { Wait, wait } from "~/composables/wait";
-import { isMarketplaceItem } from "~/api/growio/marketplace_items/utils";
-import Tag from "~/components/Tag.vue";
-import Dropzone from "~/components/Dropzone.vue";
-import { apiMarketplaceItemAssetsGetAll } from "~/api/growio/marketplace_item_assets";
+import { Wait, wait } from "@growio/shared/composables/wait";
+import { isMarketplaceItem } from "@growio/shared/api/growio/marketplace_items/utils";
+import Tag from "@growio/shared/components/Tag.vue";
+import Dropzone from "@growio/shared/components/Dropzone.vue";
+import { apiMarketplaceItemAssetsGetAll } from "@growio/shared/api/growio/marketplace_item_assets";
 import {
   MarketplaceItemAsset,
   PartialMarketplaceItemAsset,
-} from "~/api/growio/marketplace_item_assets/types";
+} from "@growio/shared/api/growio/marketplace_item_assets/types";
 
 const props = defineProps({
   modelValue: {

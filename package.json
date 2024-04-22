@@ -3,9 +3,19 @@
   "type": "module",
   "scripts": {
     "prepare": "husky",
-    "dev": "concurrently 'mix phx.server' 'npm run dev -w @growio/marketplace' 'npm run dev -w @growio/market'",
-    "lint": "concurrently 'npm run lint -w @growio/marketplace' 'npm run vue-tsc -w @growio/marketplace' 'npm run lint -w @growio/market' 'npm run vue-tsc -w @growio/market'",
-    "lint:fix": "concurrently 'npm run lint:fix -w @growio/marketplace' 'npm run lint:fix -w @growio/market'"
+    "dev": "concurrently npm:dev:api npm:dev:marketplace npm:dev:market",
+    "dev:api": "mix phx.server",
+    "dev:marketplace": "npm run dev -w @growio/marketplace",
+    "dev:market": "npm run dev -w @growio/market",
+    "lint": "concurrently npm:lint:marketplace npm:lint:market npm:lint:shared",
+    "lint:fix": "concurrently npm:lint:marketplace:fix npm:lint:market:fix npm:lint:shared:fix",
+    "lint:marketplace": "concurrently 'npm run lint -w @growio/marketplace' 'npm run vue-tsc -w @growio/marketplace'",
+    "lint:marketplace:fix": "concurrently 'npm run lint:fix -w @growio/marketplace'",
+    "lint:market": "concurrently 'npm run lint -w @growio/market' 'npm run vue-tsc -w @growio/market'",
+    "lint:market:fix": "concurrently 'npm run lint:fix -w @growio/market'",
+    "lint:shared": "concurrently 'npm run lint -w @growio/shared' 'npm run vue-tsc -w @growio/shared'",
+    "lint:shared:fix": "concurrently 'npm run lint:fix -w @growio/market'"
+
   },
   "dependencies": {
     "@floating-ui/vue": "1.0.6",
@@ -39,6 +49,7 @@
   },
   "workspaces": [
     "frontend/marketplace",
-    "frontend/market"
+    "frontend/market",
+    "frontend/shared"
   ]
 }

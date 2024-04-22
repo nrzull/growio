@@ -106,8 +106,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import Button from "~/components/Button.vue";
-import { apiMarketplaceItemsTree } from "~/api/growio/marketplace_items_tree";
+import Button from "@growio/shared/components/Button.vue";
+import { apiMarketplaceItemsTree } from "@growio/shared/api/growio/marketplace_items_tree";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -116,50 +116,50 @@ import {
 import {
   MarketplaceItemsTree,
   MarketplaceTreeItemCategory,
-} from "~/api/growio/marketplace_items_tree/types";
+} from "@growio/shared/api/growio/marketplace_items_tree/types";
 import {
   MarketplaceItem,
   PartialMarketplaceItem,
-} from "~/api/growio/marketplace_items/types";
-import Table from "~/components/Table.vue";
-import Icon from "~/components/Icon.vue";
-import PageShape from "~/components/PageShape.vue";
-import Menu from "~/components/Menu.vue";
-import PromiseModal from "~/components/PromiseModal.vue";
-import { Wait, wait } from "~/composables/wait";
-import PageLoader from "~/components/PageLoader.vue";
-import Notification from "~/components/Notifications/Notification.vue";
+} from "@growio/shared/api/growio/marketplace_items/types";
+import Table from "@growio/shared/components/Table.vue";
+import Icon from "@growio/shared/components/Icon.vue";
+import PageShape from "@growio/shared/components/PageShape.vue";
+import Menu from "@growio/shared/components/Menu.vue";
+import PromiseModal from "@growio/shared/components/PromiseModal.vue";
+import { Wait, wait } from "@growio/shared/composables/wait";
+import PageLoader from "@growio/shared/components/PageLoader.vue";
+import Notification from "@growio/shared/components/Notifications/Notification.vue";
 import {
   apiMarketplaceItemCategoriesCreate,
   apiMarketplaceItemCategoriesDelete,
   apiMarketplaceItemCategoriesUpdate,
-} from "~/api/growio/marketplace_item_categories";
+} from "@growio/shared/api/growio/marketplace_item_categories";
 import {
   MarketplaceItemCategory,
   PartialMarketplaceItemCategory,
-} from "~/api/growio/marketplace_item_categories/types";
-import { isMarketplaceItemCategory } from "~/api/growio/marketplace_item_categories/utils";
-import { isMarketplaceTreeItemCategory } from "~/api/growio/marketplace_items_tree/utils";
+} from "@growio/shared/api/growio/marketplace_item_categories/types";
+import { isMarketplaceItemCategory } from "@growio/shared/api/growio/marketplace_item_categories/utils";
+import { isMarketplaceTreeItemCategory } from "@growio/shared/api/growio/marketplace_items_tree/utils";
 import CategoryModal from "~/components/Inventory/CategoryModal.vue";
-import { buildPartialMarketplaceItemCategory } from "~/api/growio/marketplace_item_categories/utils";
-import { ItemComplex } from "~/components/Menu/types";
+import { buildPartialMarketplaceItemCategory } from "@growio/shared/api/growio/marketplace_item_categories/utils";
+import { ItemComplex } from "@growio/shared/components/Menu/types";
 import {
   buildPartialMarketplaceItem,
   isMarketplaceItem,
-} from "~/api/growio/marketplace_items/utils";
+} from "@growio/shared/api/growio/marketplace_items/utils";
 import {
   MarketplaceItemAsset,
   PartialMarketplaceItemAsset,
-} from "~/api/growio/marketplace_item_assets/types";
+} from "@growio/shared/api/growio/marketplace_item_assets/types";
 import {
   apiMarketplaceItemsCreate,
   apiMarketplaceItemsDelete,
   apiMarketplaceItemsUpdate,
-} from "~/api/growio/marketplace_items";
+} from "@growio/shared/api/growio/marketplace_items";
 import {
   apiMarketplaceItemAssetsCreate,
   apiMarketplaceItemAssetsDelete,
-} from "~/api/growio/marketplace_item_assets";
+} from "@growio/shared/api/growio/marketplace_item_assets";
 import ItemModal from "~/components/Inventory/ItemModal.vue";
 
 const tree = ref<MarketplaceItemsTree>([]);

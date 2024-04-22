@@ -1,6 +1,9 @@
 import { computed, reactive } from "vue";
-import { wait } from "~/composables/wait";
-import { apiAuthSendEmail, apiAuthSendEmailOtp } from "~/api/growio/auth";
+import { wait } from "@growio/shared/composables/wait";
+import {
+  apiAuthSendEmail,
+  apiAuthSendEmailOtp,
+} from "@growio/shared/api/growio/auth";
 
 const WAIT_SEND_EMAIL = "WAIT_SEND_EMAIL";
 const WAIT_SEND_EMAIL_OTP = "WAIT_SEND_EMAIL_OTP";

@@ -46,14 +46,14 @@
 
 <script setup lang="ts">
 import { PropType, computed, ref } from "vue";
-import Modal from "~/components/Modal.vue";
-import TextInput from "~/components/TextInput.vue";
-import Button from "~/components/Button.vue";
+import Modal from "@growio/shared/components/Modal.vue";
+import TextInput from "@growio/shared/components/TextInput.vue";
+import Button from "@growio/shared/components/Button.vue";
 import {
   MarketplaceMarketTelegramBot,
   MarketplaceMarketTelegramBotNew,
-} from "~/api/growio/marketplace_market_telegram_bots/types";
-import { isMarketplaceMarketTelegramBot } from "~/api/growio/marketplace_market_telegram_bots/utils";
+} from "@growio/shared/api/growio/marketplace_market_telegram_bots/types";
+import { isMarketplaceMarketTelegramBot } from "@growio/shared/api/growio/marketplace_market_telegram_bots/utils";
 import { clone } from "remeda";
 
 const props = defineProps({

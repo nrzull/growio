@@ -2,8 +2,8 @@ import { ref } from "vue";
 import {
   apiMarketplaceAccountsGetSelfActive,
   apiMarketplaceAccountsGetSelf,
-} from "~/api/growio/marketplace_accounts";
-import { MarketplaceAccount } from "~/api/growio/marketplace_accounts/types";
+} from "@growio/shared/api/growio/marketplace_accounts";
+import { MarketplaceAccount } from "@growio/shared/api/growio/marketplace_accounts/types";
 
 export const marketplaceAccounts = ref<MarketplaceAccount[]>([]);
 

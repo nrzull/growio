@@ -23,18 +23,18 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { wait, Wait } from "~/composables/wait";
-import PageLoader from "~/components/PageLoader.vue";
-import PageShape from "~/components/PageShape.vue";
-import TextInput from "~/components/TextInput.vue";
-import SelectInput from "~/components/SelectInput.vue";
-import Button from "~/components/Button.vue";
+import { wait, Wait } from "@growio/shared/composables/wait";
+import PageLoader from "@growio/shared/components/PageLoader.vue";
+import PageShape from "@growio/shared/components/PageShape.vue";
+import TextInput from "@growio/shared/components/TextInput.vue";
+import SelectInput from "@growio/shared/components/SelectInput.vue";
+import Button from "@growio/shared/components/Button.vue";
 import {
   marketplaceAccount,
   fetchActiveMarketplaceAccount,
 } from "~/composables/marketplace-accounts";
-import { Marketplace } from "~/api/growio/marketplaces/types";
-import { apiMarketplaceUpdate } from "~/api/growio/marketplaces";
+import { Marketplace } from "@growio/shared/api/growio/marketplaces/types";
+import { apiMarketplaceUpdate } from "@growio/shared/api/growio/marketplaces";
 import { clone } from "remeda";
 
 const currencyOptions = ["RUB", "KGS"];

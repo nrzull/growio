@@ -1,0 +1,11 @@
+{
+  "name": "@growio/shared",
+  "type": "module",
+  "scripts": {
+    "lint": "vue-tsc && eslint '**/*.+(ts|vue)' && stylelint '**/*.+(css|vue)'",
+    "lint:fix": "eslint --fix '**/*.+(ts|vue)' && stylelint --fix '**/*.+(css|vue)'",
+    "vue-tsc": "vue-tsc",
+    "eslint": "eslint",
+    "stylelint": "stylelint"
+  }
+}

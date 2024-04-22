@@ -30,26 +30,26 @@
 </template>
 
 <script setup lang="ts">
-import PageLoader from "~/components/PageLoader.vue";
-import PageShape from "~/components/PageShape.vue";
+import PageLoader from "@growio/shared/components/PageLoader.vue";
+import PageShape from "@growio/shared/components/PageShape.vue";
 import { computed, ref } from "vue";
-import { wait, Wait } from "~/composables/wait";
-import Button from "~/components/Button.vue";
+import { wait, Wait } from "@growio/shared/composables/wait";
+import Button from "@growio/shared/components/Button.vue";
 import {
   marketplaceAccounts,
   fetchMarketplaceAccounts,
 } from "~/composables/marketplace-accounts";
-import { MarketplaceAccount } from "~/api/growio/marketplace_accounts/types";
+import { MarketplaceAccount } from "@growio/shared/api/growio/marketplace_accounts/types";
 import {
   createColumnHelper,
   getCoreRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import Table from "~/components/Table.vue";
+import Table from "@growio/shared/components/Table.vue";
 import MarketplaceModal from "~/components/Self/MarketplaceModal.vue";
-import { apiMarketplacesCreate } from "~/api/growio/marketplaces";
-import Icon from "~/components/Icon.vue";
-import { apiMarketplaceAccountsUpdateSelfActive } from "~/api/growio/marketplace_accounts";
+import { apiMarketplacesCreate } from "@growio/shared/api/growio/marketplaces";
+import Icon from "@growio/shared/components/Icon.vue";
+import { apiMarketplaceAccountsUpdateSelfActive } from "@growio/shared/api/growio/marketplace_accounts";
 
 const marketplaceModal = ref(false);
 

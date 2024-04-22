@@ -4,5 +4,5 @@
 </template>
 
 <script setup lang="ts">
-import Notifications from "~/components/Notifications.vue";
+import Notifications from "@growio/shared/components/Notifications.vue";
 </script>

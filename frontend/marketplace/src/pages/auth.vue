@@ -28,14 +28,14 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import Shape from "~/components/Shape.vue";
-import Button from "~/components/Button.vue";
-import Heading from "~/components/Shape/Heading.vue";
-import TextInput from "~/components/TextInput.vue";
+import Shape from "@growio/shared/components/Shape.vue";
+import Button from "@growio/shared/components/Button.vue";
+import Heading from "@growio/shared/components/Shape/Heading.vue";
+import TextInput from "@growio/shared/components/TextInput.vue";
 import { useEmailAuth } from "~/composables/use-email-auth";
-import Notification from "~/components/Notifications/Notification.vue";
+import Notification from "@growio/shared/components/Notifications/Notification.vue";
 import { account } from "~/composables/account";
-import { apiAuthSignout } from "~/api/growio/auth";
+import { apiAuthSignout } from "@growio/shared/api/growio/auth";
 import { useRoute, useRouter } from "vue-router";
 
 account.value && location.reload();

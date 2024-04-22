@@ -26,24 +26,24 @@
 </template>
 
 <script setup lang="ts">
-import Modal from "~/components/Modal.vue";
+import Modal from "@growio/shared/components/Modal.vue";
 import {
   apiMarketplaceAccountEmailInvitationsGetAll,
   apiMarketplaceAccountEmailInvitationsDelete,
-} from "~/api/growio/marketplace_account_email_invitations";
-import { MarketplaceAccountEmailInvitation } from "~/api/growio/marketplace_account_email_invitations/types";
+} from "@growio/shared/api/growio/marketplace_account_email_invitations";
+import { MarketplaceAccountEmailInvitation } from "@growio/shared/api/growio/marketplace_account_email_invitations/types";
 import {
   createColumnHelper,
   getCoreRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
 import { computed, ref } from "vue";
-import Table from "~/components/Table.vue";
-import { wait, Wait } from "~/composables/wait";
-import Notification from "~/components/Notifications/Notification.vue";
-import Icon from "~/components/Icon.vue";
-import PromiseModal from "~/components/PromiseModal.vue";
-import Button from "~/components/Button.vue";
+import Table from "@growio/shared/components/Table.vue";
+import { wait, Wait } from "@growio/shared/composables/wait";
+import Notification from "@growio/shared/components/Notifications/Notification.vue";
+import Icon from "@growio/shared/components/Icon.vue";
+import PromiseModal from "@growio/shared/components/PromiseModal.vue";
+import Button from "@growio/shared/components/Button.vue";
 
 defineEmits(["close"]);
 
@@ -102,7 +102,11 @@ const fetchAccountEmailInvitations = async () => {
 };
 
 const deleteInvitation = async (params: MarketplaceAccountEmailInvitation) => {
-  await deleteInvitationModalRef.value?.confirm();
+  try {
+    await deleteInvitationModalRef.value?.confirm();
+  } catch {
+    return;
+  }
 
   try {
     wait.start(Wait.MARKETPLACE_ACCOUNT_EMAIL_INVITATION_DELETE);

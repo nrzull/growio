@@ -19,19 +19,19 @@
 </template>
 
 <script setup lang="ts">
-import LoaderIcon from "~/components/LoaderIcon.vue";
-import Modal from "~/components/Modal.vue";
+import LoaderIcon from "@growio/shared/components/LoaderIcon.vue";
+import Modal from "@growio/shared/components/Modal.vue";
 import { account } from "~/composables/account";
-import { apiAuthSignout } from "~/api/growio/auth";
+import { apiAuthSignout } from "@growio/shared/api/growio/auth";
 import { useRoute, useRouter } from "vue-router";
 import {
   apiMarketplaceAccountEmailInvitationsAcceptReceived,
   apiMarketplaceAccountEmailInvitationsGetReceived,
-} from "~/api/growio/marketplace_account_email_invitations";
-import { Wait, wait } from "~/composables/wait";
+} from "@growio/shared/api/growio/marketplace_account_email_invitations";
+import { Wait, wait } from "@growio/shared/composables/wait";
 import { computed, ref } from "vue";
-import { MarketplaceAccountEmailInvitation } from "~/api/growio/marketplace_account_email_invitations/types";
-import Button from "~/components/Button.vue";
+import { MarketplaceAccountEmailInvitation } from "@growio/shared/api/growio/marketplace_account_email_invitations/types";
+import Button from "@growio/shared/components/Button.vue";
 
 account.value && location.reload();
 apiAuthSignout().catch(console.error);

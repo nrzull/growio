@@ -34,17 +34,17 @@
 
 <script setup lang="ts">
 import { PropType, ref, computed } from "vue";
-import Modal from "~/components/Modal.vue";
-import TextInput from "~/components/TextInput.vue";
-import SelectInput from "~/components/SelectInput.vue";
-import Button from "~/components/Button.vue";
-import { apiMarketplaceAccountRolesGetAll } from "~/api/growio/marketplace_account_roles";
-import { MarketplaceAccountRole } from "~/api/growio/marketplace_account_roles/types";
+import Modal from "@growio/shared/components/Modal.vue";
+import TextInput from "@growio/shared/components/TextInput.vue";
+import SelectInput from "@growio/shared/components/SelectInput.vue";
+import Button from "@growio/shared/components/Button.vue";
+import { apiMarketplaceAccountRolesGetAll } from "@growio/shared/api/growio/marketplace_account_roles";
+import { MarketplaceAccountRole } from "@growio/shared/api/growio/marketplace_account_roles/types";
 import { clone } from "remeda";
-import { wait, Wait } from "~/composables/wait";
-import Tag from "~/components/Tag.vue";
-import { MarketplaceAccount } from "~/api/growio/marketplace_accounts/types";
-import { isMarketplaceAccount } from "~/api/growio/marketplace_accounts/utils";
+import { wait, Wait } from "@growio/shared/composables/wait";
+import Tag from "@growio/shared/components/Tag.vue";
+import { MarketplaceAccount } from "@growio/shared/api/growio/marketplace_accounts/types";
+import { isMarketplaceAccount } from "@growio/shared/api/growio/marketplace_accounts/utils";
 
 const props = defineProps({
   modelValue: {

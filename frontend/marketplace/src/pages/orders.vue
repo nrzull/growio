@@ -14,18 +14,18 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import PageLoader from "~/components/PageLoader.vue";
-import PageShape from "~/components/PageShape.vue";
-import { Wait, wait } from "~/composables/wait";
-import Table from "~/components/Table.vue";
+import PageLoader from "@growio/shared/components/PageLoader.vue";
+import PageShape from "@growio/shared/components/PageShape.vue";
+import { Wait, wait } from "@growio/shared/composables/wait";
+import Table from "@growio/shared/components/Table.vue";
 import {
   createColumnHelper,
   getCoreRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import Notification from "~/components/Notifications/Notification.vue";
-import { MarketplaceMarketOrder } from "~/api/growio/marketplace_market_orders/types";
-import { apiMarketplaceGetAllOrders } from "~/api/growio/marketplaces";
+import Notification from "@growio/shared/components/Notifications/Notification.vue";
+import { MarketplaceMarketOrder } from "@growio/shared/api/growio/marketplace_market_orders/types";
+import { apiMarketplaceGetAllOrders } from "@growio/shared/api/growio/marketplaces";
 
 const orders = ref<MarketplaceMarketOrder[]>([]);
 
