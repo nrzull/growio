@@ -39,12 +39,6 @@ const buttons: Array<{ icon: Icons; text: string; to: string }> = [
   },
 
   {
-    icon: "storeSolid",
-    text: "Markets",
-    to: "/markets",
-  },
-
-  {
     icon: "order",
     text: "Orders",
     to: "/orders",

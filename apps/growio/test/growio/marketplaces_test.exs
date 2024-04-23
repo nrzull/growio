@@ -10,8 +10,6 @@ defmodule Growio.MarketplacesTest do
   alias Growio.Marketplaces.MarketplaceItem
   alias Growio.Marketplaces.MarketplaceItemAsset
   alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
-  alias Growio.Marketplaces.MarketplaceMarket
-  alias Growio.Marketplaces.MarketplaceMarketItem
   alias Growio.Permissions.Permission
 
   describe "Growio.Marketplaces" do
@@ -237,7 +235,7 @@ defmodule Growio.MarketplacesTest do
       assert role.priority == 0
       assert role.name == "test"
 
-      new_permission = PermissionDefs.marketplaces__market__create()
+      new_permission = PermissionDefs.marketplaces__order__read()
 
       {:ok, updated_role} =
         Marketplaces.update_account_role(marketplace_account, role2, %{
@@ -625,112 +623,6 @@ defmodule Growio.MarketplacesTest do
         Marketplaces.use_account_email_invitation(password)
 
       nil = Marketplaces.get_account_email_invitation(:email, email)
-    end
-
-    test "create a market" do
-      valid_address = "valid_address"
-
-      %{marketplace_account: marketplace_account} =
-        MarketplacesFixture.marketplace!(AccountsFixture.account!())
-
-      {:ok, %MarketplaceMarket{} = market} =
-        Marketplaces.create_market(marketplace_account, %{address: valid_address})
-
-      assert market.address == valid_address
-    end
-
-    test "get all markets" do
-      %{marketplace: marketplace, marketplace_account: marketplace_account} =
-        MarketplacesFixture.marketplace!(AccountsFixture.account!())
-
-      MarketplacesFixture.market!(marketplace)
-      MarketplacesFixture.market!(marketplace)
-
-      [%MarketplaceMarket{}, %MarketplaceMarket{}] =
-        Marketplaces.all_markets(marketplace_account)
-    end
-
-    test "update a market" do
-      updated_address = "updated_address"
-
-      %{marketplace: marketplace, marketplace_account: marketplace_account} =
-        MarketplacesFixture.marketplace!(AccountsFixture.account!())
-
-      market = MarketplacesFixture.market!(marketplace)
-
-      {:ok, market} =
-        Marketplaces.update_market(marketplace_account, market, %{address: updated_address})
-
-      assert market.address == updated_address
-    end
-
-    test "create a market item" do
-      %{marketplace: marketplace, marketplace_account: marketplace_account} =
-        MarketplacesFixture.marketplace!(AccountsFixture.account!())
-
-      market = MarketplacesFixture.market!(marketplace)
-      category = MarketplacesFixture.item_category!(marketplace)
-      item = MarketplacesFixture.item!(category)
-
-      {:ok, %MarketplaceMarketItem{}} =
-        Marketplaces.create_market_item(marketplace_account, market, item, %{
-          quantity: 1,
-          infinity: true
-        })
-    end
-
-    test "all market items" do
-      %{marketplace: marketplace, marketplace_account: marketplace_account} =
-        MarketplacesFixture.marketplace!(AccountsFixture.account!())
-
-      market = MarketplacesFixture.market!(marketplace)
-      category = MarketplacesFixture.item_category!(marketplace)
-      item1 = MarketplacesFixture.item!(category)
-      item2 = MarketplacesFixture.item!(category)
-
-      {:ok, market_item1} =
-        Marketplaces.create_market_item(marketplace_account, market, item1, %{
-          quantity: 1,
-          infinity: true
-        })
-
-      {:ok, market_item2} =
-        Marketplaces.create_market_item(marketplace_account, market, item2, %{
-          quantity: 1,
-          infinity: true
-        })
-
-      [
-        %MarketplaceMarketItem{id: market_item1_id},
-        %MarketplaceMarketItem{id: market_item2_id}
-      ] =
-        Marketplaces.all_market_items(marketplace_account, market)
-
-      assert market_item1.id == market_item1_id
-      assert market_item2.id == market_item2_id
-    end
-
-    test "update market item" do
-      updated_params = %{infinity: false, quantity: 2}
-
-      %{marketplace: marketplace, marketplace_account: marketplace_account} =
-        MarketplacesFixture.marketplace!(AccountsFixture.account!())
-
-      market = MarketplacesFixture.market!(marketplace)
-      category = MarketplacesFixture.item_category!(marketplace)
-      item1 = MarketplacesFixture.item!(category)
-
-      {:ok, market_item} =
-        Marketplaces.create_market_item(marketplace_account, market, item1, %{
-          quantity: 1,
-          infinity: true
-        })
-
-      {:ok, market_item} =
-        Marketplaces.update_market_item(marketplace_account, market_item, updated_params)
-
-      assert market_item.infinity == updated_params.infinity
-      assert market_item.quantity == updated_params.quantity
     end
   end
 

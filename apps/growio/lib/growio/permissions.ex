@@ -8,8 +8,6 @@ defmodule Growio.Permissions do
   alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Marketplaces.MarketplaceItem
   alias Growio.Marketplaces.MarketplaceItemAsset
-  alias Growio.Marketplaces.MarketplaceMarket
-  alias Growio.Marketplaces.MarketplaceMarketItem
 
   @all_cache_ttl :timer.minutes(10)
 
@@ -46,20 +44,9 @@ defmodule Growio.Permissions do
     end
   end
 
-  def ok?(%MarketplaceAccount{} = initiator, %MarketplaceMarket{} = market) do
-    initiator.marketplace_id === market.marketplace_id
-  end
-
   def ok?(%MarketplaceAccount{} = initiator, %MarketplaceItem{} = item) do
     with item = Repo.preload(item, [:category]),
          true <- initiator.marketplace_id === item.category.marketplace_id do
-      true
-    end
-  end
-
-  def ok?(%MarketplaceAccount{} = initiator, %MarketplaceMarketItem{} = item) do
-    with item = Repo.preload(item, [:market]),
-         true <- initiator.marketplace_id === item.market.marketplace_id do
       true
     end
   end

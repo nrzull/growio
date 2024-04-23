@@ -6,7 +6,8 @@ defmodule GrowioWeb.Controllers.MarketplaceController do
   alias GrowioWeb.Views.MarketplaceJSON
   alias GrowioWeb.Schemas
   alias Growio.Marketplaces
-  alias GrowioWeb.Views.MarketplaceMarketOrderJSON
+  alias GrowioWeb.Views.MarketplaceOrderJSON
+  alias GrowioWeb.Views.MarketplaceTelegramBotJSON
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -44,12 +45,27 @@ defmodule GrowioWeb.Controllers.MarketplaceController do
 
   operation(:orders_index,
     summary: "show marketplace orders",
-    responses: [ok: {"", "application/json", Schemas.MarketplaceMarketOrders}]
+    responses: [ok: {"", "application/json", Schemas.MarketplaceOrders}]
   )
 
   def orders_index(%{assigns: %{marketplace_account: marketplace_account}} = conn, _params) do
-    with orders when is_list(orders) <- Marketplaces.all_market_orders(marketplace_account) do
-      Conn.ok(conn, MarketplaceMarketOrderJSON.render(orders))
+    with orders when is_list(orders) <- Marketplaces.all_orders(marketplace_account) do
+      Conn.ok(conn, MarketplaceOrderJSON.render(orders))
     end
+  end
+
+  operation(:integrations,
+    summary: "get all marketplace integrations",
+    responses: [ok: ""]
+  )
+
+  def integrations(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        _params
+      ) do
+    [Marketplaces.get_telegram_bot(marketplace_account)]
+    |> Enum.filter(fn v -> not is_nil(v) end)
+    |> MarketplaceTelegramBotJSON.render()
+    |> then(&Conn.ok(conn, &1))
   end
 end

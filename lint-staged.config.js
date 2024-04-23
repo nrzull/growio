@@ -16,6 +16,6 @@ const buildFrontendRules = (name) => ({
 export default {
   "apps/**/*.(ex|exs)": () => ["mix test"],
   ...buildFrontendRules("marketplace"),
-  ...buildFrontendRules("market"),
+  ...buildFrontendRules("customer"),
   ...buildFrontendRules("shared"),
 };

@@ -14,6 +14,9 @@
             :items="currencyOptions"
           />
         </div>
+        <div :class="$style.row">
+          <TextInput v-model="model.address" placeholder="Address" />
+        </div>
       </div>
 
       <Button :disabled="isLoading" @click="updateMarketplace">Save</Button>

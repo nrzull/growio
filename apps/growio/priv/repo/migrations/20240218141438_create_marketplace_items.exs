@@ -6,6 +6,8 @@ defmodule Growio.Repo.Migrations.CreateMarketplaceItems do
       add(:name, :string, null: false)
       add(:amount, :string, size: 32)
       add(:description, :text)
+      add(:infinity, :boolean)
+      add(:quantity, :integer)
       add(:deleted_at, :naive_datetime)
       add(:category_id, references(:marketplace_item_categories), null: false)
       timestamps()

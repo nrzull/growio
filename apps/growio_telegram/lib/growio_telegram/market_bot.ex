@@ -5,14 +5,14 @@ defmodule GrowioTelegram.MarketBot do
 
   alias Growio.Marketplaces
   alias GrowioTelegram.MarketBotRegistry
-  alias Growio.Marketplaces.MarketplaceMarketTelegramBot
-  alias Growio.Marketplaces.MarketplaceMarketTelegramBotCustomer
+  alias Growio.Marketplaces.MarketplaceTelegramBot
+  alias Growio.Marketplaces.MarketplaceTelegramBotCustomer
 
   @session_ttl 60 * 1_000 * 10
   @max_bot_concurrency 999_999
   @market_url Application.compile_env!(:growio_telegram, :market_url)
 
-  def update_bot(%MarketplaceMarketTelegramBot{token: token} = bot) do
+  def update_bot(%MarketplaceTelegramBot{token: token} = bot) do
     if is_bitstring(bot.description) do
       Telegram.Api.request(token, "setMyDescription", description: bot.description)
     end
@@ -36,8 +36,8 @@ defmodule GrowioTelegram.MarketBot do
       }
     ]
 
-    with %MarketplaceMarketTelegramBot{} <-
-           Marketplaces.get_market_telegram_bot(:token, token),
+    with %MarketplaceTelegramBot{} <-
+           Marketplaces.get_telegram_bot(:token, token),
          result <-
            DynamicSupervisor.start_child(
              GrowioTelegram.DynamicSupervisor,
@@ -78,22 +78,20 @@ defmodule GrowioTelegram.MarketBot do
         token,
         state
       ) do
-    with bot = %MarketplaceMarketTelegramBot{} <-
-           Marketplaces.get_market_telegram_bot(:token, token) do
-      Marketplaces.create_market_telegram_bot_customer(bot, %{chat_id: chat_id})
+    with bot = %MarketplaceTelegramBot{} <-
+           Marketplaces.get_telegram_bot(:token, token) do
+      Marketplaces.create_telegram_bot_customer(bot, %{chat_id: chat_id})
 
       if is_bitstring(bot.welcome_message) do
         Telegram.Api.request(token, "sendMessage", text: bot.welcome_message, chat_id: chat_id)
       end
 
-      with customer = %MarketplaceMarketTelegramBotCustomer{} <-
-             Marketplaces.get_market_telegram_bot_customer(bot, chat_id),
-           {:ok, order} = Marketplaces.create_market_order(customer) do
-        query = URI.encode_query(%{"order_id" => order.id})
-
+      with customer = %MarketplaceTelegramBotCustomer{} <-
+             Marketplaces.get_telegram_bot_customer(bot, chat_id),
+           {:ok, order} = Marketplaces.create_order(customer) do
         text =
           URI.parse(@market_url)
-          |> URI.append_query(query)
+          |> URI.append_path("/#{order.id}")
           |> URI.to_string()
 
         Telegram.Api.request(token, "sendMessage", text: text, chat_id: chat_id)

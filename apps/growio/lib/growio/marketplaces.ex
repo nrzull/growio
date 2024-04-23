@@ -19,12 +19,10 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceItem
   alias Growio.Marketplaces.MarketplaceItemAsset
   alias Growio.Marketplaces.MarketplaceAccountEmailInvitation
-  alias Growio.Marketplaces.MarketplaceMarket
-  alias Growio.Marketplaces.MarketplaceMarketItem
   alias Growio.Marketplaces.MarketplaceSubscription
-  alias Growio.Marketplaces.MarketplaceMarketTelegramBot
-  alias Growio.Marketplaces.MarketplaceMarketTelegramBotCustomer
-  alias Growio.Marketplaces.MarketplaceMarketOrder
+  alias Growio.Marketplaces.MarketplaceTelegramBot
+  alias Growio.Marketplaces.MarketplaceTelegramBotCustomer
+  alias Growio.Marketplaces.MarketplaceOrder
 
   def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
@@ -1017,12 +1015,7 @@ defmodule Growio.Marketplaces do
   end
 
   def delete_item(%MarketplaceItem{} = item) do
-    with false <- deleted_item?(item),
-         false <-
-           Repo.exists?(
-             MarketplaceMarketItem
-             |> where([market_item], market_item.marketplace_item_id == ^item.id)
-           ) do
+    with false <- deleted_item?(item) do
       item
       |> Changeset.change()
       |> Changeset.put_change(:deleted_at, Utils.naive_utc_now())
@@ -1259,161 +1252,6 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def all_markets(%MarketplaceAccount{} = initiator) do
-    with true <- Permissions.ok?(initiator, marketplaces__market__read()),
-         initiator = Repo.preload(initiator, [:marketplace]) do
-      all_markets(initiator.marketplace)
-    else
-      _ -> {:error, "cannot get all markets"}
-    end
-  end
-
-  def all_markets(%Marketplace{} = marketplace) do
-    MarketplaceMarket
-    |> where([market], market.marketplace_id == ^marketplace.id)
-    |> Repo.all()
-  end
-
-  def get_market(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
-    with true <- Permissions.ok?(initiator, marketplaces__market__read()),
-         market = %MarketplaceMarket{} <- get_market(id),
-         true <- Permissions.ok?(initiator, market) do
-      market
-    else
-      _ -> {:error, "cannot get all markets"}
-    end
-  end
-
-  def get_market(id) when is_integer(id) do
-    Repo.get(MarketplaceMarket, id)
-  end
-
-  def create_market(%MarketplaceAccount{} = initiator, %{} = params) do
-    with true <- Permissions.ok?(initiator, marketplaces__market__create()),
-         initiator = Repo.preload(initiator, [:marketplace]) do
-      create_market(initiator.marketplace, params)
-    end
-  end
-
-  def create_market(%Marketplace{} = marketplace, %{} = params) do
-    MarketplaceMarket.changeset(params)
-    |> Changeset.put_assoc(:marketplace, marketplace)
-    |> Repo.insert()
-  end
-
-  def update_market(
-        %MarketplaceAccount{} = initiator,
-        %MarketplaceMarket{} = market,
-        %{} = params
-      ) do
-    with true <- Permissions.ok?(initiator, market, marketplaces__market__update()) do
-      update_market(market, params)
-    end
-  end
-
-  def update_market(%MarketplaceMarket{} = market, %{} = params) do
-    MarketplaceMarket.changeset(market, params)
-    |> Repo.update()
-  end
-
-  def delete_market(%MarketplaceAccount{} = initiator, %MarketplaceMarket{} = market) do
-    with true <- Permissions.ok?(initiator, marketplaces__market__delete()),
-         false <-
-           Repo.exists?(
-             MarketplaceMarketItem
-             |> where([item], item.market_id == ^market.id)
-           ) do
-      Repo.delete(market)
-    else
-      _ -> {:error, "cannot delete a market"}
-    end
-  end
-
-  def all_market_items(%MarketplaceAccount{} = initiator, %MarketplaceMarket{} = market) do
-    with true <- Permissions.ok?(initiator, market, marketplaces__market__read()) do
-      all_market_items(market)
-    end
-  end
-
-  def all_market_items(%MarketplaceMarket{} = market) do
-    MarketplaceMarketItem
-    |> where([item], item.market_id == ^market.id)
-    |> preload([:marketplace_item])
-    |> Repo.all()
-  end
-
-  def get_market_item(%MarketplaceAccount{} = initiator, id) when is_integer(id) do
-    with true <- Permissions.ok?(initiator, marketplaces__market_item__read()) do
-      MarketplaceMarketItem
-      |> join(:left, [item], market in assoc(item, :market))
-      |> where([_, market], market.marketplace_id == ^initiator.marketplace_id)
-      |> where([item], item.id == ^id)
-      |> preload([:marketplace_item])
-      |> Repo.one()
-    else
-      _ -> {:error, "cannot get market item"}
-    end
-  end
-
-  def create_market_item(
-        %MarketplaceAccount{} = initiator,
-        %MarketplaceMarket{} = market,
-        %MarketplaceItem{} = marketplace_item,
-        %{} = params
-      ) do
-    with true <- Permissions.ok?(initiator, market, marketplaces__market_item__create()),
-         true <- Permissions.ok?(initiator, marketplace_item) do
-      create_market_item(market, marketplace_item, params)
-    end
-  end
-
-  def create_market_item(
-        %MarketplaceMarket{} = market,
-        %MarketplaceItem{} = marketplace_item,
-        %{} = params
-      ) do
-    with changeset = %Changeset{valid?: true} <- MarketplaceMarketItem.changeset(params),
-         marketplace_item = Repo.preload(marketplace_item, [:category]),
-         true <- market.marketplace_id == marketplace_item.category.marketplace_id,
-         false <-
-           Repo.exists?(
-             MarketplaceMarketItem
-             |> where([item], item.marketplace_item_id == ^marketplace_item.id)
-             |> where([item], item.market_id == ^market.id)
-           ) do
-      changeset
-      |> Changeset.put_assoc(:market, market)
-      |> Changeset.put_assoc(:marketplace_item, marketplace_item)
-      |> Repo.insert()
-    else
-      {:error, _} = v -> v
-      _ -> {:error, "cannot create a market item"}
-    end
-  end
-
-  def update_market_item(
-        %MarketplaceAccount{} = initiator,
-        %MarketplaceMarketItem{} = item,
-        %{} = params
-      ) do
-    with true <- Permissions.ok?(initiator, item, marketplaces__market_item__update()) do
-      update_market_item(item, params)
-    end
-  end
-
-  def update_market_item(%MarketplaceMarketItem{} = item, %{} = params) do
-    MarketplaceMarketItem.changeset(item, params)
-    |> Repo.update()
-  end
-
-  def delete_market_item(%MarketplaceAccount{} = initiator, %MarketplaceMarketItem{} = item) do
-    with true <- Permissions.ok?(initiator, marketplaces__market_item__delete()) do
-      Repo.delete(item)
-    else
-      _ -> {:error, "cannot delete market item"}
-    end
-  end
-
   def create_subscription(
         %Marketplace{} = marketplace,
         %Subscription{} = subscription,
@@ -1428,153 +1266,134 @@ defmodule Growio.Marketplaces do
     |> repo.insert()
   end
 
-  def all_market_telegram_bots() do
-    Repo.all(MarketplaceMarketTelegramBot)
+  def all_telegram_bots() do
+    Repo.all(MarketplaceTelegramBot)
   end
 
-  def all_market_telegram_bots(%MarketplaceAccount{} = initiator, market_id)
-      when is_integer(market_id) do
-    with true <- Permissions.ok?(initiator, marketplaces__market_telegram_bot__read()) do
-      MarketplaceMarketTelegramBot
-      |> join(:left, [bot], market in assoc(bot, :marketplace_market))
-      |> where([_, market], market.marketplace_id == ^initiator.marketplace_id)
-      |> where([bot], bot.marketplace_market_id == ^market_id)
-      |> Repo.all()
-    else
-      _ -> {:error, "cannot get all market telegram bots"}
-    end
-  end
-
-  def get_market_telegram_bot(%MarketplaceAccount{} = initiator, %MarketplaceMarket{} = market) do
-    with true <- Permissions.ok?(initiator, market, marketplaces__market_telegram_bot__read()) do
-      MarketplaceMarketTelegramBot
-      |> where([bot], bot.marketplace_market_id == ^market.id)
+  def get_telegram_bot(%MarketplaceAccount{} = initiator) do
+    with true <- Permissions.ok?(initiator, marketplaces__telegram_bot__read()) do
+      MarketplaceTelegramBot
+      |> where([bot], bot.marketplace_id == ^initiator.marketplace_id)
       |> Repo.one()
     else
-      _ -> {:error, "cannot get market telegram bot"}
+      _ -> {:error, "cannot get telegram bot"}
     end
   end
 
-  def get_market_telegram_bot(:token, token) do
-    case Cache.get(cache_key_market_telegram_bot(:token, token)) do
+  def get_telegram_bot(:token, token) do
+    case Cache.get(cache_key_telegram_bot(:token, token)) do
       value when is_struct(value) ->
         value
 
       _ ->
         bot =
-          MarketplaceMarketTelegramBot
+          MarketplaceTelegramBot
           |> where([bot], bot.token == ^token)
           |> Repo.one()
 
-        Cache.put(cache_key_market_telegram_bot(:token, token), bot, ttl: :timer.minutes(10))
+        Cache.put(cache_key_telegram_bot(:token, token), bot, ttl: :timer.minutes(10))
 
         bot
     end
   end
 
-  def cache_remove_market_telegram_bot(:token, token) do
-    cache_key_market_telegram_bot(:token, token)
+  def cache_remove_telegram_bot(:token, token) do
+    cache_key_telegram_bot(:token, token)
     |> Cache.delete()
   end
 
-  def cache_key_market_telegram_bot(:token, token) do
-    "market_telegram_bot/token/#{token}"
+  def cache_key_telegram_bot(:token, token) do
+    "telegram_bot/token/#{token}"
   end
 
-  def create_market_telegram_bot(
+  def create_telegram_bot(
         %MarketplaceAccount{} = initiator,
         %{} = params
       ) do
-    with true <- Permissions.ok?(initiator, marketplaces__market_telegram_bot__create()),
-         changeset = %Changeset{valid?: true} <- MarketplaceMarketTelegramBot.changeset(params),
-         {:ok, marketplace_market_id} when is_integer(marketplace_market_id) <-
-           Changeset.fetch_change(changeset, :marketplace_market_id),
-         market = %MarketplaceMarket{} <-
-           get_market(initiator, marketplace_market_id) do
+    with true <- Permissions.ok?(initiator, marketplaces__telegram_bot__create()),
+         changeset = %Changeset{valid?: true} <- MarketplaceTelegramBot.changeset(params) do
       changeset
-      |> Changeset.delete_change(:marketplace_market_id)
-      |> Changeset.put_assoc(:marketplace_market, market)
+      |> Changeset.put_assoc(:marketplace, Repo.preload(initiator, [:marketplace]).marketplace)
       |> Repo.insert()
     else
-      _ -> {:error, "cannot create market telegram bot"}
+      e ->
+        IO.inspect(e)
+        {:error, "cannot create telegram bot"}
     end
   end
 
-  def update_market_telegram_bot(
+  def update_telegram_bot(
         %MarketplaceAccount{} = initiator,
-        %MarketplaceMarketTelegramBot{} = bot,
+        %MarketplaceTelegramBot{} = bot,
         %{} = params
       ) do
-    with true <- Permissions.ok?(initiator, marketplaces__market_telegram_bot__update()),
+    with true <- Permissions.ok?(initiator, marketplaces__telegram_bot__update()),
          changeset = %Changeset{valid?: true} <-
-           MarketplaceMarketTelegramBot.changeset(bot, params) do
+           MarketplaceTelegramBot.changeset(bot, params) do
       changeset
       |> Repo.update()
       |> case do
         {:ok, _} = v ->
-          cache_remove_market_telegram_bot(:token, bot.token)
+          cache_remove_telegram_bot(:token, bot.token)
           v
 
         e ->
           e
       end
     else
-      _ -> {:error, "cannot update market telegram bot"}
+      _ -> {:error, "cannot update telegram bot"}
     end
   end
 
-  def delete_market_telegram_bot(
+  def delete_telegram_bot(
         %MarketplaceAccount{} = initiator,
-        %MarketplaceMarket{} = market,
         id
       )
       when is_integer(id) do
-    with true <- Permissions.ok?(initiator, marketplaces__market_telegram_bot__delete()) do
-      MarketplaceMarketTelegramBot
+    with true <- Permissions.ok?(initiator, marketplaces__telegram_bot__delete()) do
+      MarketplaceTelegramBot
       |> where([bot], bot.id == ^id)
-      |> where([bot], bot.marketplace_market_id == ^market.id)
+      |> where([bot], bot.marketplace_id == ^initiator.marketplace_id)
       |> Repo.one()
       |> Repo.delete()
     else
-      _ -> {:error, "cannot delete market telegram bot"}
+      _ -> {:error, "cannot delete telegram bot"}
     end
   end
 
-  def get_market_telegram_bot_customer(%MarketplaceMarketTelegramBot{} = bot, chat_id)
+  def get_telegram_bot_customer(%MarketplaceTelegramBot{} = bot, chat_id)
       when is_integer(chat_id) do
-    MarketplaceMarketTelegramBotCustomer
+    MarketplaceTelegramBotCustomer
     |> where([customer], customer.chat_id == ^chat_id)
     |> where([customer], customer.bot_id == ^bot.id)
     |> Repo.one()
   end
 
-  def create_market_telegram_bot_customer(%MarketplaceMarketTelegramBot{} = bot, %{} = params) do
-    MarketplaceMarketTelegramBotCustomer.changeset(params)
+  def create_telegram_bot_customer(%MarketplaceTelegramBot{} = bot, %{} = params) do
+    MarketplaceTelegramBotCustomer.changeset(params)
     |> Changeset.put_assoc(:bot, bot)
     |> Repo.insert()
   end
 
-  def create_market_order(
-        %MarketplaceMarketTelegramBotCustomer{} = customer,
+  def create_order(
+        %MarketplaceTelegramBotCustomer{} = customer,
         %{} = params \\ %{payload: %{}}
       ) do
-    market = Repo.preload(customer, bot: [:marketplace_market]).bot.marketplace_market
+    marketplace = Repo.preload(customer, bot: [:marketplace]).bot.marketplace
 
-    MarketplaceMarketOrder.changeset(Map.merge(params, %{status: :init}))
-    |> Changeset.put_assoc(:market, market)
+    MarketplaceOrder.changeset(Map.merge(params, %{status: :init}))
+    |> Changeset.put_assoc(:marketplace, marketplace)
     |> Changeset.put_assoc(:telegram_bot_customer, customer)
     |> Repo.insert()
   end
 
-  def all_market_orders(%MarketplaceAccount{} = initiator) do
-    with true <- Permissions.ok?(initiator, marketplaces__market_order__read()) do
-      MarketplaceMarketOrder
-      |> join(:left, [order], market in assoc(order, :market))
-      |> where([_, market], market.marketplace_id == ^initiator.marketplace_id)
-      |> where([order, market], order.market_id == market.id)
+  def all_orders(%MarketplaceAccount{} = initiator) do
+    with true <- Permissions.ok?(initiator, marketplaces__order__read()) do
+      MarketplaceOrder
+      |> where([order], order.marketplace_id == ^initiator.marketplace_id)
       |> Repo.all()
     else
-      _ -> {:error, "cannot get all market orders"}
+      _ -> {:error, "cannot get all marketplace orders"}
     end
   end
 end

@@ -15,6 +15,16 @@
         Subscription
       </Button>
     </RouterLink>
+
+    <RouterLink
+      v-slot="{ navigate, isActive }"
+      to="/settings/integrations"
+      custom
+    >
+      <Button type="neutral" size="sm" :active="isActive" @click="navigate">
+        Integrations
+      </Button>
+    </RouterLink>
   </teleport>
 
   <RouterView />

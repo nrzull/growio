@@ -24,12 +24,12 @@ import {
   useVueTable,
 } from "@tanstack/vue-table";
 import Notification from "@growio/shared/components/Notifications/Notification.vue";
-import { MarketplaceMarketOrder } from "@growio/shared/api/growio/marketplace_market_orders/types";
+import { MarketplaceOrder } from "@growio/shared/api/growio/marketplace_orders/types";
 import { apiMarketplaceGetAllOrders } from "@growio/shared/api/growio/marketplaces";
 
-const orders = ref<MarketplaceMarketOrder[]>([]);
+const orders = ref<MarketplaceOrder[]>([]);
 
-const columnHelper = createColumnHelper<MarketplaceMarketOrder>();
+const columnHelper = createColumnHelper<MarketplaceOrder>();
 
 const columns = ref([
   columnHelper.accessor("id", {
@@ -55,19 +55,17 @@ const table = useVueTable({
   },
 });
 
-const isLoading = computed(() =>
-  wait.some([Wait.MARKETPLACE_MARKET_ORDERS_FETCH])
-);
+const isLoading = computed(() => wait.some([Wait.MARKETPLACE_ORDERS_FETCH]));
 const isEmpty = computed(() => !isLoading.value && !orders.value.length);
 
 const fetchOrders = async () => {
   try {
-    wait.start(Wait.MARKETPLACE_MARKET_ORDERS_FETCH);
+    wait.start(Wait.MARKETPLACE_ORDERS_FETCH);
     orders.value = await apiMarketplaceGetAllOrders();
   } catch (e) {
     console.error(e);
   } finally {
-    wait.end(Wait.MARKETPLACE_MARKET_ORDERS_FETCH);
+    wait.end(Wait.MARKETPLACE_ORDERS_FETCH);
   }
 };
 

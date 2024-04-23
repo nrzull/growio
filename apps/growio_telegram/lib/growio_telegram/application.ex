@@ -23,7 +23,7 @@ defmodule GrowioTelegram.Application do
         name: GrowioTelegram.Supervisor
       )
 
-    Marketplaces.all_market_telegram_bots()
+    Marketplaces.all_telegram_bots()
     |> Enum.each(fn bot -> MarketBot.start_bot(bot.token) end)
 
     result

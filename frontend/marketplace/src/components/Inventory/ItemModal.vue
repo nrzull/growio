@@ -17,6 +17,11 @@
       />
     </div>
 
+    <div :class="$style.row">
+      <TextInput v-model="item.quantity" placeholder="Quantity" />
+      <TextInput v-model="item.description" placeholder="Description" />
+    </div>
+
     <Dropzone
       v-model:output="assetsOutput"
       v-model:output-create="assetsOutputCreate"
@@ -160,8 +165,7 @@ fetchAssets();
 
 <style module>
 .row {
-  display: grid;
+  display: flex;
   gap: 8px;
-  grid-template-columns: 1fr 1fr;
 }
 </style>

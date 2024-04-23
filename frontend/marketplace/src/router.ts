@@ -87,66 +87,38 @@ export const router = createRouter({
             },
 
             {
-              path: "",
-              redirect: "/settings/general",
-            },
-          ],
-        },
-
-        {
-          path: "markets",
-          children: [
-            {
-              path: ":id",
-              component: () => import("~/pages/markets/_id.vue"),
+              path: "integrations",
               children: [
                 {
-                  path: "items",
-                  component: () => import("~/pages/markets/_id/items.vue"),
-                },
-
-                {
-                  path: "integrations",
+                  path: "telegram",
+                  component: () =>
+                    import("~/pages/settings/integrations/telegram.vue"),
                   children: [
                     {
-                      path: "telegram",
+                      path: "mailing",
                       component: () =>
-                        import("~/pages/markets/_id/integrations/telegram.vue"),
-                      children: [
-                        {
-                          path: "mailing",
-                          component: () =>
-                            import(
-                              "~/pages/markets/_id/integrations/telegram/mailing.vue"
-                            ),
-                        },
-
-                        {
-                          path: "",
-                          redirect: (v) =>
-                            `/markets/${v.params.id}/integrations/telegram/mailing`,
-                        },
-                      ],
+                        import(
+                          "~/pages/settings/integrations/telegram/mailing.vue"
+                        ),
                     },
 
                     {
                       path: "",
-                      component: () =>
-                        import("~/pages/markets/_id/integrations.vue"),
+                      redirect: () => `/settings/integrations/telegram/mailing`,
                     },
                   ],
                 },
 
                 {
                   path: "",
-                  redirect: (v) => `/markets/${v.params.id}/items`,
+                  component: () => import("~/pages/settings/integrations.vue"),
                 },
               ],
             },
 
             {
               path: "",
-              component: () => import("~/pages/markets.vue"),
+              redirect: "/settings/general",
             },
           ],
         },

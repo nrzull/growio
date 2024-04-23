@@ -7,6 +7,9 @@ defmodule GrowioWeb.Views.MarketplaceItemJSON do
     %{
       id: value.id,
       name: value.name,
+      description: value.description,
+      infinity: value.infinity,
+      quantity: value.quantity,
       origin_id: value.origin_id,
       category_id: value.category_id
     }

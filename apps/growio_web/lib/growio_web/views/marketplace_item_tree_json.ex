@@ -14,6 +14,9 @@ defmodule GrowioWeb.Views.MarketplaceItemTreeJSON do
     %{
       id: value.id,
       name: value.name,
+      quantity: value.quantity,
+      infinity: value.infinity,
+      description: value.description,
       origin_id: value.origin_id,
       category_id: value.category_id
     }

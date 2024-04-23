@@ -114,7 +114,10 @@ defmodule GrowioWeb.Schemas do
       type: :object,
       properties: %{
         id: %Schema{type: :integer},
-        name: %Schema{type: :string}
+        name: %Schema{type: :string},
+        quantity: %Schema{type: :integer, nullable: true},
+        infinity: %Schema{type: :boolean, nullable: true},
+        description: %Schema{type: :string, nullable: true}
       }
     })
   end
@@ -123,7 +126,10 @@ defmodule GrowioWeb.Schemas do
     schema(%{
       type: :object,
       properties: %{
-        name: %Schema{type: :string}
+        name: %Schema{type: :string},
+        quantity: %Schema{type: :integer, nullable: true},
+        infinity: %Schema{type: :boolean, nullable: true},
+        description: %Schema{type: :string, nullable: true}
       }
     })
   end
@@ -258,88 +264,18 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule MarketplaceMarket do
-    schema(%{
-      type: :object,
-      properties: %{
-        id: %Schema{type: :integer},
-        name: %Schema{type: :string},
-        address: %Schema{type: :string, nullable: true}
-      }
-    })
-  end
-
-  defmodule MarketplaceMarkets do
-    schema(%{
-      type: :array,
-      items: MarketplaceMarket
-    })
-  end
-
-  defmodule MarketplaceMarketCreate do
-    schema(%{
-      type: :object,
-      properties: %{
-        name: %Schema{type: :string},
-        address: %Schema{type: :string, nullable: true}
-      }
-    })
-  end
-
-  defmodule MarketplaceMarketItem do
-    schema(%{
-      type: :object,
-      properties: %{
-        id: %Schema{type: :integer},
-        quantity: %Schema{type: :integer},
-        infinity: %Schema{type: :boolean},
-        marketplace_item: MarketplaceItem,
-        marketplace_item_id: %Schema{type: :integer}
-      }
-    })
-  end
-
-  defmodule MarketplaceMarketItems do
-    schema(%{
-      type: :array,
-      items: MarketplaceMarketItem
-    })
-  end
-
-  defmodule MarketplaceMarketItemCreate do
-    schema(%{
-      type: :object,
-      properties: %{
-        quantity: %Schema{type: :integer},
-        infinity: %Schema{type: :boolean},
-        marketplace_item_id: %Schema{type: :integer}
-      }
-    })
-  end
-
-  defmodule MarketplaceMarketItemUpdate do
-    schema(%{
-      type: :object,
-      properties: %{
-        quantity: %Schema{type: :integer},
-        infinity: %Schema{type: :boolean},
-        marketplace_item_id: %Schema{type: :integer}
-      }
-    })
-  end
-
-  defmodule MarketplaceMarketTelegramBot do
+  defmodule MarketplaceTelegramBot do
     schema(%{
       type: :object,
       properties: %{
         id: %Schema{type: :integer},
         token: %Schema{type: :string},
-        marketplace_market_id: %Schema{type: :integer}
+        marketplace_id: %Schema{type: :integer}
       }
     })
   end
 
-  defmodule MarketplaceMarketTelegramBotCreate do
+  defmodule MarketplaceTelegramBotCreate do
     schema(%{
       type: :object,
       properties: %{
@@ -348,23 +284,23 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
-  defmodule MarketplaceMarketOrder do
+  defmodule MarketplaceOrder do
     schema(%{
       type: :object,
       properties: %{
         id: %Schema{type: :string},
         status: %Schema{type: :string},
         payload: %Schema{type: :object},
-        market_id: %Schema{type: :integer},
+        marketplace_id: %Schema{type: :integer},
         telegram_bot_customer_id: %Schema{type: :integer, nullable: true}
       }
     })
   end
 
-  defmodule MarketplaceMarketOrders do
+  defmodule MarketplaceOrders do
     schema(%{
       type: :array,
-      items: MarketplaceMarketOrder
+      items: MarketplaceOrder
     })
   end
 end

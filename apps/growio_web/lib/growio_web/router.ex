@@ -10,10 +10,8 @@ defmodule GrowioWeb.Router do
   alias GrowioWeb.Controllers.MarketplaceItemCategoryController
   alias GrowioWeb.Controllers.MarketplaceItemAssetController
   alias GrowioWeb.Controllers.MarketplaceItemController
-  alias GrowioWeb.Controllers.MarketplaceMarketController
-  alias GrowioWeb.Controllers.MarketplaceMarketItemController
   alias GrowioWeb.Controllers.MarketplaceItemTreeController
-  alias GrowioWeb.Controllers.MarketplaceMarketTelegramBotController
+  alias GrowioWeb.Controllers.MarketplaceTelegramBotController
   alias GrowioWeb.Plugs.AuthPlug
   alias GrowioWeb.Plugs.MarketplaceAccountPlug
 
@@ -97,6 +95,25 @@ defmodule GrowioWeb.Router do
     pipe_through([:marketplace_account])
     patch("/", MarketplaceController, :self_update)
     get("/orders", MarketplaceController, :orders_index)
+    get("/integrations", MarketplaceController, :integrations)
+
+    resources(
+      "/telegram_bots",
+      MarketplaceTelegramBotController,
+      only: [:create, :delete]
+    )
+
+    get(
+      "/telegram_bot",
+      MarketplaceTelegramBotController,
+      :index_self
+    )
+
+    patch(
+      "/telegram_bot",
+      MarketplaceTelegramBotController,
+      :update_self
+    )
   end
 
   scope "/api/marketplace_account_email_invitations" do
@@ -135,35 +152,6 @@ defmodule GrowioWeb.Router do
       "/:category_id/marketplace_items/:item_id/marketplace_item_assets",
       MarketplaceItemAssetController,
       only: [:index, :create, :delete]
-    )
-  end
-
-  scope "/api/marketplace_markets" do
-    pipe_through([:marketplace_account])
-    resources("/", MarketplaceMarketController, only: [:index, :create, :update, :delete, :show])
-
-    resources("/:market_id/marketplace_market_items", MarketplaceMarketItemController,
-      only: [:index, :create, :update, :delete]
-    )
-
-    get("/:market_id/integrations", MarketplaceMarketController, :integrations)
-
-    resources(
-      "/:market_id/marketplace_market_telegram_bots",
-      MarketplaceMarketTelegramBotController,
-      only: [:create, :delete]
-    )
-
-    get(
-      "/:market_id/marketplace_market_telegram_bot",
-      MarketplaceMarketTelegramBotController,
-      :index_self
-    )
-
-    patch(
-      "/:market_id/marketplace_market_telegram_bot",
-      MarketplaceMarketTelegramBotController,
-      :update_self
     )
   end
 end
