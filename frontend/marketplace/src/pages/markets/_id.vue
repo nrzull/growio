@@ -1,16 +1,16 @@
 <template>
   <MarketModal
     v-if="marketModal"
-    @close="marketModal = undefined"
-    @submit="updateMarket"
     :loading="isLoading"
     :model-value="marketModal"
+    @close="marketModal = undefined"
+    @submit="updateMarket"
   />
 
   <RouterView v-slot="{ Component }">
     <component
-      v-if="market"
       :is="Component"
+      v-if="market"
       :loading="isLoading"
       :market="market"
       @update:market="fetchMarket"
@@ -28,9 +28,9 @@
           </Button>
 
           <RouterLink
+            v-slot="{ navigate, isActive }"
             custom
             :to="`/markets/${marketId}/items`"
-            v-slot="{ navigate, isActive }"
           >
             <Button
               type="neutral"
@@ -43,9 +43,9 @@
           </RouterLink>
 
           <RouterLink
+            v-slot="{ navigate, isActive }"
             custom
             :to="`/markets/${marketId}/integrations`"
-            v-slot="{ navigate, isActive }"
           >
             <Button
               type="neutral"

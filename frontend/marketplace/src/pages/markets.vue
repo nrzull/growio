@@ -3,10 +3,10 @@
 
   <MarketModal
     v-if="marketModal"
-    @close="marketModal = undefined"
-    @submit="createMarket"
     :loading="isLoading"
     :model-value="marketModal"
+    @close="marketModal = undefined"
+    @submit="createMarket"
   />
 
   <PromiseModal ref="deleteMarketModalRef">

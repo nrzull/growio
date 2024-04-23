@@ -71,7 +71,7 @@
         <span>{{ ctx.row.original.name }}</span>
       </template>
 
-      <template #actions="{ ctx }" v-if="!deletedTree">
+      <template v-if="!deletedTree" #actions="{ ctx }">
         <Menu
           track-by="id"
           label-path="title"

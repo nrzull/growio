@@ -7,7 +7,7 @@
 
     <div :class="$style.grid">
       <div :class="$style.row">
-        <TextInput placeholder="Name" v-model="telegramBot.name" />
+        <TextInput v-model="telegramBot.name" placeholder="Name" />
 
         <TextInput
           v-model="telegramBot.token"
@@ -18,22 +18,22 @@
 
       <div :class="$style.row">
         <TextInput
-          placeholder="Short Description"
           v-model="telegramBot.short_description"
+          placeholder="Short Description"
         />
       </div>
 
       <div :class="$style.row">
         <TextInput
-          placeholder="Description"
           v-model="telegramBot.description"
+          placeholder="Description"
         />
       </div>
 
       <div :class="$style.row">
         <TextInput
-          placeholder="Welcome Message"
           v-model="telegramBot.welcome_message"
+          placeholder="Welcome Message"
         />
       </div>
     </div>

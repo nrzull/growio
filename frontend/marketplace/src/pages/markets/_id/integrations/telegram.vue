@@ -1,20 +1,20 @@
 <template>
   <TelegramBotModal
     v-if="telegramBotModal"
-    @close="telegramBotModal = undefined"
     :model-value="telegramBotModal"
     :loading="isLoading"
+    @close="telegramBotModal = undefined"
     @submit="updateTelegramBot"
   />
 
   <RouterView v-slot="{ Component }">
-    <component v-if="telegramBot" :is="Component" v-bind="$props">
+    <component :is="Component" v-if="telegramBot" v-bind="$props">
       <template #tabs>
         <Tabs>
           <RouterLink
+            v-slot="{ navigate }"
             :to="`/markets/${market.id}/integrations`"
             custom
-            v-slot="{ navigate }"
           >
             <Button type="neutral" size="md" icon="arrowBack" @click="navigate">
               {{ market.address }}
@@ -32,15 +32,15 @@
           </Button>
 
           <RouterLink
+            v-slot="{ navigate, isActive }"
             :to="`/markets/${market.id}/integrations/telegram/mailing`"
             custom
-            v-slot="{ navigate, isActive }"
           >
             <Button
               type="neutral"
               size="md"
-              @click="navigate"
               :active="isActive"
+              @click="navigate"
             >
               Mailing
             </Button>

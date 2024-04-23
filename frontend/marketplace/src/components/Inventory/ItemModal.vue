@@ -8,8 +8,8 @@
     <div :class="$style.row">
       <TextInput v-model="item.name" placeholder="Name" />
       <SelectInput
-        :readonly="isMarketplaceItem(modelValue)"
         v-model="category"
+        :readonly="isMarketplaceItem(modelValue)"
         placeholder="Category"
         track-by="id"
         label-path="name"
