@@ -3,6 +3,11 @@
 
   <PageShape v-if="payload">
     <template #heading>{{ payload.marketplace.name }}</template>
+    <template v-if="payload.marketplace.address" #subheading>
+      {{ payload.marketplace.address }}
+    </template>
+
+    <Inventory :items="payload.items" />
   </PageShape>
 </template>
 
@@ -14,6 +19,7 @@ import { wait, Wait } from "@growio/shared/composables/wait";
 import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import PageLoader from "@growio/shared/components/PageLoader.vue";
 import PageShape from "@growio/shared/components/PageShape.vue";
+import Inventory from "~/components/Inventory.vue";
 
 const route = useRoute();
 

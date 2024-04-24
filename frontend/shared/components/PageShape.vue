@@ -1,8 +1,14 @@
 <template>
   <Shape full-height :class="$style.shape">
-    <div v-if="'tools' in $slots || 'heading' in $slots" :class="$style.head">
-      <div :class="$style.heading">
-        <slot name="heading" />
+    <div v-if="['tools', 'heading', 'subheading'].some(v => v in $slots)" :class="$style.head">
+      <div v-if="['heading', 'subheading'].some(v => v in $slots)">
+        <div :class="$style.heading">
+          <slot name="heading" />
+        </div>
+
+        <div :class="$style.subheading">
+          <slot name="subheading" />
+        </div>
       </div>
 
       <div v-if="'tools' in $slots" :class="$style.tools">
@@ -33,7 +39,14 @@ import Shape from "@growio/shared/components/Shape.vue";
 
 .heading {
   font-size: 18px;
-  display: inline-flex;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subheading {
+  font-size: 16px;
+  display: flex;
   align-items: center;
   gap: 8px;
 }

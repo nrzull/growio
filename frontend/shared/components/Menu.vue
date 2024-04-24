@@ -2,7 +2,7 @@
   <Dropdown
     ref="dropdownRef"
     :manual
-    :class="[$style.menu, $style.menu]"
+    :floating-class="$style.menu"
     :use-floating-options="useFloatingOptions"
     @click:trigger="$emit('click:trigger', $event)"
   >

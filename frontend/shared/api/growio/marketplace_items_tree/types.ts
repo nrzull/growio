@@ -2,9 +2,11 @@ import { MarketplaceItemCategory } from "@growio/shared/api/growio/marketplace_i
 import { MarketplaceItem } from "@growio/shared/api/growio/marketplace_items/types";
 
 export type MarketplaceTreeItemCategory = MarketplaceItemCategory & {
-  children: MarketplaceItemCategory[];
+  children: MarketplaceItemsTree;
 };
 
-export type MarketplaceItemsTree = Array<
-  MarketplaceTreeItemCategory | MarketplaceItem
->;
+export type MarketplaceItemsTreeItem =
+  | MarketplaceTreeItemCategory
+  | MarketplaceItem;
+
+export type MarketplaceItemsTree = Array<MarketplaceItemsTreeItem>;

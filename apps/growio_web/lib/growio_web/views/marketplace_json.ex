@@ -7,7 +7,8 @@ defmodule GrowioWeb.Views.MarketplaceJSON do
     %{
       id: value.id,
       name: value.name,
-      currency: value.currency
+      currency: value.currency,
+      address: value.address
     }
   end
 

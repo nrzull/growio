@@ -60,8 +60,7 @@ const updateMarketplace = async () => {
 
 <style module>
 .row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 8px;
 }
 

@@ -6,6 +6,7 @@
     :track-by
     :label-path
     :children-path
+    :class="$style.selectInput"
     @click:item="proxyModelValue = $event"
   >
     <TextInput
@@ -67,3 +68,9 @@ const proxyModelValue = computed({
   set: (v) => emit("update:model-value", v),
 });
 </script>
+
+<style module>
+.selectInput {
+  flex: 1;
+}
+</style>

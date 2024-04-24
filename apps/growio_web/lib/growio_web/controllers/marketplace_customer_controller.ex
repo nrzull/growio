@@ -28,7 +28,8 @@ defmodule GrowioWeb.Controllers.MarketplaceCustomerController do
   def show_payload(conn, %{"payload" => payload}) do
     with order = %MarketplaceOrder{} <- Marketplaces.get_order(payload),
          order = Repo.preload(order, [:marketplace, :telegram_bot_customer]),
-         tree when is_list(tree) <- Marketplaces.all_items_tree(order.marketplace) do
+         tree when is_list(tree) <-
+           Marketplaces.all_items_tree(order.marketplace, deleted_at: false) do
       Conn.ok(conn, MarketplacePayloadJSON.render(%{order: order, items: tree}))
     end
   end

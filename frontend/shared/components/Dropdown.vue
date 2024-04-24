@@ -1,5 +1,5 @@
 <template>
-  <div :class="$style.dropdown">
+  <div :class="$attrs.class">
     <div
       ref="triggerRef"
       :class="$style.trigger"
@@ -12,7 +12,7 @@
       v-if="open"
       ref="floatingRef"
       :style="floatingStyles"
-      :class="[$style.floating, $attrs.class]"
+      :class="[$style.floating, floatingClass]"
     >
       <slot></slot>
     </div>
@@ -36,6 +36,11 @@ const props = defineProps({
     type: Object as PropType<UseFloatingOptions>,
     default: () => ({}),
   },
+
+  floatingClass: {
+    type: String,
+    default: undefined
+  }
 });
 
 defineEmits({ "click:trigger": (_v: boolean) => true });
@@ -73,6 +78,7 @@ defineExpose({ open, setOpen });
 <style module>
 .trigger {
   cursor: pointer;
+  width: 100%;
 }
 
 .floating {

@@ -61,6 +61,6 @@ defineProps({
 }
 
 .shape.fullHeight {
-  min-height: 100%;
+  flex: 1;
 }
 </style>
