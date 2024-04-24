@@ -303,4 +303,11 @@ defmodule GrowioWeb.Schemas do
       items: MarketplaceOrder
     })
   end
+
+  defmodule MarketplacePayload do
+    schema(%{
+      type: :object,
+      properties: %{}
+    })
+  end
 end

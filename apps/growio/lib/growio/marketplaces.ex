@@ -755,60 +755,66 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def all_items_tree(%MarketplaceAccount{} = initiator, opts \\ []) do
+  def all_items_tree(a, opts \\ [])
+
+  def all_items_tree(%MarketplaceAccount{} = initiator, opts) do
     with true <-
            Permissions.ok?(initiator, marketplaces__marketplace_item__read()) do
-      categories =
-        MarketplaceItemCategory
-        |> where([category], is_nil(category.parent_id))
-        |> where([category], category.marketplace_id == ^initiator.marketplace_id)
-        |> then(fn query ->
-          case Keyword.get(opts, :deleted_at) do
-            true ->
-              where(query, [category], not is_nil(category.deleted_at))
-
-            false ->
-              where(query, [category], is_nil(category.deleted_at))
-
-            _ ->
-              query
-          end
-        end)
-        |> Repo.all()
-        |> Enum.map(fn category ->
-          items =
-            MarketplaceItem
-            |> where([item], item.category_id == ^category.id)
-            |> then(fn query ->
-              case Keyword.get(opts, :deleted_at) do
-                true ->
-                  where(query, [item], not is_nil(item.deleted_at))
-
-                false ->
-                  where(query, [item], is_nil(item.deleted_at))
-
-                _ ->
-                  query
-              end
-            end)
-            |> Repo.all()
-            |> Enum.map(&Map.from_struct/1)
-
-          category
-          |> Map.from_struct()
-          |> Map.merge(%{children: do_all_items_tree(category, opts) ++ items})
-        end)
-
-      items =
-        MarketplaceItem
-        |> where([item], is_nil(item.category_id))
-        |> Repo.all()
-        |> Enum.map(&Map.from_struct/1)
-
-      categories ++ items
+      all_items_tree(%Marketplace{id: initiator.marketplace_id}, opts)
     else
       _ -> {:error, "cannot get items tree"}
     end
+  end
+
+  def all_items_tree(%Marketplace{id: marketplace_id}, opts) when is_integer(marketplace_id) do
+    categories =
+      MarketplaceItemCategory
+      |> where([category], is_nil(category.parent_id))
+      |> where([category], category.marketplace_id == ^marketplace_id)
+      |> then(fn query ->
+        case Keyword.get(opts, :deleted_at) do
+          true ->
+            where(query, [category], not is_nil(category.deleted_at))
+
+          false ->
+            where(query, [category], is_nil(category.deleted_at))
+
+          _ ->
+            query
+        end
+      end)
+      |> Repo.all()
+      |> Enum.map(fn category ->
+        items =
+          MarketplaceItem
+          |> where([item], item.category_id == ^category.id)
+          |> then(fn query ->
+            case Keyword.get(opts, :deleted_at) do
+              true ->
+                where(query, [item], not is_nil(item.deleted_at))
+
+              false ->
+                where(query, [item], is_nil(item.deleted_at))
+
+              _ ->
+                query
+            end
+          end)
+          |> Repo.all()
+          |> Enum.map(&Map.from_struct/1)
+
+        category
+        |> Map.from_struct()
+        |> Map.merge(%{children: do_all_items_tree(category, opts) ++ items})
+      end)
+
+    items =
+      MarketplaceItem
+      |> where([item], is_nil(item.category_id))
+      |> Repo.all()
+      |> Enum.map(&Map.from_struct/1)
+
+    categories ++ items
   end
 
   defp do_all_items_tree(%MarketplaceItemCategory{} = struct, opts) do
@@ -1316,9 +1322,7 @@ defmodule Growio.Marketplaces do
       |> Changeset.put_assoc(:marketplace, Repo.preload(initiator, [:marketplace]).marketplace)
       |> Repo.insert()
     else
-      e ->
-        IO.inspect(e)
-        {:error, "cannot create telegram bot"}
+      _ -> {:error, "cannot create telegram bot"}
     end
   end
 
@@ -1395,5 +1399,9 @@ defmodule Growio.Marketplaces do
     else
       _ -> {:error, "cannot get all marketplace orders"}
     end
+  end
+
+  def get_order(order_id) when is_bitstring(order_id) do
+    Repo.get(MarketplaceOrder, order_id)
   end
 end

@@ -1,5 +1,7 @@
 defmodule GrowioWeb.Router do
   use GrowioWeb, :router
+  alias GrowioWeb.Plugs.AuthPlug
+  alias GrowioWeb.Plugs.MarketplaceAccountPlug
   alias GrowioWeb.Controllers.AuthController
   alias GrowioWeb.Controllers.AccountController
   alias GrowioWeb.Controllers.PermissionController
@@ -12,8 +14,7 @@ defmodule GrowioWeb.Router do
   alias GrowioWeb.Controllers.MarketplaceItemController
   alias GrowioWeb.Controllers.MarketplaceItemTreeController
   alias GrowioWeb.Controllers.MarketplaceTelegramBotController
-  alias GrowioWeb.Plugs.AuthPlug
-  alias GrowioWeb.Plugs.MarketplaceAccountPlug
+  alias GrowioWeb.Controllers.MarketplaceCustomerController
 
   pipeline :guest do
     plug(:accepts, ["json"])
@@ -153,5 +154,10 @@ defmodule GrowioWeb.Router do
       MarketplaceItemAssetController,
       only: [:index, :create, :delete]
     )
+  end
+
+  scope "/api/customers/marketplace" do
+    pipe_through([:guest])
+    get("/payload/:payload", MarketplaceCustomerController, :show_payload)
   end
 end

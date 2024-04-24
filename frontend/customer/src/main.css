@@ -1,0 +1,17 @@
+@import "@growio/shared/main.css";
+
+#app {
+  line-height: var(--line-height);
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  color: var(--color);
+  background-color: var(--background-color);
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-flow: column;
+}
+
+body {
+  overflow: hidden;
+}
