@@ -6,11 +6,12 @@ defmodule Growio.Marketplaces.MarketplaceTelegramBot do
 
   @type t :: %__MODULE__{}
   @required ~w(token)a
-  @optional ~w(name description short_description welcome_message)a
+  @optional ~w(name description tag short_description welcome_message)a
 
   schema "marketplace_telegram_bots" do
     field(:token, :string)
     field(:name, :string)
+    field(:tag, :string)
     field(:description, :string)
     field(:short_description, :string)
     field(:welcome_message, :string)
@@ -26,5 +27,6 @@ defmodule Growio.Marketplaces.MarketplaceTelegramBot do
     |> cast(params, @required ++ @optional)
     |> validate_required(@required)
     |> unique_constraint(:token)
+    |> unique_constraint(:tag)
   end
 end

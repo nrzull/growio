@@ -5,7 +5,7 @@ defmodule GrowioWeb.Controllers.MarketplaceController do
   alias GrowioWeb.Conn
   alias GrowioWeb.Views.MarketplaceJSON
   alias GrowioWeb.Schemas
-  alias Growio.Marketplaces
+  alias Growio.Marketplaces.Marketplace
   alias GrowioWeb.Views.MarketplaceOrderJSON
   alias GrowioWeb.Views.MarketplaceTelegramBotJSON
 
@@ -63,8 +63,8 @@ defmodule GrowioWeb.Controllers.MarketplaceController do
         %{assigns: %{marketplace_account: marketplace_account}} = conn,
         _params
       ) do
-    [Marketplaces.get_telegram_bot(marketplace_account)]
-    |> Enum.filter(fn v -> not is_nil(v) end)
+    %Marketplace{id: marketplace_account.marketplace_id}
+    |> Marketplaces.all_integrations()
     |> MarketplaceTelegramBotJSON.render()
     |> then(&Conn.ok(conn, &1))
   end

@@ -7,6 +7,8 @@ defmodule GrowioWeb.Controllers.MarketplaceCustomerController do
   alias Growio.Marketplaces
   alias Growio.Marketplaces.MarketplaceOrder
   alias GrowioWeb.Views.MarketplacePayloadJSON
+  alias GrowioWeb.Views.MarketplaceTelegramBotJSON
+  alias Growio.Marketplaces.MarketplaceTelegramBot
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -30,7 +32,22 @@ defmodule GrowioWeb.Controllers.MarketplaceCustomerController do
          order = Repo.preload(order, [:marketplace, :telegram_bot_customer]),
          tree when is_list(tree) <-
            Marketplaces.all_items_tree(order.marketplace, deleted_at: false) do
-      Conn.ok(conn, MarketplacePayloadJSON.render(%{order: order, items: tree}))
+      integrations =
+        order.marketplace
+        |> Marketplaces.all_integrations()
+        |> Enum.map(fn
+          %MarketplaceTelegramBot{} = bot ->
+            MarketplaceTelegramBotJSON.render(bot, take: [:tag])
+
+          v ->
+            v
+        end)
+
+      payload =
+        %{order: order, items: tree, integrations: integrations}
+        |> MarketplacePayloadJSON.render()
+
+      Conn.ok(conn, payload)
     end
   end
 end

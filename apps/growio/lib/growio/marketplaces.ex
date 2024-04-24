@@ -1272,6 +1272,11 @@ defmodule Growio.Marketplaces do
     |> repo.insert()
   end
 
+  def all_integrations(%Marketplace{id: _} = marketplace) do
+    [get_telegram_bot(marketplace)]
+    |> Enum.filter(fn v -> not is_nil(v) end)
+  end
+
   def all_telegram_bots() do
     Repo.all(MarketplaceTelegramBot)
   end
@@ -1284,6 +1289,12 @@ defmodule Growio.Marketplaces do
     else
       _ -> {:error, "cannot get telegram bot"}
     end
+  end
+
+  def get_telegram_bot(%Marketplace{id: marketplace_id}) do
+    MarketplaceTelegramBot
+    |> where([bot], bot.marketplace_id == ^marketplace_id)
+    |> Repo.one()
   end
 
   def get_telegram_bot(:token, token) do
@@ -1331,21 +1342,26 @@ defmodule Growio.Marketplaces do
         %MarketplaceTelegramBot{} = bot,
         %{} = params
       ) do
-    with true <- Permissions.ok?(initiator, marketplaces__telegram_bot__update()),
-         changeset = %Changeset{valid?: true} <-
-           MarketplaceTelegramBot.changeset(bot, params) do
-      changeset
-      |> Repo.update()
-      |> case do
-        {:ok, _} = v ->
-          cache_remove_telegram_bot(:token, bot.token)
-          v
-
-        e ->
-          e
-      end
+    with true <- Permissions.ok?(initiator, marketplaces__telegram_bot__update()) do
+      update_telegram_bot(bot, params)
     else
       _ -> {:error, "cannot update telegram bot"}
+    end
+  end
+
+  def update_telegram_bot(
+        %MarketplaceTelegramBot{} = bot,
+        %{} = params
+      ) do
+    MarketplaceTelegramBot.changeset(bot, params)
+    |> Repo.update()
+    |> case do
+      {:ok, _} = v ->
+        cache_remove_telegram_bot(:token, bot.token)
+        v
+
+      e ->
+        e
     end
   end
 

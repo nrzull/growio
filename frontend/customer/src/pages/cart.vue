@@ -103,7 +103,10 @@ const columns = ref([
     header: () => "Name",
   }),
 
-  columnHelper.display({ id: "quantity" }),
+  columnHelper.display({
+    id: "quantity",
+    meta: { style: { "text-align": "right" } },
+  }),
 
   columnHelper.display({ id: "actions", meta: { style: { width: "0" } } }),
 ]);

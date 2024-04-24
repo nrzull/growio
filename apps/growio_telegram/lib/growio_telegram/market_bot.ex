@@ -36,7 +36,7 @@ defmodule GrowioTelegram.MarketBot do
       }
     ]
 
-    with %MarketplaceTelegramBot{} <-
+    with bot = %MarketplaceTelegramBot{} <-
            Marketplaces.get_telegram_bot(:token, token),
          result <-
            DynamicSupervisor.start_child(
@@ -45,7 +45,13 @@ defmodule GrowioTelegram.MarketBot do
            ),
          true <- match?({:ok, _}, result) or match?({:ok, _, _}, result) do
       [_, pid | _] = Tuple.to_list(result)
-      MarketBotRegistry.register(token, pid) |> IO.inspect()
+      MarketBotRegistry.register(token, pid)
+
+      with {:ok, %{"username" => username}} <- Telegram.Api.request(token, "getMe"),
+           true <- bot.tag != username do
+        Marketplaces.update_telegram_bot(bot, %{tag: username})
+      end
+
       result
     else
       e ->
