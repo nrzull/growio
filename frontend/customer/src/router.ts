@@ -10,6 +10,17 @@ export const router = createRouter({
         {
           path: ":payload",
           component: () => import("~/pages/root.vue"),
+          children: [
+            {
+              path: "cart",
+              component: () => import("~/pages/cart.vue"),
+            },
+
+            {
+              path: "",
+              component: () => import("~/pages/inventory.vue"),
+            },
+          ],
         },
       ],
     },

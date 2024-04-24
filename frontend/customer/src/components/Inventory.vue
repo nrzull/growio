@@ -6,8 +6,8 @@
         :class="$style.heading"
         size="md"
         @click="proxyParent = undefined"
+        icon="arrowBack"
       >
-        Главная
       </Button>
 
       <Button
@@ -23,7 +23,11 @@
       </Button>
     </Tabs>
 
-    <div :class="$style.shapes">
+    <Notification
+      v-if="!(categories.length + activeItems.length)"
+      :model-value="{ text: 'No items', type: 'info' }"
+    />
+    <div v-else :class="$style.shapes">
       <Shape
         v-for="category in categories"
         :key="category.id"
@@ -37,8 +41,9 @@
       <Shape
         v-for="item in activeItems"
         :key="item.id"
-        :class="$style.shape"
+        :class="[$style.shape, { [$style.toggled]: isToggled(item) }]"
         type="secondary"
+        @click="toggleItem(item)"
       >
         {{ item.name }}
       </Shape>
@@ -59,6 +64,8 @@ import { clone } from "remeda";
 import Shape from "@growio/shared/components/Shape.vue";
 import Button from "@growio/shared/components/Button.vue";
 import Tabs from "@growio/shared/components/Tabs.vue";
+import { isMarketplaceItem } from "@growio/shared/api/growio/marketplace_items/utils";
+import Notification from "@growio/shared/components/Notifications/Notification.vue";
 
 defineOptions({ inheritAttrs: false });
 
@@ -85,6 +92,11 @@ const emit = defineEmits({
 
 const proxyParent = ref<MarketplaceTreeItemCategory>(clone(props.parent));
 
+const proxyModelValue = computed({
+  get: () => props.modelValue,
+  set: (v) => emit("update:model-value", v),
+});
+
 const inventory = computed(() =>
   proxyParent.value ? proxyParent.value.children : props.items
 );
@@ -93,9 +105,20 @@ const categories = computed(() =>
   inventory.value.filter(isMarketplaceTreeItemCategory)
 );
 
-const activeItems = computed(() =>
-  inventory.value.filter((v) => !isMarketplaceTreeItemCategory(v))
-);
+const activeItems = computed(() => inventory.value.filter(isMarketplaceItem));
+
+const toggleItem = (item: MarketplaceItem) => {
+  if (isToggled(item)) {
+    proxyModelValue.value = proxyModelValue.value.filter(
+      (v) => v.id !== item.id
+    );
+  } else {
+    proxyModelValue.value.push({ ...item, quantity: 1 });
+  }
+};
+
+const isToggled = (item: MarketplaceItem) =>
+  proxyModelValue.value.some((v) => v.id === item.id);
 
 const getParentAncestors = () => {
   if (!proxyParent.value) {
@@ -151,5 +174,9 @@ const findAncestor = (id: number) => {
 
 .shape {
   cursor: pointer;
+}
+
+.shape.toggled {
+  border-color: var(--color-primary);
 }
 </style>

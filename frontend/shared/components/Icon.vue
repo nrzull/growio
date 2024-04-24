@@ -22,6 +22,8 @@ import editRegular from "@growio/shared/assets/edit-regular.svg?raw";
 import folderFilled from "@growio/shared/assets/folder-filled.svg?raw";
 import telegramFilled from "@growio/shared/assets/telegram-filled.svg?raw";
 import arrowBack from "@growio/shared/assets/arrow-back.svg?raw";
+import cart from "@growio/shared/assets/cart.svg?raw";
+import minusCircle from "@growio/shared/assets/minus-circle.svg?raw";
 
 const icons = {
   users,
@@ -39,6 +41,8 @@ const icons = {
   folderFilled,
   telegramFilled,
   arrowBack,
+  cart,
+  minusCircle,
 } as const;
 
 export type Icons = keyof typeof icons;

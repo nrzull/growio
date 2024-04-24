@@ -7,7 +7,26 @@
       {{ payload.marketplace.address }}
     </template>
 
-    <Inventory :items="payload.items" />
+    <template #tools>
+      <Button
+        v-if="selectedItems.length"
+        size="md"
+        icon="cart"
+        @click="$router.push(`/${payloadKey}/cart`)"
+      >
+        {{ selectedItems.length }}
+      </Button>
+    </template>
+
+    <RouterView v-slot="{ Component }">
+      <component
+        :is="Component"
+        :loading="isLoading"
+        :payload-key="payloadKey"
+        v-model:payload="payload"
+        v-model:selected-items="selectedItems"
+      />
+    </RouterView>
   </PageShape>
 </template>
 
@@ -19,11 +38,15 @@ import { wait, Wait } from "@growio/shared/composables/wait";
 import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import PageLoader from "@growio/shared/components/PageLoader.vue";
 import PageShape from "@growio/shared/components/PageShape.vue";
-import Inventory from "~/components/Inventory.vue";
+
+import { useLocalStorage } from "@vueuse/core";
+import { MarketplaceItem } from "@growio/shared/api/growio/marketplace_items/types";
+import Button from "@growio/shared/components/Button.vue";
 
 const route = useRoute();
-
+const payloadKey = route.params.payload as string;
 const payload = ref<MarketplacePayload>();
+const selectedItems = useLocalStorage<MarketplaceItem[]>(payloadKey, []);
 
 const isLoading = computed(() => wait.some([Wait.MARKETPLACE_PAYLOAD_FETCH]));
 
@@ -31,9 +54,7 @@ const fetchPayload = async () => {
   try {
     wait.start(Wait.MARKETPLACE_PAYLOAD_FETCH);
 
-    payload.value = await apiCustomersGetMarketplacePayload(
-      route.params.payload as string
-    );
+    payload.value = await apiCustomersGetMarketplacePayload(payloadKey);
   } catch (e) {
     console.error(e);
   } finally {

@@ -5,7 +5,7 @@ import {
 import { isPlainObject, mergeDeep } from "remeda";
 
 export const isMarketplaceItem = (v: unknown): v is MarketplaceItem =>
-  isPlainObject(v) && ["id"].every((vv) => vv in v && v[vv]);
+  isPlainObject(v) && ["id", "quantity"].every((vv) => vv in v);
 
 export const buildPartialMarketplaceItem = (
   params: Partial<PartialMarketplaceItem> = {}

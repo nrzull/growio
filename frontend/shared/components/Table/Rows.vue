@@ -55,7 +55,6 @@ import {
   FlexRender,
 } from "@tanstack/vue-table";
 import { PropType, ref } from "vue";
-import Icon from "@growio/shared/components/Icon.vue";
 import {
   prepareSlotName,
   getAccessorKey,
