@@ -1,25 +1,25 @@
 <template>
   <div :class="$style.inventory">
-    <Tabs v-if="proxyParent">
+    <Tabs v-if="categoryId">
       <Button
         type="neutral"
         :class="$style.heading"
         size="md"
-        @click="proxyParent = undefined"
         icon="arrowBack"
+        @click="categoryId = undefined"
       >
       </Button>
 
       <Button
-        v-for="ancestor in getParentAncestors()"
-        :key="ancestor.id"
+        v-for="category in getCategoryAncestors()"
+        :key="category.id"
         type="neutral"
         :class="$style.heading"
         size="md"
-        :active="proxyParent.id === ancestor.id"
-        @click="proxyParent = ancestor"
+        :active="categoryId === category.id"
+        @click="categoryId = category.id"
       >
-        {{ ancestor.name }}
+        {{ category.name }}
       </Button>
     </Tabs>
 
@@ -33,7 +33,7 @@
         :key="category.id"
         :class="$style.shape"
         type="secondary"
-        @click="proxyParent = category"
+        @click="categoryId = category.id"
       >
         {{ category.name }}
       </Shape>
@@ -52,53 +52,54 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import {
-  MarketplaceItemsTree,
-  MarketplaceTreeItemCategory,
-} from "@growio/shared/api/growio/marketplace_items_tree/types";
+import { computed } from "vue";
+import { MarketplaceTreeItemCategory } from "@growio/shared/api/growio/marketplace_items_tree/types";
 import { PropType } from "vue";
 import { isMarketplaceTreeItemCategory } from "@growio/shared/api/growio/marketplace_items_tree/utils";
 import { MarketplaceItem } from "@growio/shared/api/growio/marketplace_items/types";
-import { clone } from "remeda";
+
 import Shape from "@growio/shared/components/Shape.vue";
 import Button from "@growio/shared/components/Button.vue";
 import Tabs from "@growio/shared/components/Tabs.vue";
 import { isMarketplaceItem } from "@growio/shared/api/growio/marketplace_items/utils";
 import Notification from "@growio/shared/components/Notifications/Notification.vue";
+import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
+import { useRoute, useRouter } from "vue-router";
 
 defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
-  modelValue: {
+  payload: {
+    type: Object as PropType<MarketplacePayload>,
+    required: true,
+  },
+
+  selectedItems: {
     type: Array as PropType<MarketplaceItem[]>,
     default: () => [],
   },
-
-  items: {
-    type: Array as PropType<MarketplaceItemsTree>,
-    default: () => [],
-  },
-
-  parent: {
-    type: Object as PropType<MarketplaceTreeItemCategory>,
-    default: undefined,
-  },
 });
 
-const emit = defineEmits({
-  "update:model-value": (_v: MarketplaceItem[]) => true,
+const route = useRoute();
+const router = useRouter();
+
+const payloadKey = route.params.payload as string;
+
+const categoryId = computed({
+  get: () =>
+    route.params.categoryId ? Number(route.params.categoryId) : undefined,
+  set: (v) => router.push(`/${payloadKey}/categories/${v || ""}`),
 });
 
-const proxyParent = ref<MarketplaceTreeItemCategory>(clone(props.parent));
-
-const proxyModelValue = computed({
-  get: () => props.modelValue,
-  set: (v) => emit("update:model-value", v),
+const proxySelectedItems = defineModel<MarketplaceItem[]>("selectedItems", {
+  required: true,
 });
 
-const inventory = computed(() =>
-  proxyParent.value ? proxyParent.value.children : props.items
+const inventory = computed(
+  () =>
+    (categoryId.value
+      ? findCategory(categoryId.value)?.children
+      : props.payload.items) || []
 );
 
 const categories = computed(() =>
@@ -109,26 +110,28 @@ const activeItems = computed(() => inventory.value.filter(isMarketplaceItem));
 
 const toggleItem = (item: MarketplaceItem) => {
   if (isToggled(item)) {
-    proxyModelValue.value = proxyModelValue.value.filter(
+    proxySelectedItems.value = proxySelectedItems.value.filter(
       (v) => v.id !== item.id
     );
   } else {
-    proxyModelValue.value.push({ ...item, quantity: 1 });
+    proxySelectedItems.value.push({ ...item, quantity: 1 });
   }
 };
 
 const isToggled = (item: MarketplaceItem) =>
-  proxyModelValue.value.some((v) => v.id === item.id);
+  proxySelectedItems.value.some((v) => v.id === item.id);
 
-const getParentAncestors = () => {
-  if (!proxyParent.value) {
+const getCategoryAncestors = () => {
+  if (!categoryId.value) {
     return [];
   }
 
+  const category = findCategory(categoryId.value);
+
   const ancestors = [];
 
-  const executor = (parent = proxyParent.value) => {
-    const target = findAncestor(parent?.parent_id);
+  const executor = (parent = category) => {
+    const target = findCategory(parent?.parent_id);
 
     if (target) {
       ancestors.unshift(target);
@@ -138,11 +141,13 @@ const getParentAncestors = () => {
 
   executor();
 
-  return ancestors.concat(proxyParent.value);
+  return ancestors.concat(category);
 };
 
-const findAncestor = (id: number) => {
-  const executor = (children = props.items) => {
+const findCategory = (id: number) => {
+  const executor = (
+    children = props.payload.items
+  ): MarketplaceTreeItemCategory[] => {
     const r = children
       .filter(isMarketplaceTreeItemCategory)
       .map((v) => (v.id === id ? v : executor(v.children)));
@@ -150,9 +155,9 @@ const findAncestor = (id: number) => {
     return r.flat();
   };
 
-  const [nextParent] = executor();
+  const [foundCategory] = executor();
 
-  return nextParent;
+  return foundCategory;
 };
 </script>
 

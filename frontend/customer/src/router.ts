@@ -9,16 +9,28 @@ export const router = createRouter({
       children: [
         {
           path: ":payload",
-          component: () => import("~/pages/root.vue"),
+          component: () => import("~/pages/_payload.vue"),
           children: [
             {
+              path: "categories",
+              component: () => import("~/pages/_payload/categories.vue"),
+              children: [
+                {
+                  path: ":categoryId?",
+                  component: () =>
+                    import("~/pages/_payload/categories/_categoryId.vue"),
+                },
+              ],
+            },
+
+            {
               path: "cart",
-              component: () => import("~/pages/cart.vue"),
+              component: () => import("~/pages/_payload/cart.vue"),
             },
 
             {
               path: "",
-              component: () => import("~/pages/inventory.vue"),
+              redirect: (v) => `${v.params.payload}/categories`,
             },
           ],
         },

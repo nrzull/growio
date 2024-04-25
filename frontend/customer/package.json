@@ -10,5 +10,8 @@
     "vue-tsc": "vue-tsc",
     "eslint": "eslint",
     "stylelint": "stylelint"
+  },
+  "dependencies": {
+    "@growio/shared": "file:../shared"
   }
 }
