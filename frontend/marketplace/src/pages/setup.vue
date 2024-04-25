@@ -22,7 +22,7 @@ const redirect = () => router.push((route.query.to as string) || "/");
   if (accounts.length) {
     redirect();
   } else {
-    await apiMarketplacesCreate({ name: account.value.email });
+    await apiMarketplacesCreate({ name: account.value.email, currency: "USD" });
     redirect();
   }
 })();

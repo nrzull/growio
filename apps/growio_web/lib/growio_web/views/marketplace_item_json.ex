@@ -11,6 +11,7 @@ defmodule GrowioWeb.Views.MarketplaceItemJSON do
       infinity: value.infinity,
       quantity: value.quantity,
       origin_id: value.origin_id,
+      price: value.price,
       category_id: value.category_id
     }
   end

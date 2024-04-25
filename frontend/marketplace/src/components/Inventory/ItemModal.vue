@@ -7,6 +7,10 @@
 
     <div :class="$style.row">
       <TextInput v-model="item.name" placeholder="Name" />
+      <TextInput
+        v-model="item.price"
+        :placeholder="`Price ${currency ? `(${currency})` : ''}`"
+      />
       <SelectInput
         v-model="category"
         :readonly="isMarketplaceItem(modelValue)"
@@ -57,6 +61,7 @@ import {
   MarketplaceItemAsset,
   PartialMarketplaceItemAsset,
 } from "@growio/shared/api/growio/marketplace_item_assets/types";
+import { marketplaceAccount } from "~/composables/marketplace-accounts";
 
 const props = defineProps({
   modelValue: {
@@ -93,6 +98,8 @@ const item = ref<PartialMarketplaceItem | MarketplaceItem>(
 );
 const category = ref<MarketplaceItemCategory>();
 const categories = ref<MarketplaceItemCategory[]>([]);
+
+const currency = computed(() => marketplaceAccount.value.marketplace.currency);
 
 const isLoading = computed(
   () =>

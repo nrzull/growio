@@ -50,6 +50,7 @@ import MarketplaceModal from "~/components/Self/MarketplaceModal.vue";
 import { apiMarketplacesCreate } from "@growio/shared/api/growio/marketplaces";
 import Icon from "@growio/shared/components/Icon.vue";
 import { apiMarketplaceAccountsUpdateSelfActive } from "@growio/shared/api/growio/marketplace_accounts";
+import { Currency } from "@growio/shared/utils/money";
 
 const marketplaceModal = ref(false);
 
@@ -93,7 +94,10 @@ const table = useVueTable({
   },
 });
 
-const createMarketplace = async (params: { name: string }) => {
+const createMarketplace = async (params: {
+  name: string;
+  currency: Currency;
+}) => {
   try {
     wait.start(Wait.MARKETPLACE_CREATE);
     await apiMarketplacesCreate(params);

@@ -17,6 +17,7 @@ export const buildPartialMarketplaceItem = (
       description: undefined,
       infinity: undefined,
       quantity: undefined,
+      price: undefined,
     } as PartialMarketplaceItem,
     params as PartialMarketplaceItem
   );

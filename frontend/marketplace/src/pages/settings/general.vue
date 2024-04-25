@@ -11,7 +11,7 @@
           <SelectInput
             v-model="model.currency"
             placeholder="Currency"
-            :items="currencyOptions"
+            :items="currencies"
           />
         </div>
         <div :class="$style.row">
@@ -39,8 +39,8 @@ import {
 import { Marketplace } from "@growio/shared/api/growio/marketplaces/types";
 import { apiMarketplaceUpdate } from "@growio/shared/api/growio/marketplaces";
 import { clone } from "remeda";
+import { currencies } from "@growio/shared/utils/money";
 
-const currencyOptions = ["RUB", "KGS"];
 const model = ref<Marketplace>(clone(marketplaceAccount.value.marketplace));
 
 const isLoading = computed(() => wait.some([Wait.MARKETPLACE_UPDATE]));

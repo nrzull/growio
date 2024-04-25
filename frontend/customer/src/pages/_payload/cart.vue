@@ -33,8 +33,22 @@
     />
     <template v-else>
       <Table :table headless>
+        <template #price="{ ctx }">
+          <template v-if="ctx.row.original.price && ctx.row.original.quantity">
+            {{
+              formatPrice({
+                currency: payload.marketplace.currency,
+                price: ctx.row.original.price,
+                quantity: ctx.row.original.quantity,
+              })
+            }}
+          </template>
+        </template>
+
         <template #quantity="{ ctx }">
-          {{ ctx.row.original.quantity }}
+          <template v-if="ctx.row.original.quantity">
+            {{ ctx.row.original.quantity }}
+          </template>
         </template>
 
         <template #actions="{ ctx }">
@@ -53,7 +67,17 @@
         </template>
       </Table>
 
-      <Button :disabled="!hasQuantity">Checkout</Button>
+      <Button :disabled="!hasQuantity">
+        Checkout
+
+        <template v-if="totalPrice">{{
+          formatPrice({
+            price: String(totalPrice),
+            currency: payload.marketplace.currency,
+            quantity: 1,
+          })
+        }}</template>
+      </Button>
     </template>
   </PageShape>
 </template>
@@ -75,6 +99,7 @@ import Notification from "@growio/shared/components/Notifications/Notification.v
 import { useRoute } from "vue-router";
 import { useLocalStorage } from "@vueuse/core";
 import PageShape from "@growio/shared/components/PageShape.vue";
+import { formatPrice } from "@growio/shared/utils/money";
 
 defineOptions({ inheritAttrs: false });
 
@@ -109,6 +134,11 @@ const columns = ref([
     meta: { style: { "text-align": "right" } },
   }),
 
+  columnHelper.display({
+    id: "price",
+    meta: { style: { width: "0", "text-align": "right" } },
+  }),
+
   columnHelper.display({ id: "actions", meta: { style: { width: "0" } } }),
 ]);
 
@@ -123,6 +153,15 @@ const table = useVueTable({
     return columns.value;
   },
 });
+
+const totalPrice = computed(() =>
+  hasQuantity.value
+    ? selectedItems.value.reduce(
+        (acc, value) => acc + Number(value.price) * value.quantity!,
+        0
+      )
+    : 0
+);
 
 const hasQuantity = computed(() => selectedItems.value.some((v) => v.quantity));
 

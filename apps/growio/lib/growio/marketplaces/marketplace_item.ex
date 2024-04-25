@@ -6,11 +6,11 @@ defmodule Growio.Marketplaces.MarketplaceItem do
 
   @type t :: %__MODULE__{}
   @required ~w(name)a
-  @optional ~w(amount description deleted_at infinity quantity category_id origin_id)a
+  @optional ~w(price description deleted_at infinity quantity category_id origin_id)a
 
   schema "marketplace_items" do
     field(:name, :string)
-    field(:amount, :string)
+    field(:price, :string)
     field(:description, :string)
     field(:infinity, :boolean)
     field(:quantity, :integer)
