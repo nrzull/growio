@@ -70,13 +70,15 @@
       <Button :disabled="!hasQuantity">
         Checkout
 
-        <template v-if="totalPrice">{{
-          formatPrice({
-            price: String(totalPrice),
-            currency: payload.marketplace.currency,
-            quantity: 1,
-          })
-        }}</template>
+        <template v-if="totalPrice">
+          {{
+            formatPrice({
+              price: String(totalPrice),
+              currency: payload.marketplace.currency,
+              quantity: 1,
+            })
+          }}
+        </template>
       </Button>
     </template>
   </PageShape>

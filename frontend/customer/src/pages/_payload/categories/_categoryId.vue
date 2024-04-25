@@ -48,7 +48,21 @@
           :class="$style.item"
           type="secondary"
         >
-          <div :class="$style.price">
+          <div
+            :class="[
+              $style.itemImageWrapper,
+              { [$style.empty]: !item.assets.at(0) },
+            ]"
+          >
+            <img
+              v-if="item.assets.at(0)"
+              :class="$style.itemImage"
+              :src="item.assets.at(0).src"
+            />
+            <Icon v-else value="imageRect" size="lg" />
+          </div>
+
+          <div :class="$style.itemPrice">
             {{
               formatPrice({
                 price: item.price,
@@ -69,7 +83,7 @@
             {{ item.name }}
           </div>
 
-          <div :class="$style.itemButtons" v-if="isSelected(item)">
+          <div v-if="isSelected(item)" :class="$style.itemButtons">
             <Button
               type="neutral"
               size="md"
@@ -93,10 +107,12 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { MarketplaceTreeItemCategory } from "@growio/shared/api/growio/marketplace_items_tree/types";
+import {
+  MarketplaceTreeCategory,
+  MarketplaceTreeItem,
+} from "@growio/shared/api/growio/marketplace_items_tree/types";
 import { PropType } from "vue";
 import { isMarketplaceTreeItemCategory } from "@growio/shared/api/growio/marketplace_items_tree/utils";
-import { MarketplaceItem } from "@growio/shared/api/growio/marketplace_items/types";
 
 import Shape from "@growio/shared/components/Shape.vue";
 import Button from "@growio/shared/components/Button.vue";
@@ -107,6 +123,7 @@ import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import { useRoute, useRouter } from "vue-router";
 import { useCart } from "~/composables/useCart";
 import { formatPrice } from "@growio/shared/utils/money";
+import Icon from "@growio/shared/components/Icon.vue";
 
 defineOptions({ inheritAttrs: false });
 
@@ -173,8 +190,8 @@ const getCategoryAncestors = () => {
   return ancestors.concat(category);
 };
 
-const getItemDescendants = (category: MarketplaceTreeItemCategory) => {
-  const itemDescendants: MarketplaceItem[] = [];
+const getItemDescendants = (category: MarketplaceTreeCategory) => {
+  const itemDescendants: MarketplaceTreeItem[] = [];
 
   const executor = (target = category) => {
     target.children.map((c) => {
@@ -194,7 +211,7 @@ const getItemDescendants = (category: MarketplaceTreeItemCategory) => {
 const findCategory = (id: number) => {
   const executor = (
     children = props.payload.items
-  ): MarketplaceTreeItemCategory[] => {
+  ): MarketplaceTreeCategory[] => {
     const r = children
       .filter(isMarketplaceTreeItemCategory)
       .map((v) => (v.id === id ? v : executor(v.children)));
@@ -239,7 +256,6 @@ const findCategory = (id: number) => {
   display: flex;
   flex-flow: column;
   gap: 12px;
-  justify-content: space-between;
   padding: 24px 12px;
 }
 
@@ -249,10 +265,34 @@ const findCategory = (id: number) => {
   align-items: center;
 }
 
+.itemPrice {
+  font-weight: 700;
+}
+
 .itemTitle {
   width: max-content;
   cursor: pointer;
   transition: color 0.2s ease;
+  flex: 1;
+}
+
+.itemImageWrapper {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.itemImageWrapper.empty {
+  background-color: var(--color-gray-50);
+  border-radius: 8px;
+}
+
+.itemImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .itemTitle:hover {

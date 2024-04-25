@@ -802,6 +802,9 @@ defmodule Growio.Marketplaces do
           end)
           |> Repo.all()
           |> Enum.map(&Map.from_struct/1)
+          |> Enum.map(fn item ->
+            Map.put(item, :assets, all_item_assets(%MarketplaceItem{id: item.id}))
+          end)
 
         category
         |> Map.from_struct()
@@ -813,6 +816,9 @@ defmodule Growio.Marketplaces do
       |> where([item], is_nil(item.category_id))
       |> Repo.all()
       |> Enum.map(&Map.from_struct/1)
+      |> Enum.map(fn item ->
+        Map.put(item, :assets, all_item_assets(%MarketplaceItem{id: item.id}))
+      end)
 
     categories ++ items
   end
@@ -851,6 +857,9 @@ defmodule Growio.Marketplaces do
         end)
         |> Repo.all()
         |> Enum.map(&Map.from_struct/1)
+        |> Enum.map(fn item ->
+          Map.put(item, :assets, all_item_assets(%MarketplaceItem{id: item.id}))
+        end)
 
       value
       |> Map.from_struct()

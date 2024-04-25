@@ -1,4 +1,6 @@
 defmodule GrowioWeb.Views.MarketplaceItemTreeJSON do
+  alias GrowioWeb.Views.MarketplaceItemAssetJSON
+
   def render(values) when is_list(values), do: Enum.map(values, &render(&1))
 
   def render(%{children: children} = value) do
@@ -19,7 +21,8 @@ defmodule GrowioWeb.Views.MarketplaceItemTreeJSON do
       price: value.price,
       description: value.description,
       origin_id: value.origin_id,
-      category_id: value.category_id
+      category_id: value.category_id,
+      assets: MarketplaceItemAssetJSON.render(value.assets)
     }
   end
 

@@ -1,4 +1,4 @@
-import { MarketplaceItem } from "@growio/shared/api/growio/marketplace_items/types";
+import { MarketplaceTreeItem } from "@growio/shared/api/growio/marketplace_items_tree/types";
 import { useLocalStorage } from "@vueuse/core";
 import PromiseModal from "@growio/shared/components/PromiseModal.vue";
 import { Ref, computed } from "vue";
@@ -7,7 +7,7 @@ export const useCart = (params: {
   key: string;
   deleteItemModalRef?: Ref<InstanceType<typeof PromiseModal>>;
 }) => {
-  const selectedItems = useLocalStorage<MarketplaceItem[]>(params.key, []);
+  const selectedItems = useLocalStorage<MarketplaceTreeItem[]>(params.key, []);
 
   const hasQuantity = computed(() =>
     selectedItems.value.some((v) => v.quantity)
@@ -22,7 +22,7 @@ export const useCart = (params: {
       : 0
   );
 
-  const increment = (item: MarketplaceItem) => {
+  const increment = (item: MarketplaceTreeItem) => {
     const foundItem = selectedItems.value.find((i) => i.id === item.id);
 
     if (foundItem) {
@@ -32,7 +32,7 @@ export const useCart = (params: {
     }
   };
 
-  const decrement = async (item: MarketplaceItem) => {
+  const decrement = async (item: MarketplaceTreeItem) => {
     const foundItem = selectedItems.value.find((i) => i.id === item.id);
 
     if (foundItem && foundItem.quantity >= 2) {
@@ -49,13 +49,13 @@ export const useCart = (params: {
     removeItem(item);
   };
 
-  const isSelected = (item: MarketplaceItem) =>
+  const isSelected = (item: MarketplaceTreeItem) =>
     selectedItems.value.some((v) => v.id === item.id);
 
-  const getSelected = (item: MarketplaceItem) =>
+  const getSelected = (item: MarketplaceTreeItem) =>
     selectedItems.value.find((v) => v.id === item.id);
 
-  const addItem = (item: MarketplaceItem) => {
+  const addItem = (item: MarketplaceTreeItem) => {
     if (isSelected(item)) {
       return;
     }
@@ -63,7 +63,7 @@ export const useCart = (params: {
     selectedItems.value.push({ ...item, quantity: 1 });
   };
 
-  const removeItem = (item: MarketplaceItem) => {
+  const removeItem = (item: MarketplaceTreeItem) => {
     if (!isSelected(item)) {
       return;
     }

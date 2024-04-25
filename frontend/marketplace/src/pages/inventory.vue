@@ -115,7 +115,7 @@ import {
 } from "@tanstack/vue-table";
 import {
   MarketplaceItemsTree,
-  MarketplaceTreeItemCategory,
+  MarketplaceTreeCategory,
 } from "@growio/shared/api/growio/marketplace_items_tree/types";
 import {
   MarketplaceItem,
@@ -174,7 +174,7 @@ const itemModal = ref<PartialMarketplaceItem | MarketplaceItem>();
 const deleteItemModal = ref<InstanceType<typeof PromiseModal>>();
 
 const columnHelper = createColumnHelper<
-  MarketplaceTreeItemCategory | MarketplaceItem
+  MarketplaceTreeCategory | MarketplaceItem
 >();
 
 const columns = ref([
@@ -233,10 +233,7 @@ const table = useVueTable({
   },
 });
 
-const handleAddRow = (
-  { id }: ItemComplex,
-  parent: MarketplaceTreeItemCategory
-) =>
+const handleAddRow = ({ id }: ItemComplex, parent: MarketplaceTreeCategory) =>
   id === "category"
     ? (categoryModal.value = buildPartialMarketplaceItemCategory({
         parent_id: parent.id,

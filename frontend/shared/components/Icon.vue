@@ -24,6 +24,7 @@ import telegramFilled from "@growio/shared/assets/telegram-filled.svg?raw";
 import arrowBack from "@growio/shared/assets/arrow-back.svg?raw";
 import cart from "@growio/shared/assets/cart.svg?raw";
 import minusCircle from "@growio/shared/assets/minus-circle.svg?raw";
+import imageRect from "@growio/shared/assets/image-rect.svg?raw";
 
 const icons = {
   users,
@@ -43,6 +44,7 @@ const icons = {
   arrowBack,
   cart,
   minusCircle,
+  imageRect,
 } as const;
 
 export type Icons = keyof typeof icons;
