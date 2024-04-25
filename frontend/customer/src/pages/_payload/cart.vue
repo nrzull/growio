@@ -55,14 +55,14 @@
           <Button
             type="neutral"
             size="sm"
-            icon="plus"
-            @click.stop="increment(ctx.row.original)"
+            icon="minusCircle"
+            @click.stop="decrement(ctx.row.original)"
           ></Button>
           <Button
             type="neutral"
             size="sm"
-            icon="minusCircle"
-            @click.stop="decrement(ctx.row.original)"
+            icon="plus"
+            @click.stop="increment(ctx.row.original)"
           ></Button>
         </template>
       </Table>
@@ -85,7 +85,7 @@
 <script setup lang="ts">
 import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import { MarketplaceItem } from "@growio/shared/api/growio/marketplace_items/types";
-import { PropType, computed, ref } from "vue";
+import { PropType, ref } from "vue";
 import Tabs from "@growio/shared/components/Tabs.vue";
 import Button from "@growio/shared/components/Button.vue";
 import Table from "@growio/shared/components/Table.vue";
@@ -97,9 +97,9 @@ import {
 import PromiseModal from "@growio/shared/components/PromiseModal.vue";
 import Notification from "@growio/shared/components/Notifications/Notification.vue";
 import { useRoute } from "vue-router";
-import { useLocalStorage } from "@vueuse/core";
 import PageShape from "@growio/shared/components/PageShape.vue";
 import { formatPrice } from "@growio/shared/utils/money";
+import { useCart } from "~/composables/useCart";
 
 defineOptions({ inheritAttrs: false });
 
@@ -117,9 +117,11 @@ defineProps({
 
 const route = useRoute();
 const payloadKey = route.params.payload as string;
-const selectedItems = useLocalStorage<MarketplaceItem[]>(payloadKey, []);
 
 const deleteItemModalRef = ref<InstanceType<typeof PromiseModal>>();
+
+const { decrement, hasQuantity, increment, selectedItems, totalPrice } =
+  useCart({ key: payloadKey, deleteItemModalRef });
 
 const columnHelper = createColumnHelper<MarketplaceItem>();
 
@@ -153,40 +155,4 @@ const table = useVueTable({
     return columns.value;
   },
 });
-
-const totalPrice = computed(() =>
-  hasQuantity.value
-    ? selectedItems.value.reduce(
-        (acc, value) => acc + Number(value.price) * value.quantity!,
-        0
-      )
-    : 0
-);
-
-const hasQuantity = computed(() => selectedItems.value.some((v) => v.quantity));
-
-const increment = (item: MarketplaceItem) => {
-  const foundItem = selectedItems.value.find((i) => i.id === item.id);
-
-  if (foundItem) {
-    foundItem.quantity += 1;
-  }
-};
-
-const decrement = async (item: MarketplaceItem) => {
-  const foundItem = selectedItems.value.find((i) => i.id === item.id);
-
-  if (foundItem && foundItem.quantity >= 1) {
-    foundItem.quantity -= 1;
-    return;
-  }
-
-  try {
-    await deleteItemModalRef.value?.confirm();
-  } catch {
-    return;
-  }
-
-  selectedItems.value = selectedItems.value.filter((v) => v.id !== item.id);
-};
 </script>

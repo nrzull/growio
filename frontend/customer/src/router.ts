@@ -17,8 +17,21 @@ export const router = createRouter({
               children: [
                 {
                   path: ":categoryId?",
-                  component: () =>
-                    import("~/pages/_payload/categories/_categoryId.vue"),
+                  children: [
+                    {
+                      path: "items/:itemId",
+                      component: () =>
+                        import(
+                          "~/pages/_payload/categories/_categoryId/_itemId.vue"
+                        ),
+                    },
+
+                    {
+                      path: "",
+                      component: () =>
+                        import("~/pages/_payload/categories/_categoryId.vue"),
+                    },
+                  ],
                 },
               ],
             },
