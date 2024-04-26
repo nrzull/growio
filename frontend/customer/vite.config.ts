@@ -5,7 +5,16 @@ import browserslist from "browserslist";
 
 export default defineConfig({
   envDir: new URL("../../", import.meta.url).pathname,
-  plugins: [vue()],
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) =>
+            ["swiper-container", "swiper-slide"].some((v) => tag === v),
+        },
+      },
+    }),
+  ],
   resolve: {
     alias: {
       "~": new URL("./src", import.meta.url).pathname,

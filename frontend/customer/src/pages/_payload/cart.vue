@@ -41,8 +41,9 @@
                 `/${payloadKey}/categories/${ctx.row.original.category_id}/items/${ctx.row.original.id}`
               )
             "
-            >{{ ctx.row.original.name }}</span
           >
+            {{ ctx.row.original.name }}
+          </span>
         </template>
 
         <template #price="{ ctx }">

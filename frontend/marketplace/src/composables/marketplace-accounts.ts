@@ -20,6 +20,10 @@ export const fetchMarketplaceAccounts = async () => {
 export const fetchActiveMarketplaceAccount = async () => {
   try {
     marketplaceAccount.value = await apiMarketplaceAccountsGetSelfActive();
+
+    if (marketplaceAccount.value?.marketplace?.name) {
+      document.title = `Growio Marketplace | ${marketplaceAccount.value?.marketplace?.name}`;
+    }
   } catch (e) {
     console.error(e);
   }

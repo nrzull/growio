@@ -75,6 +75,7 @@
               type="neutral"
               size="md"
               icon="minusCircle"
+              active
               @click="decrement(getSelected(item))"
             ></Button>
             <span>{{ getSelected(item).quantity }}</span>
@@ -82,6 +83,7 @@
               type="neutral"
               size="md"
               icon="plus"
+              active
               @click="increment(getSelected(item))"
             ></Button>
           </div>
@@ -198,10 +200,10 @@ const findCategory = buildFindCategory(() => props.payload.items);
 
 .itemPrice {
   font-weight: 700;
+  font-size: 18px;
 }
 
 .itemTitle {
-  width: max-content;
   flex: 1;
 }
 

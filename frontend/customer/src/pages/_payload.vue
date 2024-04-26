@@ -51,6 +51,7 @@ const fetchPayload = async () => {
   try {
     wait.start(Wait.MARKETPLACE_PAYLOAD_FETCH);
     payload.value = await apiCustomersGetMarketplacePayload(payloadKey);
+    document.title = payload.value.marketplace.name;
   } catch (e) {
     console.error(e);
   } finally {

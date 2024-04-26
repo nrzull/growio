@@ -1,5 +1,5 @@
 <template>
-  <div :class="$style.itemId">
+  <div :class="$style.page">
     <Tabs v-if="categoryId">
       <Button
         type="neutral"
@@ -21,8 +21,74 @@
       </Button>
     </Tabs>
 
+    <div :class="$style.top">
+      <div>
+        <div :class="$style.name">
+          {{ item.name }}
+        </div>
+
+        <div :class="$style.price">
+          {{
+            formatPrice({
+              price: item.price,
+              quantity: 1,
+              currency: payload.marketplace.currency,
+            })
+          }}
+        </div>
+      </div>
+
+      <div :class="$style.cartButtonsWrapper">
+        <div v-if="isSelected(item)" :class="$style.cartButtons">
+          <Button
+            size="md"
+            active
+            icon="minusCircle"
+            type="neutral"
+            @click="decrement(getSelected(item))"
+          ></Button>
+          <span>{{ getSelected(item).quantity }}</span>
+          <Button
+            size="md"
+            active
+            icon="plus"
+            type="neutral"
+            @click="increment(getSelected(item))"
+          ></Button>
+        </div>
+        <Button
+          v-else
+          size="md"
+          :class="$style.cartButton"
+          @click="addItem(item)"
+        >
+          Add to Cart
+        </Button>
+      </div>
+    </div>
+
     <div v-if="item" :class="$style.item">
-      <ImagePreview :class="$style.imagePreview" :model-value="item" />
+      <div :class="$style.images">
+        <swiper-container
+          v-if="item.assets.length"
+          :class="$style.images"
+          :slides-per-view="1"
+          :pagination="true"
+          :pagination-clickable="true"
+          direction="vertical"
+        >
+          <swiper-slide v-for="asset in item.assets" :key="asset.id">
+            <img :class="$style.image" :src="asset.src" />
+          </swiper-slide>
+        </swiper-container>
+      </div>
+
+      <div :class="$style.main">
+        <div :class="$style.description">
+          <div :class="$style.subheading">Описание</div>
+          {{ item.description || "-" }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -30,7 +96,7 @@
 <script setup lang="ts">
 import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import { PropType, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useCart } from "~/composables/useCart";
 import {
   buildFindCategory,
@@ -39,7 +105,7 @@ import {
 } from "~/utils/category";
 import Button from "@growio/shared/components/Button.vue";
 import Tabs from "@growio/shared/components/Tabs.vue";
-import ImagePreview from "~/components/ImagePreview.vue";
+import { formatPrice } from "@growio/shared/utils/money";
 
 defineOptions({ inheritAttrs: false });
 
@@ -51,7 +117,6 @@ const props = defineProps({
 });
 
 const route = useRoute();
-const router = useRouter();
 
 const payloadKey = route.params.payload as string;
 
@@ -70,21 +135,82 @@ const item = computed(() =>
 const findCategory = buildFindCategory(() => props.payload.items);
 const findItem = buildFindItem(() => props.payload.items);
 
-const {} = useCart({ key: payloadKey });
+const { isSelected, increment, decrement, getSelected, addItem } = useCart({
+  key: payloadKey,
+});
 </script>
 
 <style module>
-.itemId {
-  display: grid;
-  gap: 12px;
+.page {
+  display: flex;
+  flex-flow: column;
+  gap: 24px;
 }
 
 .item {
   display: grid;
-  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
 }
 
-.imagePreview {
-  height: 480px;
+.name {
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.33;
+  overflow-wrap: anywhere;
+}
+
+.price {
+  font-size: 28px;
+  font-weight: 700;
+  display: inline-flex;
+  width: max-content;
+  border-radius: 8px;
+}
+
+.description {
+  display: grid;
+  gap: 8px;
+}
+
+.subheading {
+  font-weight: 500;
+  font-size: 21px;
+}
+
+.image {
+  width: 100%;
+  object-fit: contain;
+}
+
+.main {
+  display: flex;
+  flex-flow: column;
+  gap: 24px;
+}
+
+.images {
+  height: 320px;
+}
+
+.cartButtonsWrapper {
+  width: 100%;
+}
+
+.cartButtons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.cartButton {
+  width: 100%;
+}
+
+.top {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 24px;
 }
 </style>
