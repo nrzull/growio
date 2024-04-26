@@ -1,7 +1,9 @@
 <template>
   <div :class="$style.main">
     <div id="main"></div>
-    <RouterView v-if="isMounted" />
+    <div :class="$style.content">
+      <RouterView v-if="isMounted" />
+    </div>
   </div>
 </template>
 
@@ -14,17 +16,21 @@ onMounted(() => (isMounted.value = true));
 
 <style module>
 .main {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: clip;
+}
+
+.content {
   position: relative;
   display: flex;
   flex-flow: column;
   gap: 20px;
   padding: 20px;
-  height: 100%;
+  height: inherit;
   max-width: 960px;
   width: 100%;
   margin: 0 auto;
-  overflow-y: auto;
-  overflow-x: clip;
 }
 
 :global(#main) {

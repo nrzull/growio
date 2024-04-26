@@ -33,6 +33,18 @@
     />
     <template v-else>
       <Table :table headless>
+        <template #name="{ ctx }">
+          <span
+            :class="$style.name"
+            @click="
+              $router.push(
+                `/${payloadKey}/categories/${ctx.row.original.category_id}/items/${ctx.row.original.id}`
+              )
+            "
+            >{{ ctx.row.original.name }}</span
+          >
+        </template>
+
         <template #price="{ ctx }">
           <template v-if="ctx.row.original.price && ctx.row.original.quantity">
             {{
@@ -128,10 +140,7 @@ const { decrement, hasQuantity, increment, selectedItems, totalPrice } =
 const columnHelper = createColumnHelper<MarketplaceItem>();
 
 const columns = ref([
-  columnHelper.accessor("name", {
-    cell: (info) => info.getValue(),
-    header: () => "Name",
-  }),
+  columnHelper.display({ id: "name" }),
 
   columnHelper.display({
     id: "quantity",
@@ -158,3 +167,9 @@ const table = useVueTable({
   },
 });
 </script>
+
+<style module>
+.name {
+  cursor: pointer;
+}
+</style>

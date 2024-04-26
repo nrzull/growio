@@ -3,7 +3,6 @@
     <Tabs v-if="categoryId">
       <Button
         type="neutral"
-        :class="$style.heading"
         size="md"
         icon="arrowBack"
         @click="categoryId = undefined"
@@ -11,10 +10,9 @@
       </Button>
 
       <Button
-        v-for="category in getCategoryAncestors()"
+        v-for="category in getCategoryAncestors({ findCategory, categoryId })"
         :key="category.id"
         type="neutral"
-        :class="$style.heading"
         size="md"
         :active="categoryId === category.id"
         @click="categoryId = category.id"
@@ -48,19 +46,15 @@
           :class="$style.item"
           type="secondary"
         >
-          <div
-            :class="[
-              $style.itemImageWrapper,
-              { [$style.empty]: !item.assets.at(0) },
-            ]"
-          >
-            <img
-              v-if="item.assets.at(0)"
-              :class="$style.itemImage"
-              :src="item.assets.at(0).src"
-            />
-            <Icon v-else value="imageRect" size="lg" />
-          </div>
+          <ImagePreview
+            :model-value="item"
+            :class="$style.imagePreview"
+            @click="
+              $router.push(
+                `/${payloadKey}/categories/${item.category_id}/items/${item.id}`
+              )
+            "
+          />
 
           <div :class="$style.itemPrice">
             {{
@@ -72,14 +66,7 @@
             }}
           </div>
 
-          <div
-            :class="$style.itemTitle"
-            @click="
-              $router.push(
-                `/${payloadKey}/categories/${item.category_id}/items/${item.id}`
-              )
-            "
-          >
+          <div :class="$style.itemTitle">
             {{ item.name }}
           </div>
 
@@ -107,23 +94,22 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  MarketplaceTreeCategory,
-  MarketplaceTreeItem,
-} from "@growio/shared/api/growio/marketplace_items_tree/types";
 import { PropType } from "vue";
 import { isMarketplaceTreeItemCategory } from "@growio/shared/api/growio/marketplace_items_tree/utils";
-
 import Shape from "@growio/shared/components/Shape.vue";
 import Button from "@growio/shared/components/Button.vue";
 import Tabs from "@growio/shared/components/Tabs.vue";
-import { isMarketplaceItem } from "@growio/shared/api/growio/marketplace_items/utils";
 import Notification from "@growio/shared/components/Notifications/Notification.vue";
 import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import { useRoute, useRouter } from "vue-router";
 import { useCart } from "~/composables/useCart";
 import { formatPrice } from "@growio/shared/utils/money";
-import Icon from "@growio/shared/components/Icon.vue";
+import {
+  buildFindCategory,
+  getCategoryAncestors,
+  getItemDescendants,
+} from "~/utils/category";
+import ImagePreview from "~/components/ImagePreview.vue";
 
 defineOptions({ inheritAttrs: false });
 
@@ -167,62 +153,7 @@ const activeItems = computed(() =>
     : categories.value.map((category) => getItemDescendants(category)).flat()
 );
 
-const getCategoryAncestors = () => {
-  if (!categoryId.value) {
-    return [];
-  }
-
-  const category = findCategory(categoryId.value);
-
-  const ancestors = [];
-
-  const executor = (parent = category) => {
-    const target = findCategory(parent?.parent_id);
-
-    if (target) {
-      ancestors.unshift(target);
-      executor(target);
-    }
-  };
-
-  executor();
-
-  return ancestors.concat(category);
-};
-
-const getItemDescendants = (category: MarketplaceTreeCategory) => {
-  const itemDescendants: MarketplaceTreeItem[] = [];
-
-  const executor = (target = category) => {
-    target.children.map((c) => {
-      if (isMarketplaceItem(c)) {
-        itemDescendants.push(c);
-      } else {
-        executor(c);
-      }
-    });
-  };
-
-  executor();
-
-  return itemDescendants;
-};
-
-const findCategory = (id: number) => {
-  const executor = (
-    children = props.payload.items
-  ): MarketplaceTreeCategory[] => {
-    const r = children
-      .filter(isMarketplaceTreeItemCategory)
-      .map((v) => (v.id === id ? v : executor(v.children)));
-
-    return r.flat();
-  };
-
-  const [foundCategory] = executor();
-
-  return foundCategory;
-};
+const findCategory = buildFindCategory(() => props.payload.items);
 </script>
 
 <style module>
@@ -271,31 +202,10 @@ const findCategory = (id: number) => {
 
 .itemTitle {
   width: max-content;
-  cursor: pointer;
-  transition: color 0.2s ease;
   flex: 1;
 }
 
-.itemImageWrapper {
-  width: 100%;
-  height: 200px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.itemImageWrapper.empty {
-  background-color: var(--color-gray-50);
-  border-radius: 8px;
-}
-
-.itemImage {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.itemTitle:hover {
-  color: var(--color-gray-500);
+.imagePreview {
+  cursor: pointer;
 }
 </style>
