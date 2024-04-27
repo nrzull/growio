@@ -45,7 +45,7 @@
             active
             icon="minusCircle"
             type="neutral"
-            @click="decrement(getSelected(item))"
+            @click="decrement(item)"
           ></Button>
           <span>{{ getSelected(item).quantity }}</span>
           <Button
@@ -53,7 +53,7 @@
             active
             icon="plus"
             type="neutral"
-            @click="increment(getSelected(item))"
+            @click="increment(item)"
           ></Button>
         </div>
         <Button
@@ -137,6 +137,7 @@ const findItem = buildFindItem(() => props.payload.items);
 
 const { isSelected, increment, decrement, getSelected, addItem } = useCart({
   key: payloadKey,
+  items: computed(() => props.payload.items),
 });
 </script>
 

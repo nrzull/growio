@@ -1,12 +1,18 @@
-import { MarketplaceTreeItem } from "@growio/shared/api/growio/marketplace_items_tree/types";
+import {
+  MarketplaceItemsTree,
+  MarketplaceTreeItem,
+} from "@growio/shared/api/growio/marketplace_items_tree/types";
 import { useLocalStorage } from "@vueuse/core";
 import PromiseModal from "@growio/shared/components/PromiseModal.vue";
-import { Ref, computed } from "vue";
+import { ComputedRef, Ref, computed } from "vue";
+import { buildFindItem } from "~/utils/category";
 
 export const useCart = (params: {
   key: string;
   deleteItemModalRef?: Ref<InstanceType<typeof PromiseModal>>;
+  items: ComputedRef<MarketplaceItemsTree>;
 }) => {
+  const findItem = buildFindItem(() => params.items.value);
   const selectedItems = useLocalStorage<MarketplaceTreeItem[]>(params.key, []);
 
   const hasQuantity = computed(() =>
@@ -23,20 +29,24 @@ export const useCart = (params: {
   );
 
   const increment = (item: MarketplaceTreeItem) => {
-    const foundItem = selectedItems.value.find((i) => i.id === item.id);
+    const sourceItem = findItem(item.id);
+    const selectedItem = selectedItems.value.find((i) => i.id === item.id);
 
-    if (foundItem) {
-      foundItem.quantity += 1;
+    if (
+      selectedItem &&
+      (selectedItem.quantity + 1 <= sourceItem.quantity || sourceItem.infinity)
+    ) {
+      selectedItem.quantity += 1;
     } else {
       addItem(item);
     }
   };
 
   const decrement = async (item: MarketplaceTreeItem) => {
-    const foundItem = selectedItems.value.find((i) => i.id === item.id);
+    const selectedItem = selectedItems.value.find((i) => i.id === item.id);
 
-    if (foundItem && foundItem.quantity >= 2) {
-      foundItem.quantity -= 1;
+    if (selectedItem && selectedItem.quantity >= 2) {
+      selectedItem.quantity -= 1;
       return;
     }
 
@@ -56,7 +66,9 @@ export const useCart = (params: {
     selectedItems.value.find((v) => v.id === item.id);
 
   const addItem = (item: MarketplaceTreeItem) => {
-    if (isSelected(item)) {
+    const sourceItem = findItem(item.id);
+
+    if (isSelected(sourceItem) || sourceItem.quantity < 1) {
       return;
     }
 
@@ -64,7 +76,9 @@ export const useCart = (params: {
   };
 
   const removeItem = (item: MarketplaceTreeItem) => {
-    if (!isSelected(item)) {
+    const sourceItem = findItem(item.id);
+
+    if (!isSelected(sourceItem)) {
       return;
     }
 

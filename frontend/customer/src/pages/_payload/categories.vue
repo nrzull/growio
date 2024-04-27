@@ -33,7 +33,7 @@ import { useRoute } from "vue-router";
 import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import { useCart } from "~/composables/useCart";
 
-defineProps({
+const props = defineProps({
   loading: {
     type: Boolean,
     default: false,
@@ -48,5 +48,8 @@ defineProps({
 const route = useRoute();
 const payloadKey = route.params.payload as string;
 const categoryId = computed(() => route.params.categoryId as string);
-const { selectedItems } = useCart({ key: payloadKey });
+const { selectedItems } = useCart({
+  key: payloadKey,
+  items: computed(() => props.payload.items),
+});
 </script>

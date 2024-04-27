@@ -76,7 +76,7 @@
               size="md"
               icon="minusCircle"
               active
-              @click="decrement(getSelected(item))"
+              @click="decrement(item)"
             ></Button>
             <span>{{ getSelected(item).quantity }}</span>
             <Button
@@ -84,7 +84,7 @@
               size="md"
               icon="plus"
               active
-              @click="increment(getSelected(item))"
+              @click="increment(item)"
             ></Button>
           </div>
           <Button v-else size="md" @click="addItem(item)">Add to Cart</Button>
@@ -129,6 +129,7 @@ const payloadKey = route.params.payload as string;
 
 const { increment, decrement, addItem, isSelected, getSelected } = useCart({
   key: payloadKey,
+  items: computed(() => props.payload.items),
 });
 
 const categoryId = computed({

@@ -100,7 +100,7 @@
 <script setup lang="ts">
 import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import { MarketplaceItem } from "@growio/shared/api/growio/marketplace_items/types";
-import { PropType, ref } from "vue";
+import { PropType, computed, ref } from "vue";
 import Tabs from "@growio/shared/components/Tabs.vue";
 import Button from "@growio/shared/components/Button.vue";
 import Table from "@growio/shared/components/Table.vue";
@@ -118,7 +118,7 @@ import { useCart } from "~/composables/useCart";
 
 defineOptions({ inheritAttrs: false });
 
-defineProps({
+const props = defineProps({
   loading: {
     type: Boolean,
     default: false,
@@ -136,7 +136,11 @@ const payloadKey = route.params.payload as string;
 const deleteItemModalRef = ref<InstanceType<typeof PromiseModal>>();
 
 const { decrement, hasQuantity, increment, selectedItems, totalPrice } =
-  useCart({ key: payloadKey, deleteItemModalRef });
+  useCart({
+    key: payloadKey,
+    deleteItemModalRef,
+    items: computed(() => props.payload.items),
+  });
 
 const columnHelper = createColumnHelper<MarketplaceItem>();
 
