@@ -159,5 +159,6 @@ defmodule GrowioWeb.Router do
   scope "/api/customers/marketplace" do
     pipe_through([:guest])
     get("/payload/:payload", MarketplaceCustomerController, :show_payload)
+    patch("/payload/:payload", MarketplaceCustomerController, :update_payload)
   end
 end

@@ -26,30 +26,18 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed } from "vue";
+import { computed } from "vue";
 import PageShape from "@growio/shared/components/PageShape.vue";
 import Button from "@growio/shared/components/Button.vue";
 import { useRoute } from "vue-router";
-import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import { useCart } from "~/composables/useCart";
-
-const props = defineProps({
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-
-  payload: {
-    type: Object as PropType<MarketplacePayload>,
-    required: true,
-  },
-});
+import { payload } from "~/composables/payload";
 
 const route = useRoute();
 const payloadKey = route.params.payload as string;
 const categoryId = computed(() => route.params.categoryId as string);
 const { selectedItems } = useCart({
   key: payloadKey,
-  items: computed(() => props.payload.items),
+  items: computed(() => payload.value.items),
 });
 </script>

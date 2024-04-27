@@ -39,6 +39,8 @@
   --color-primary-hover: var(--color-primary-300);
 
   --swiper-pagination-color: var(--color-primary);
+  --notifications-top: calc(96px - 24px);
+  --notifications-right: 24px;
 
   --font-size: 16px;
   --font-family: Inter, serif;

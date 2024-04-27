@@ -14,8 +14,6 @@ defmodule Growio.Marketplaces.MarketplaceOrder do
     field(:status, Ecto.Enum,
       values: [
         :init,
-        :need_help,
-        :need_price_approval,
         :need_payment,
         :done,
         :cancelled
@@ -35,4 +33,16 @@ defmodule Growio.Marketplaces.MarketplaceOrder do
     |> cast(params, @required ++ @optional)
     |> validate_required(@required)
   end
+
+  def valid_status_change?(:init, to),
+    do: String.to_existing_atom(to) in [:need_payment]
+
+  def valid_status_change?(:need_payment, to),
+    do: String.to_existing_atom(to) in [:done, :cancelled]
+
+  def valid_status_change?(:done, to),
+    do: String.to_existing_atom(to) in []
+
+  def valid_status_change?(:cancelled, to),
+    do: String.to_existing_atom(to) in []
 end

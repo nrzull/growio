@@ -1429,4 +1429,9 @@ defmodule Growio.Marketplaces do
   def get_order(order_id) when is_bitstring(order_id) do
     Repo.get(MarketplaceOrder, order_id)
   end
+
+  def update_order(%MarketplaceOrder{} = order, %{} = params) do
+    MarketplaceOrder.changeset(order, params)
+    |> Repo.update()
+  end
 end

@@ -96,13 +96,11 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { PropType } from "vue";
 import { isMarketplaceTreeItemCategory } from "@growio/shared/api/growio/marketplace_items_tree/utils";
 import Shape from "@growio/shared/components/Shape.vue";
 import Button from "@growio/shared/components/Button.vue";
 import Tabs from "@growio/shared/components/Tabs.vue";
 import Notification from "@growio/shared/components/Notifications/Notification.vue";
-import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import { useRoute, useRouter } from "vue-router";
 import { useCart } from "~/composables/useCart";
 import { formatPrice } from "@growio/shared/utils/money";
@@ -112,24 +110,15 @@ import {
   getItemDescendants,
 } from "~/utils/category";
 import ImagePreview from "~/components/ImagePreview.vue";
-
-defineOptions({ inheritAttrs: false });
-
-const props = defineProps({
-  payload: {
-    type: Object as PropType<MarketplacePayload>,
-    required: true,
-  },
-});
+import { payload } from "~/composables/payload";
 
 const route = useRoute();
 const router = useRouter();
-
 const payloadKey = route.params.payload as string;
 
 const { increment, decrement, addItem, isSelected, getSelected } = useCart({
   key: payloadKey,
-  items: computed(() => props.payload.items),
+  items: computed(() => payload.value.items),
 });
 
 const categoryId = computed({
@@ -143,7 +132,7 @@ const currentCategory = computed(() =>
 );
 
 const inventory = computed(
-  () => currentCategory.value?.children || props.payload.items || []
+  () => currentCategory.value?.children || payload.value.items || []
 );
 
 const categories = computed(() =>
@@ -156,7 +145,7 @@ const activeItems = computed(() =>
     : categories.value.map((category) => getItemDescendants(category)).flat()
 );
 
-const findCategory = buildFindCategory(() => props.payload.items);
+const findCategory = buildFindCategory(() => payload.value.items);
 </script>
 
 <style module>

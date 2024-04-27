@@ -310,4 +310,20 @@ defmodule GrowioWeb.Schemas do
       properties: %{}
     })
   end
+
+  defmodule MarketplacePayloadUpdate do
+    schema(%{
+      type: :object,
+      properties: %{
+        status: %Schema{type: :string},
+        items: %Schema{
+          type: :array,
+          items: %Schema{
+            type: :object,
+            properties: %{}
+          }
+        }
+      }
+    })
+  end
 end

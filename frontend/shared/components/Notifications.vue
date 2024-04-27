@@ -16,8 +16,8 @@ import Notification from "@growio/shared/components/Notifications/Notification.v
 <style module>
 .notifications {
   position: fixed;
-  right: 24px;
-  top: calc(96px - 24px);
+  right: var(--notifications-right);
+  top: var(--notifications-top);
   z-index: var(--z-index-notifications);
   display: grid;
   gap: 8px;

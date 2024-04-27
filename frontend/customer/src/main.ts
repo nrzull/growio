@@ -3,9 +3,15 @@ import { createApp } from "vue";
 import { router } from "~/router";
 import App from "~/App.vue";
 import { register } from "swiper/element/bundle";
+import { fetchPayload } from "~/composables/payload";
 
 register();
 
-const app = createApp(App).use(router);
+const {
+  params: { payload },
+} = router.resolve(new URL(document.location.href).pathname);
 
-router.isReady().then(() => app.mount("#app"));
+fetchPayload(payload as string).then(() => {
+  const app = createApp(App).use(router);
+  router.isReady().then(() => app.mount("#app"));
+});

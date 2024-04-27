@@ -2,7 +2,7 @@
   <PageLoader :loading="isLoading" />
 
   <RouterView v-if="payload" v-slot="{ Component }">
-    <component :is="Component" :loading="isLoading" :payload="payload">
+    <component :is="Component">
       <template #heading>
         {{ payload.marketplace.name }}
 
@@ -25,17 +25,11 @@
 </template>
 
 <script setup lang="ts">
-import { apiCustomersGetMarketplacePayload } from "@growio/shared/api/growio/customers";
-import { MarketplacePayload } from "@growio/shared/api/growio/customers/types";
 import { Wait, wait } from "@growio/shared/composables/wait";
-import { computed, ref } from "vue";
-import { useRoute } from "vue-router";
+import { computed } from "vue";
 import PageLoader from "@growio/shared/components/PageLoader.vue";
 import Icon from "@growio/shared/components/Icon.vue";
-
-const route = useRoute();
-const payloadKey = route.params.payload as string;
-const payload = ref<MarketplacePayload>();
+import { payload } from "~/composables/payload";
 
 const isLoading = computed(() => wait.some([Wait.MARKETPLACE_PAYLOAD_FETCH]));
 
@@ -46,20 +40,6 @@ const telegramBotLink = computed(() => {
     return `https://t.me/${tag}`;
   }
 });
-
-const fetchPayload = async () => {
-  try {
-    wait.start(Wait.MARKETPLACE_PAYLOAD_FETCH);
-    payload.value = await apiCustomersGetMarketplacePayload(payloadKey);
-    document.title = payload.value.marketplace.name;
-  } catch (e) {
-    console.error(e);
-  } finally {
-    wait.end(Wait.MARKETPLACE_PAYLOAD_FETCH);
-  }
-};
-
-fetchPayload();
 </script>
 
 <style module>
