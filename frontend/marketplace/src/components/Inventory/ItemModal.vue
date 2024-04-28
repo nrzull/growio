@@ -22,8 +22,16 @@
     </div>
 
     <div :class="$style.row">
-      <TextInput v-model="item.quantity" placeholder="Quantity" />
+      <TextInput
+        v-model="item.quantity"
+        placeholder="Quantity"
+        :readonly="item.infinity"
+      />
       <TextInput v-model="item.description" placeholder="Description" />
+    </div>
+
+    <div :class="$style.row">
+      <Checkbox v-model="item.infinity"> Infinity </Checkbox>
     </div>
 
     <Dropzone
@@ -62,6 +70,7 @@ import {
   PartialMarketplaceItemAsset,
 } from "@growio/shared/api/growio/marketplace_item_assets/types";
 import { marketplaceAccount } from "~/composables/marketplace-accounts";
+import Checkbox from "@growio/shared/components/Checkbox.vue";
 
 const props = defineProps({
   modelValue: {
