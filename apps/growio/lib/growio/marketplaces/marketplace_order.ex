@@ -6,7 +6,7 @@ defmodule Growio.Marketplaces.MarketplaceOrder do
 
   @type t :: %__MODULE__{}
   @required ~w(status)a
-  @optional ~w(items currency payment_type payment_provider delivery_type delivery_provider)a
+  @optional ~w(items currency payment_type payment_provider delivery_type delivery_provider delivery_address)a
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
@@ -30,6 +30,7 @@ defmodule Growio.Marketplaces.MarketplaceOrder do
     field(:payment_provider, Ecto.Enum, values: [:system])
     field(:delivery_type, Ecto.Enum, values: [:export, :self_export])
     field(:delivery_provider, Ecto.Enum, values: [:merchant])
+    field(:delivery_address, :string)
 
     belongs_to(:marketplace, Marketplace)
     belongs_to(:telegram_bot_customer, MarketplaceTelegramBotCustomer)

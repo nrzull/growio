@@ -11,6 +11,7 @@ defmodule Growio.Repo.Migrations.CreateMarketplaceOrders do
       add(:payment_provider, :string)
       add(:delivery_type, :string)
       add(:delivery_provider, :string)
+      add(:delivery_address, :string)
 
       add(:marketplace_id, references(:marketplaces), null: false)
       add(:telegram_bot_customer_id, references(:marketplace_telegram_bot_customers))

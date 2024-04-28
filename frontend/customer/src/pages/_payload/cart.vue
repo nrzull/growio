@@ -82,6 +82,27 @@
         </template>
       </Table>
 
+      <div :class="$style.radioGroups">
+        <div :class="$style.radioGroup">
+          <div :class="$style.radioGroupTitle">Оплата</div>
+          <Radio option="online" v-model="paymentType">Картой онлайн</Radio>
+          <Radio option="in_place" v-model="paymentType">Наличными</Radio>
+        </div>
+
+        <div :class="$style.radioGroup">
+          <div :class="$style.radioGroupTitle">Способы доставки</div>
+          <Radio option="self_export" v-model="deliveryType">Самовывоз</Radio>
+          <Radio option="export" v-model="deliveryType">
+            Указать адрес доставки
+          </Radio>
+          <TextInput
+            v-if="deliveryType === 'export'"
+            placeholder="Адрес"
+            v-model="deliveryAddress"
+          />
+        </div>
+      </div>
+
       <Button :disabled="!hasQuantity" @click="updateOrder">
         Checkout
 
@@ -127,10 +148,16 @@ import {
 } from "@growio/shared/composables/notifications/constants";
 import { apiCustomersUpdateMarketplacePayload } from "@growio/shared/api/growio/customers";
 import { payload, getPayload } from "~/composables/payload";
+import Radio from "@growio/shared/components/Radio.vue";
+import TextInput from "@growio/shared/components/TextInput.vue";
 
 const route = useRoute();
 const router = useRouter();
 const payloadKey = route.params.payload as string;
+
+const paymentType = ref<"online" | "in_place">("online");
+const deliveryType = ref<"export" | "self_export">("self_export");
+const deliveryAddress = ref<string>();
 
 const deleteItemModalRef = ref<InstanceType<typeof PromiseModal>>();
 
@@ -210,7 +237,13 @@ const updateOrder = async () => {
 
     payload.value = await apiCustomersUpdateMarketplacePayload({
       key: payloadKey,
-      payload: { items: selectedItems.value, status: "need_payment" },
+      payload: {
+        items: selectedItems.value,
+        status: paymentType.value === "online" ? "need_payment" : "preparing",
+        payment_type: paymentType.value,
+        delivery_type: deliveryType.value,
+        delivery_address: deliveryAddress.value,
+      },
     });
 
     router.push(`/${payloadKey}/status`);
@@ -226,5 +259,20 @@ const updateOrder = async () => {
 <style module>
 .name {
   cursor: pointer;
+}
+
+.radioGroups {
+  display: grid;
+  gap: 24px;
+}
+
+.radioGroup {
+  display: grid;
+  gap: 8px;
+}
+
+.radioGroupTitle {
+  font-size: 18px;
+  font-weight: 500;
 }
 </style>

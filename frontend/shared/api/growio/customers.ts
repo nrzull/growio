@@ -10,10 +10,10 @@ export const apiCustomersGetMarketplacePayload = (params: string) =>
 
 export const apiCustomersUpdateMarketplacePayload = (params: {
   key: string;
-  payload: {
-    items: Array<Pick<MarketplaceItem, "id" | "name" | "price" | "quantity">>;
-    status: MarketplaceOrder["status"];
-  };
+  payload: Pick<
+    MarketplaceOrder,
+    "items" | "status" | "payment_type" | "delivery_type" | "delivery_address"
+  >;
 }) =>
   growio
     .patch<MarketplacePayload>(

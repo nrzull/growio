@@ -18,6 +18,7 @@ export type MarketplaceOrder = {
   payment_provider?: "system";
   delivery_type?: "export" | "self_export";
   delivery_provider?: "merchant";
+  delivery_address?: string;
   marketplace_id: number;
   telegram_bot_customer_id?: number;
 };
