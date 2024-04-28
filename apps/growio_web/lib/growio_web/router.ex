@@ -110,6 +110,12 @@ defmodule GrowioWeb.Router do
       :index_self
     )
 
+    get(
+      "/telegram_bot/customers",
+      MarketplaceTelegramBotController,
+      :index_self_customers
+    )
+
     patch(
       "/telegram_bot",
       MarketplaceTelegramBotController,

@@ -284,6 +284,17 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
+  defmodule MarketplaceTelegramBotCustomer do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer},
+        bot_id: %Schema{type: :integer},
+        conversation: %Schema{type: :boolean}
+      }
+    })
+  end
+
   defmodule MarketplaceOrder do
     schema(%{
       type: :object,

@@ -7,6 +7,7 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
   alias Growio.Marketplaces
   alias Growio.Marketplaces.MarketplaceTelegramBot
   alias GrowioWeb.Views.MarketplaceTelegramBotJSON
+  alias GrowioWeb.Views.MarketplaceTelegramBotCustomerJSON
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -87,6 +88,23 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
          {:ok, deleted_telegram_bot} <-
            Marketplaces.delete_telegram_bot(marketplace_account, id) do
       Conn.ok(conn, MarketplaceTelegramBotJSON.render(deleted_telegram_bot))
+    end
+  end
+
+  operation(:index_self_customers,
+    summary: "get self marketplace telegram bot customers",
+    responses: [ok: {"", "application/json", Schemas.MarketplaceTelegramBotCustomer}]
+  )
+
+  def index_self_customers(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        _params
+      ) do
+    opts = GrowioWeb.QueryParams.into_keyword(conn.query_params)
+
+    with values when is_list(values) <-
+           Marketplaces.all_telegram_bot_customers(marketplace_account, opts) do
+      Conn.ok(conn, MarketplaceTelegramBotCustomerJSON.render(values))
     end
   end
 end

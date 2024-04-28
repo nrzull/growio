@@ -1398,6 +1398,30 @@ defmodule Growio.Marketplaces do
     |> Repo.one()
   end
 
+  def all_telegram_bot_customers(%MarketplaceAccount{} = initiator, opts) do
+    filters = Keyword.get(opts, :filters, %{})
+
+    with true <- Permissions.ok?(initiator, marketplaces__telegram_bot__read()),
+         bot = %MarketplaceTelegramBot{} <- get_telegram_bot(initiator) do
+      query =
+        MarketplaceTelegramBotCustomer
+        |> where([customer], customer.bot_id == ^bot.id)
+
+      query =
+        Enum.reduce(filters, query, fn
+          {"conversation", v}, acc ->
+            acc
+            |> where([customer], customer.conversation == ^v)
+
+          _, acc ->
+            acc
+        end)
+
+      query
+      |> Repo.all()
+    end
+  end
+
   def create_telegram_bot_customer(%MarketplaceTelegramBot{} = bot, %{} = params) do
     MarketplaceTelegramBotCustomer.changeset(params)
     |> Changeset.put_assoc(:bot, bot)
