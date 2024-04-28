@@ -36,15 +36,15 @@ defmodule GrowioWeb.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "1.7.11"},
-      {:phoenix_ecto, "4.4.3"},
+      {:phoenix, "1.7.12"},
+      {:phoenix_ecto, "4.5.1"},
       {:telemetry_metrics, "0.6.2"},
       {:telemetry_poller, "1.0.0"},
       {:gettext, "0.24.0"},
       {:growio, in_umbrella: true},
       {:jason, "1.4.1"},
-      {:plug_cowboy, "2.7.0"},
-      {:open_api_spex, "3.18.2"},
+      {:plug_cowboy, "2.7.1"},
+      {:open_api_spex, "3.18.3"},
       {:corsica, "2.1.3"}
     ]
   end

@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { ensureSomeStatus } from "~/middlewares/ensureStatus";
+import {
+  ensureSomeStatus,
+  ensureNotSomeStatus,
+} from "~/middlewares/ensureStatus";
 import { payload } from "~/composables/payload";
 
 export const router = createRouter({
@@ -12,6 +15,10 @@ export const router = createRouter({
         {
           path: ":payload",
           component: () => import("~/pages/_payload.vue"),
+          redirect: ({ params }) =>
+            payload.value.order.status === "init"
+              ? `${params.payload}/categories`
+              : `${params.payload}/status`,
           children: [
             {
               path: "categories",
@@ -52,21 +59,9 @@ export const router = createRouter({
             {
               path: "status",
               beforeEnter: [
-                (to) =>
-                  ensureSomeStatus(
-                    ["need_payment", "done", "cancelled"],
-                    `/${to.params.payload}`
-                  ),
+                (to) => ensureNotSomeStatus(["init"], `/${to.params.payload}`),
               ],
               component: () => import("~/pages/_payload/status.vue"),
-            },
-
-            {
-              path: "",
-              redirect: ({ params }) =>
-                payload.value.order.status === "init"
-                  ? `${params.payload}/categories`
-                  : `${params.payload}/status`,
             },
           ],
         },

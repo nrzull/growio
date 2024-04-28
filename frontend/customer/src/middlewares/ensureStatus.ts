@@ -10,3 +10,12 @@ export const ensureSomeStatus = (
     return redirect;
   }
 };
+
+export const ensureNotSomeStatus = (
+  statuses: Array<MarketplaceOrder["status"]>,
+  redirect: RouteLocationRaw
+) => {
+  if (statuses.some((status) => status === payload.value.order.status)) {
+    return redirect;
+  }
+};

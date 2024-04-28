@@ -13,6 +13,7 @@ defmodule GrowioWeb.Views.MarketplaceOrderJSON do
       payment_provider: value.payment_provider,
       delivery_type: value.delivery_type,
       delivery_provider: value.delivery_provider,
+      delivery_address: value.delivery_address,
       marketplace_id: value.marketplace_id,
       telegram_bot_customer_id: value.telegram_bot_customer_id
     }

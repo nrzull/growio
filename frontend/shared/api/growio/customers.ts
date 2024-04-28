@@ -1,7 +1,6 @@
 import { growio } from "@growio/shared/api/growio";
 import { MarketplacePayload } from "./customers/types";
 import { MarketplaceOrder } from "./marketplace_orders/types";
-import { MarketplaceItem } from "./marketplace_items/types";
 
 export const apiCustomersGetMarketplacePayload = (params: string) =>
   growio

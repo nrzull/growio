@@ -246,7 +246,7 @@ const updateOrder = async () => {
       },
     });
 
-    router.push(`/${payloadKey}/status`);
+    location.reload();
   } catch (e) {
     console.error(e);
     addErrorNotification({ text: NOTIFICATION_CUSTOMER_PAYLOAD_UPDATE_ERROR });

@@ -6,9 +6,13 @@ defmodule GrowioWeb.Views.MarketplacePayloadJSON do
 
   def render(values) when is_list(values), do: Enum.map(values, &render(&1))
 
-  def render(%{order: %MarketplaceOrder{} = order, items: items, integrations: integrations}) do
+  def render(%{
+        order: %MarketplaceOrder{marketplace: marketplace} = order,
+        items: items,
+        integrations: integrations
+      }) do
     %{
-      marketplace: MarketplaceJSON.render(order.marketplace),
+      marketplace: MarketplaceJSON.render(marketplace),
       order: MarketplaceOrderJSON.render(order),
       items: MarketplaceItemTreeJSON.render(items),
       integrations: integrations
