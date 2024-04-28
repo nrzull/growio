@@ -38,6 +38,16 @@ defmodule GrowioTelegram.Interface do
     {:noreply, state}
   end
 
+  def handle_cast({:send_message, bot, opts}, state) do
+    Telegram.Api.request(bot.token, "sendMessage", opts)
+    |> case do
+      {:error, _} = v -> IO.inspect(v)
+      _ -> nil
+    end
+
+    {:noreply, state}
+  end
+
   def handle_cast(_, state) do
     {:noreply, state}
   end

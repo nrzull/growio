@@ -48,7 +48,7 @@ defmodule Growio.Marketplaces.MarketplaceOrder do
   def status_changes do
     %{
       init: [:need_payment, :preparing],
-      need_payment: [:preparing, :cancelled],
+      need_payment: [:preparing],
       preparing: [:can_be_taken, :can_be_delivered, :cancelled],
       can_be_taken: [:done, :cancelled],
       can_be_delivered: [:delivering, :cancelled],

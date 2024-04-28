@@ -95,12 +95,21 @@ defmodule GrowioTelegram.MarketBot do
       with customer = %MarketplaceTelegramBotCustomer{} <-
              Marketplaces.get_telegram_bot_customer(bot, chat_id),
            {:ok, order} = Marketplaces.create_order(customer) do
-        text =
+        url =
           URI.parse(@market_url)
           |> URI.append_path("/#{order.id}")
           |> URI.to_string()
 
-        Telegram.Api.request(token, "sendMessage", text: text, chat_id: chat_id)
+        text =
+          "[Created a new session for your shopping. Click on me to check what we have for you!](#{url})\n\n```#{order.id}```"
+
+        text = if Mix.env() == :dev, do: "#{text}\n\n`#{url}`", else: text
+
+        Telegram.Api.request(token, "sendMessage",
+          text: text,
+          chat_id: chat_id,
+          parse_mode: "Markdown"
+        )
       end
     end
 

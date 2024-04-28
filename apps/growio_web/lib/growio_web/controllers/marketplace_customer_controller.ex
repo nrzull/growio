@@ -9,6 +9,7 @@ defmodule GrowioWeb.Controllers.MarketplaceCustomerController do
   alias GrowioWeb.Views.MarketplacePayloadJSON
   alias GrowioWeb.Views.MarketplaceTelegramBotJSON
   alias Growio.Marketplaces.MarketplaceTelegramBot
+  alias Growio.Marketplaces.MarketplaceTelegramBotCustomer
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -100,6 +101,28 @@ defmodule GrowioWeb.Controllers.MarketplaceCustomerController do
                    "delivery_address" => delivery_address
                  }),
                {:ok, payload} <- prepare_payload(updated_order) do
+            if order.status != updated_order.status and updated_order.status == :preparing do
+              with %MarketplaceOrder{
+                     telegram_bot_customer: %MarketplaceTelegramBotCustomer{
+                       chat_id: chat_id,
+                       bot: bot
+                     }
+                   } <- Repo.preload(updated_order, telegram_bot_customer: [:bot]) do
+                text =
+                  "You've just created an order! Here are some details:\n\nProducts: `#{Jason.encode!(payload.items)}`"
+                  |> String.trim()
+
+                GrowioWeb.Interface.telegram_cast(
+                  {:send_message, bot,
+                   [
+                     chat_id: chat_id,
+                     text: text,
+                     parse_mode: "Markdown"
+                   ]}
+                )
+              end
+            end
+
             Conn.ok(conn, payload)
           end
       end

@@ -81,6 +81,7 @@
             <img :class="$style.image" :src="asset.src" />
           </swiper-slide>
         </swiper-container>
+        <ImagePreview v-else :model-value="item" />
       </div>
 
       <div :class="$style.main">
@@ -106,6 +107,7 @@ import Button from "@growio/shared/components/Button.vue";
 import Tabs from "@growio/shared/components/Tabs.vue";
 import { formatPrice } from "@growio/shared/utils/money";
 import { payload } from "~/composables/payload";
+import ImagePreview from "~/components/ImagePreview.vue";
 
 const route = useRoute();
 const payloadKey = route.params.payload as string;
