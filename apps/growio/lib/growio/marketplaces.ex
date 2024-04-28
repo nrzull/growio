@@ -1404,6 +1404,11 @@ defmodule Growio.Marketplaces do
     |> Repo.insert()
   end
 
+  def update_telegram_bot_customer(%MarketplaceTelegramBotCustomer{} = bot, params) do
+    MarketplaceTelegramBotCustomer.changeset(bot, params)
+    |> Repo.update()
+  end
+
   def create_order(
         %MarketplaceTelegramBotCustomer{} = customer,
         %{} = params \\ %{payload: %{}}

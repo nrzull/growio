@@ -103,11 +103,14 @@ defmodule GrowioWeb.Controllers.MarketplaceCustomerController do
                {:ok, payload} <- prepare_payload(updated_order) do
             if order.status != updated_order.status and updated_order.status == :preparing do
               with %MarketplaceOrder{
-                     telegram_bot_customer: %MarketplaceTelegramBotCustomer{
-                       chat_id: chat_id,
-                       bot: bot
-                     }
+                     telegram_bot_customer:
+                       %MarketplaceTelegramBotCustomer{
+                         chat_id: chat_id,
+                         bot: bot
+                       } = customer
                    } <- Repo.preload(updated_order, telegram_bot_customer: [:bot]) do
+                Marketplaces.update_telegram_bot_customer(customer, %{conversation: true})
+
                 text =
                   "You've just created an order! Here are some details:\n\nProducts: `#{Jason.encode!(payload.items)}`"
                   |> String.trim()

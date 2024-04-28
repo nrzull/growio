@@ -5,10 +5,11 @@ defmodule Growio.Marketplaces.MarketplaceTelegramBotCustomer do
 
   @type t :: %__MODULE__{}
   @required ~w(chat_id)a
-  @optional ~w()a
+  @optional ~w(conversation)a
 
   schema "marketplace_telegram_bot_customers" do
     field(:chat_id, :integer)
+    field(:conversation, :boolean)
     belongs_to(:bot, MarketplaceTelegramBot)
 
     timestamps()
