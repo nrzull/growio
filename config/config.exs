@@ -30,7 +30,7 @@ config :growio_web,
 # Configures the endpoint
 config :growio_web, GrowioWeb.Endpoint,
   url: [host: "localhost"],
-  adapter: Phoenix.Endpoint.Cowboy2Adapter,
+  adapter: Bandit.PhoenixAdapter,
   render_errors: [
     view: GrowioWeb.Views.JSON,
     accepts: ~w(json),

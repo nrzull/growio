@@ -85,20 +85,20 @@
       <div :class="$style.radioGroups">
         <div :class="$style.radioGroup">
           <div :class="$style.radioGroupTitle">Оплата</div>
-          <Radio option="online" v-model="paymentType">Картой онлайн</Radio>
-          <Radio option="in_place" v-model="paymentType">Наличными</Radio>
+          <Radio v-model="paymentType" option="online">Картой онлайн</Radio>
+          <Radio v-model="paymentType" option="in_place">Наличными</Radio>
         </div>
 
         <div :class="$style.radioGroup">
           <div :class="$style.radioGroupTitle">Способы доставки</div>
-          <Radio option="self_export" v-model="deliveryType">Самовывоз</Radio>
-          <Radio option="export" v-model="deliveryType">
+          <Radio v-model="deliveryType" option="self_export">Самовывоз</Radio>
+          <Radio v-model="deliveryType" option="export">
             Указать адрес доставки
           </Radio>
           <TextInput
             v-if="deliveryType === 'export'"
-            placeholder="Адрес"
             v-model="deliveryAddress"
+            placeholder="Адрес"
           />
         </div>
       </div>

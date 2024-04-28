@@ -14,10 +14,10 @@
 
     <div :class="$style.items">
       <Shape
-        :class="$style.item"
-        type="secondary"
         v-for="item in payload.order.items || []"
         :key="item.id"
+        :class="$style.item"
+        type="secondary"
       >
         <div>{{ item.name }}</div>
         <div :class="$style.quantity">{{ item.quantity }}</div>
