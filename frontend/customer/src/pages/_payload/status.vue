@@ -16,7 +16,7 @@
       <Shape
         :class="$style.item"
         type="secondary"
-        v-for="item in payload.order.payload.items || []"
+        v-for="item in payload.order.items || []"
         :key="item.id"
       >
         <div>{{ item.name }}</div>
@@ -26,7 +26,7 @@
             formatPrice({
               price: item.price,
               quantity: item.quantity,
-              currency: payload.order.payload.currency,
+              currency: payload.order.currency,
             })
           }}
         </div>

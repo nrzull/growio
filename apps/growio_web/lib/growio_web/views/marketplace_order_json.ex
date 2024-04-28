@@ -7,7 +7,12 @@ defmodule GrowioWeb.Views.MarketplaceOrderJSON do
     %{
       id: value.id,
       status: value.status,
-      payload: value.payload,
+      items: value.items,
+      currency: value.currency,
+      payment_type: value.payment_type,
+      payment_provider: value.payment_provider,
+      delivery_type: value.delivery_type,
+      delivery_provider: value.delivery_provider,
       marketplace_id: value.marketplace_id,
       telegram_bot_customer_id: value.telegram_bot_customer_id
     }

@@ -54,10 +54,8 @@ defmodule GrowioWeb.Controllers.MarketplaceCustomerController do
          {:ok, updated_order} <-
            Marketplaces.update_order(order, %{
              "status" => status,
-             "payload" =>
-               order.payload
-               |> Map.put(:items, items)
-               |> Map.put(:currency, order.marketplace.currency)
+             "currency" => order.marketplace.currency,
+             "items" => items
            }),
          {:ok, payload} = prepare_payload(updated_order) do
       Conn.ok(conn, payload)
