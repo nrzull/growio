@@ -24,7 +24,11 @@
         ref="inputRef"
         type="text"
         v-bind="inputAttrs"
-        :class="[$style.textInput, { [$style.invalid]: isInvalid }]"
+        :class="[
+          innerInputClass,
+          $style.textInput,
+          { [$style.invalid]: isInvalid },
+        ]"
         :value="modelValue"
         @focus="setFocus(true)"
         @blur="setFocus(false)"
@@ -50,7 +54,7 @@
 
 <script setup lang="ts">
 import { PropType, computed, ref, useAttrs } from "vue";
-import { pick } from "remeda";
+import { pick, omit } from "remeda";
 
 defineOptions({ inheritAttrs: false });
 
@@ -64,12 +68,16 @@ const props = defineProps({
     type: [Boolean, String, Array] as PropType<string | boolean | string[]>,
     default: undefined,
   },
+
+  innerInputClass: {
+    type: String,
+    default: undefined,
+  },
 });
 
 defineEmits(["update:model-value"]);
 
 const attrs = useAttrs() as Record<any, any>;
-
 const inputRef = ref<HTMLInputElement>();
 const focused = ref(false);
 
@@ -85,19 +93,19 @@ const setFocus = (v: boolean) => {
 };
 
 const wrapperAttrs = computed(() =>
-  pick(attrs, ["class", "style"])
+  pick(attrs, ["class", "style"]),
 ) as unknown as typeof attrs;
 
 const inputAttrs = computed(() =>
-  pick(attrs, ["type", "readonly", "disabled"])
+  omit(attrs, ["class", "style", "placeholder"]),
 );
 
 const isInvalid = computed(() =>
   Array.isArray(props.errors)
     ? !!props.errors.length
     : ["string", "boolean"].includes(typeof props.errors)
-    ? props.errors
-    : false
+      ? props.errors
+      : false,
 );
 </script>
 

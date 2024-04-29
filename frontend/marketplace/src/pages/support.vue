@@ -4,8 +4,14 @@
   <PageShape>
     <template #heading>Support</template>
 
-    <div :class="$style.support">
-      <Shape type="secondary" :class="$style.customers">
+    <div
+      :class="[$style.support, { [$style.empty]: !telegramCustomers.length }]"
+    >
+      <Shape
+        type="secondary"
+        :class="$style.customers"
+        v-if="telegramCustomers.length"
+      >
         <Button
           v-for="customer in telegramCustomers"
           :key="customer.id"
@@ -20,7 +26,14 @@
         </Button>
       </Shape>
 
-      <RouterView :key="customerId" />
+      <div v-if="!telegramCustomers.length" :class="$style.notice">
+        There is no active chats
+      </div>
+      <div v-else-if="!customerId" :class="$style.notice">
+        Select a chat to start messaging
+      </div>
+
+      <RouterView v-else :key="customerId" />
     </div>
   </PageShape>
 </template>
@@ -42,7 +55,7 @@ const customerId = computed(() => Number(route.params.customerId));
 const telegramCustomers = ref<MarketplaceTelegramBotCustomer[]>([]);
 
 const isLoading = computed(() =>
-  wait.some([Wait.MARKETPLACE_TELEGRAM_BOT_CUSTOMERS_FETCH])
+  wait.some([Wait.MARKETPLACE_TELEGRAM_BOT_CUSTOMERS_FETCH]),
 );
 
 const fetchCustomers = async () => {
@@ -69,6 +82,18 @@ fetchCustomers();
   height: 100%;
   gap: 12px;
   overflow: auto;
+}
+
+.support.empty {
+  grid-template-columns: 1fr;
+}
+
+.notice {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .chat {
