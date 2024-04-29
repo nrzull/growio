@@ -107,4 +107,20 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
       Conn.ok(conn, MarketplaceTelegramBotCustomerJSON.render(values))
     end
   end
+
+  operation(:create_message, false)
+
+  def create_message(%{assigns: %{marketplace_account: marketplace_account}} = conn, params) do
+    {:ok, message} =
+      Marketplaces.create_telegram_bot_customer_message(marketplace_account, params)
+
+    bot = Marketplaces.get_telegram_bot(marketplace_account)
+    customer = Marketplaces.get_telegram_bot_customer(message.customer_id)
+
+    GrowioWeb.Interface.telegram_cast(
+      {:send_message, bot, text: message.text, chat_id: customer.chat_id}
+    )
+
+    Conn.ok(conn)
+  end
 end

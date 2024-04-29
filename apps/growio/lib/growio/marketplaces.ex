@@ -23,6 +23,7 @@ defmodule Growio.Marketplaces do
   alias Growio.Marketplaces.MarketplaceTelegramBot
   alias Growio.Marketplaces.MarketplaceTelegramBotCustomer
   alias Growio.Marketplaces.MarketplaceOrder
+  alias Growio.Marketplaces.MarketplaceTelegramBotCustomerMessage
 
   def get_marketplace_by(:id, id) do
     Repo.get(Marketplace, id)
@@ -1398,6 +1399,10 @@ defmodule Growio.Marketplaces do
     |> Repo.one()
   end
 
+  def get_telegram_bot_customer(id) do
+    Repo.get(MarketplaceTelegramBotCustomer, id)
+  end
+
   def all_telegram_bot_customers(%MarketplaceAccount{} = initiator, opts) do
     filters = Keyword.get(opts, :filters, %{})
 
@@ -1428,8 +1433,8 @@ defmodule Growio.Marketplaces do
     |> Repo.insert()
   end
 
-  def update_telegram_bot_customer(%MarketplaceTelegramBotCustomer{} = bot, params) do
-    MarketplaceTelegramBotCustomer.changeset(bot, params)
+  def update_telegram_bot_customer(%MarketplaceTelegramBotCustomer{} = customer, params) do
+    MarketplaceTelegramBotCustomer.changeset(customer, params)
     |> Repo.update()
   end
 
@@ -1462,5 +1467,29 @@ defmodule Growio.Marketplaces do
   def update_order(%MarketplaceOrder{} = order, %{} = params) do
     MarketplaceOrder.changeset(order, params)
     |> Repo.update()
+  end
+
+  def create_telegram_bot_customer_message(%MarketplaceAccount{} = initiator, %{} = params) do
+    with true <- Permissions.ok?(initiator, marketplaces__telegram_bot__read()),
+         {:ok, message} <-
+           MarketplaceTelegramBotCustomerMessage.changeset(params)
+           |> Changeset.put_assoc(:marketplace_account, initiator)
+           |> Repo.insert() do
+      {:ok, message}
+    end
+  end
+
+  # TODO: make transaction
+  def create_telegram_bot_customer_message(
+        %MarketplaceTelegramBotCustomer{} = initiator,
+        %{} = params
+      ) do
+    with {:ok, message} <-
+           MarketplaceTelegramBotCustomerMessage.changeset(params)
+           |> Changeset.put_assoc(:customer, initiator)
+           |> Repo.insert(),
+         {:ok, _} <- update_telegram_bot_customer(initiator, %{conversation: true}) do
+      {:ok, message}
+    end
   end
 end

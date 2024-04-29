@@ -24,14 +24,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import TextInput from "@growio/shared/components/TextInput.vue";
 import Button from "@growio/shared/components/Button.vue";
+import { apiMarketplaceTelegramBotCustomerMessagesCreate } from "@growio/shared/api/growio/marketplace_telegram_bot_customer_messages";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
+const customerId = computed(() => Number(route.params.customerId));
 const input = ref<string>();
 
 const sendMessage = () => {
-  console.log(input.value);
+  if (!input.value) {
+    return;
+  }
+
+  const text = input.value;
+
+  apiMarketplaceTelegramBotCustomerMessagesCreate({
+    customer_id: customerId.value,
+    text,
+  }).then(() => (input.value === text ? (input.value = undefined) : null));
 };
 </script>
 
