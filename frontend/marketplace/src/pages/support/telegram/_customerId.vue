@@ -4,10 +4,10 @@
 
     <div :class="$style.inputWrapper">
       <TextInput
+        v-model="input"
         :inner-input-class="$style.input"
         placeholder="Message"
         @keydown.enter="sendMessage"
-        v-model="input"
       />
 
       <Button

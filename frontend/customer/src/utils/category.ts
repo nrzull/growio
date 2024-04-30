@@ -27,8 +27,8 @@ export const buildFindItem =
         isMarketplaceTreeItemCategory(v)
           ? executor(v.children)
           : v.id === id
-          ? v
-          : undefined
+            ? v
+            : undefined
       );
 
       return r.flat();

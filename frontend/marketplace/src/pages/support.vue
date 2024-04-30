@@ -8,9 +8,9 @@
       :class="[$style.support, { [$style.empty]: !telegramCustomers.length }]"
     >
       <Shape
+        v-if="telegramCustomers.length"
         type="secondary"
         :class="$style.customers"
-        v-if="telegramCustomers.length"
       >
         <Button
           v-for="customer in telegramCustomers"
@@ -55,7 +55,7 @@ const customerId = computed(() => Number(route.params.customerId));
 const telegramCustomers = ref<MarketplaceTelegramBotCustomer[]>([]);
 
 const isLoading = computed(() =>
-  wait.some([Wait.MARKETPLACE_TELEGRAM_BOT_CUSTOMERS_FETCH]),
+  wait.some([Wait.MARKETPLACE_TELEGRAM_BOT_CUSTOMERS_FETCH])
 );
 
 const fetchCustomers = async () => {

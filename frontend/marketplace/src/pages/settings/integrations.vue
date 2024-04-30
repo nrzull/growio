@@ -130,7 +130,7 @@ const isLoading = computed(
   () =>
     props.loading ||
     wait.some([
-      Wait.MARKETPLACE_MARKET_INTEGRATIONS_FETCH,
+      Wait.MARKETPLACE_INTEGRATIONS_FETCH,
       Wait.MARKETPLACE_TELEGRAM_BOT_CREATE,
       Wait.MARKETPLACE_TELEGRAM_BOT_DELETE,
     ])
@@ -218,12 +218,12 @@ const updateTelegramBot = async (params: MarketplaceTelegramBot) => {};
 
 const fetchIntegrations = async () => {
   try {
-    wait.start(Wait.MARKETPLACE_MARKET_INTEGRATIONS_FETCH);
+    wait.start(Wait.MARKETPLACE_INTEGRATIONS_FETCH);
     integrations.value = await apiMarketplaceGetAllIntegrations();
   } catch (e) {
     console.error(e);
   } finally {
-    wait.end(Wait.MARKETPLACE_MARKET_INTEGRATIONS_FETCH);
+    wait.end(Wait.MARKETPLACE_INTEGRATIONS_FETCH);
   }
 };
 
