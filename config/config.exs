@@ -25,7 +25,8 @@ config :growio, Growio.Mailer, adapter: Swoosh.Adapters.Local
 config :growio_web,
   ecto_repos: [Growio.Repo],
   generators: [context_app: :growio],
-  jwt_secret: "jwt_secret"
+  jwt_secret: "jwt_secret",
+  ws_secret: "ws_secret"
 
 # Configures the endpoint
 config :growio_web, GrowioWeb.Endpoint,

@@ -20,18 +20,40 @@ defmodule GrowioWeb.Plugs.AuthPlug do
     access_cookie = conn.req_cookies[Conn.access_cookie_name()]
     refresh_cookie = conn.req_cookies[Conn.refresh_cookie_name()]
 
-    access_token_age =
-      (Mix.env() == :test &&
-         Map.get(conn.query_params, "access_token_max_age")) ||
-        Conn.access_token_max_age()
+    result =
+      handle_cookies(access_cookie, refresh_cookie,
+        access_token_age:
+          (Mix.env() == :test &&
+             Map.get(conn.query_params, "access_token_max_age")) ||
+            Conn.access_token_max_age(),
+        refresh_token_age:
+          (Mix.env() == :test &&
+             Map.get(conn.query_params, "refresh_token_max_age")) ||
+            Conn.refresh_token_max_age()
+      )
+
+    case result do
+      {:error, _} ->
+        Conn.invalidate_refresh_cookie(refresh_cookie)
+        Conn.unauthorized(conn)
+
+      {:ok, %{account: account, decoded_access: decoded_access}} ->
+        conn
+        |> Conn.setup_auth_cookies(decoded_access)
+        |> ok(account)
+
+      {:ok, %{account: account}} ->
+        ok(conn, account)
+    end
+  end
+
+  def handle_cookies(access_cookie, refresh_cookie, opts \\ []) do
+    access_token_age = Keyword.get(opts, :access_token_age, Conn.access_token_max_age())
 
     access_token_age =
       (is_bitstring(access_token_age) && String.to_integer(access_token_age)) || access_token_age
 
-    refresh_token_age =
-      (Mix.env() == :test &&
-         Map.get(conn.query_params, "refresh_token_max_age")) ||
-        Conn.refresh_token_max_age()
+    refresh_token_age = Keyword.get(opts, :refresh_token_age, Conn.refresh_token_max_age())
 
     refresh_token_age =
       (is_bitstring(refresh_token_age) && String.to_integer(refresh_token_age)) ||
@@ -46,7 +68,7 @@ defmodule GrowioWeb.Plugs.AuthPlug do
          true <- Map.get(decoded_refresh_token, :access_token) == access_cookie,
          %{account_id: account_id} <- decoded_access_token,
          account = %Account{} <- Accounts.get_account_by(:id, account_id) do
-      ok(conn, account)
+      {:ok, %{account: account}}
     else
       {:decode_access, {:error, :expired}} ->
         max_age = 999_999_999
@@ -56,17 +78,14 @@ defmodule GrowioWeb.Plugs.AuthPlug do
              true <- decoded_refresh.access_token == access_cookie,
              %{account_id: account_id} <- decoded_access,
              account = %Account{} <- Accounts.get_account_by(:id, account_id) do
-          conn
-          |> Conn.setup_auth_cookies(decoded_access)
-          |> ok(account)
+          {:ok, %{account: account, decoded_access: decoded_access}}
         else
           _ ->
-            Conn.unauthorized(conn)
+            {:error, :unauthorized}
         end
 
       _ ->
-        Conn.invalidate_refresh_cookie(refresh_cookie)
-        Conn.unauthorized(conn)
+        {:error, :unauthorized}
     end
   end
 

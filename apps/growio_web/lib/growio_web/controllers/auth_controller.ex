@@ -57,11 +57,20 @@ defmodule GrowioWeb.Controllers.AuthController do
 
   operation(:healthcheck,
     summary: "check authentication health",
-    responses: [ok: ""]
+    responses: [ok: {"", "application/json", Schemas.AuthHealthcheckResponse}]
   )
 
   def healthcheck(conn, _params) do
-    Conn.ok(conn)
+    conn = fetch_cookies(conn)
+    access_cookie = conn.req_cookies[Conn.access_cookie_name()]
+    refresh_cookie = conn.req_cookies[Conn.refresh_cookie_name()]
+
+    ws_secret = Application.fetch_env!(:growio_web, :ws_secret)
+
+    ws_token =
+      Plug.Crypto.encrypt(ws_secret, "ws_token", [access_cookie, refresh_cookie])
+
+    Conn.ok(conn, %{ws_token: ws_token})
   end
 
   operation(:signout,

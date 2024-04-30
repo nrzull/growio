@@ -360,4 +360,13 @@ defmodule GrowioWeb.Schemas do
       }
     })
   end
+
+  defmodule AuthHealthcheckResponse do
+    schema(%{
+      type: :object,
+      properties: %{
+        ws_token: %Schema{type: :string}
+      }
+    })
+  end
 end

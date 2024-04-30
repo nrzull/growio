@@ -13,8 +13,11 @@
 import Top from "~/layouts/Default/Top.vue";
 import Sidebar from "~/layouts/Default/Sidebar.vue";
 import { onMounted, ref } from "vue";
+import { useCustomerMessagesChannel } from "~/composables/customerMessagesChannel";
 
 const isMounted = ref(false);
+
+useCustomerMessagesChannel();
 onMounted(() => (isMounted.value = true));
 </script>
 

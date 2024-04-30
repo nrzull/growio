@@ -2,10 +2,11 @@ import { growio } from "@growio/shared/api/growio";
 
 export const apiAuthSendEmail = (params: { email: string }) =>
   growio
-    .post<{ email: string; password?: string; expiredAt: string }>(
-      "/api/auth/email",
-      params
-    )
+    .post<{
+      email: string;
+      password?: string;
+      expiredAt: string;
+    }>("/api/auth/email", params)
     .then((r) => r.data);
 
 export const apiAuthSendEmailOtp = (params: {
@@ -15,4 +16,5 @@ export const apiAuthSendEmailOtp = (params: {
 
 export const apiAuthSignout = () => growio.get("/api/auth/signout");
 
-export const apiAuthHealthcheck = () => growio.get("/api/auth/healthcheck");
+export const apiAuthHealthcheck = () =>
+  growio.get<{ ws_token: string }>("/api/auth/healthcheck").then((r) => r.data);
