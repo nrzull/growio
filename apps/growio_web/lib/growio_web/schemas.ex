@@ -337,4 +337,27 @@ defmodule GrowioWeb.Schemas do
       }
     })
   end
+
+  defmodule MarketplaceTelegramBotCustomerMessage do
+    schema(%{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer},
+        text: %Schema{type: :string},
+        marketplace_account_id: %Schema{type: :integer, nullable: true},
+        customer_id: %Schema{type: :integer}
+      }
+    })
+  end
+
+  defmodule MarketplaceTelegramBotCustomerMessageCreate do
+    schema(%{
+      type: :object,
+      properties: %{
+        text: %Schema{type: :string},
+        marketplace_account_id: %Schema{type: :integer, nullable: true},
+        customer_id: %Schema{type: :integer}
+      }
+    })
+  end
 end

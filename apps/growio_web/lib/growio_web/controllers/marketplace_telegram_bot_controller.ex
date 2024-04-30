@@ -108,7 +108,12 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
     end
   end
 
-  operation(:create_message, false)
+  operation(:create_message,
+    request_body: {"", "application/json", Schemas.MarketplaceTelegramBotCustomerMessageCreate},
+    responses: [
+      ok: {"", "application/json", Schemas.MarketplaceTelegramBotCustomerMessage}
+    ]
+  )
 
   def create_message(%{assigns: %{marketplace_account: marketplace_account}} = conn, params) do
     {:ok, message} =

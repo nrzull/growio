@@ -117,8 +117,14 @@ defmodule GrowioTelegram.MarketBot do
   end
 
   @impl Telegram.ChatBot
-  def handle_update(update, _token, state) do
-    IO.inspect(update)
+  def handle_update(update, token, state) do
+    with %{"message" => %{"text" => text, "chat" => %{"id" => chat_id}}} <- update,
+         bot = %MarketplaceTelegramBot{} <- Marketplaces.get_telegram_bot(:token, token),
+         customer = %MarketplaceTelegramBotCustomer{} <-
+           Marketplaces.get_telegram_bot_customer(bot, chat_id) do
+      Marketplaces.create_telegram_bot_customer_message(customer, %{text: text})
+    end
+
     {:ok, state, @session_ttl}
   end
 

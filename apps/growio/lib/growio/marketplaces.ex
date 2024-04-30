@@ -1433,9 +1433,13 @@ defmodule Growio.Marketplaces do
     |> Repo.insert()
   end
 
-  def update_telegram_bot_customer(%MarketplaceTelegramBotCustomer{} = customer, params) do
+  def update_telegram_bot_customer(
+        %MarketplaceTelegramBotCustomer{} = customer,
+        params,
+        repo \\ Repo
+      ) do
     MarketplaceTelegramBotCustomer.changeset(customer, params)
-    |> Repo.update()
+    |> repo.update()
   end
 
   def create_order(
@@ -1479,17 +1483,23 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  # TODO: make transaction
   def create_telegram_bot_customer_message(
         %MarketplaceTelegramBotCustomer{} = initiator,
         %{} = params
       ) do
-    with {:ok, message} <-
-           MarketplaceTelegramBotCustomerMessage.changeset(params)
-           |> Changeset.put_assoc(:customer, initiator)
-           |> Repo.insert(),
-         {:ok, _} <- update_telegram_bot_customer(initiator, %{conversation: true}) do
-      {:ok, message}
+    changeset =
+      MarketplaceTelegramBotCustomerMessage.changeset(params)
+      |> Changeset.put_assoc(:customer, initiator)
+
+    Multi.new()
+    |> Multi.insert(:message, changeset)
+    |> Multi.run(:update_customer, fn repo, %{} ->
+      update_telegram_bot_customer(initiator, %{conversation: true}, repo)
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{message: message}} -> {:ok, message}
+      _ -> {:error, "cannot create customer message"}
     end
   end
 end
