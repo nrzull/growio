@@ -21,6 +21,11 @@ defmodule GrowioWeb.Interface do
   end
 
   @impl true
+  def handle_cast({module, fun, opts}, state) do
+    apply(module, fun, opts)
+    {:noreply, state}
+  end
+
   def handle_cast(_params, state) do
     {:noreply, state}
   end

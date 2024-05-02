@@ -48,6 +48,11 @@ defmodule GrowioTelegram.Interface do
     {:noreply, state}
   end
 
+  def handle_cast({module, fun, opts}, state) do
+    apply(module, fun, opts)
+    {:noreply, state}
+  end
+
   def handle_cast(_, state) do
     {:noreply, state}
   end

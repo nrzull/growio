@@ -1,14 +1,21 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { growioWS } from "@growio/shared/api/growio";
-import { marketplaceAccount } from "~/composables/marketplace-accounts";
 import { apiAuthHealthcheck } from "@growio/shared/api/growio/auth";
+import { MarketplaceTelegramBotCustomerMessage } from "@growio/shared/api/growio/marketplace_telegram_bot_customer_messages/types";
+
+export const customerMessages = ref<MarketplaceTelegramBotCustomerMessage[]>(
+  []
+);
 
 export const useCustomerMessagesChannel = () => {
   const channel = ref(growioWS.channel("customer:messages"));
 
-  const messageHandle = channel.value.on("message", (payload) => {
-    console.log(payload);
-  });
+  const messageHandle = channel.value.on(
+    "new_message",
+    (payload: MarketplaceTelegramBotCustomerMessage) => {
+      customerMessages.value.push(payload);
+    }
+  );
 
   onMounted(async () => {
     if (!growioWS.isConnected()) {
@@ -20,7 +27,7 @@ export const useCustomerMessagesChannel = () => {
   });
 
   onBeforeUnmount(() => {
-    channel.value.off("message", messageHandle);
+    channel.value.off("new_message", messageHandle);
     channel.value.leave();
   });
 

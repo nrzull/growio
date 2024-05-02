@@ -1,6 +1,18 @@
 <template>
   <div :class="$style.customerId">
-    <div :class="$style.chat"></div>
+    <div :class="$style.chat">
+      <div
+        v-for="message in activeMessages"
+        :key="message.id"
+        :class="[
+          $style.message,
+          { [$style.customer]: !message.marketplace_account_id },
+        ]"
+      >
+        {{ message.marketplace_account_id ? "" : "Клиент:" }}
+        {{ message.text }}
+      </div>
+    </div>
 
     <div :class="$style.inputWrapper">
       <TextInput
@@ -29,10 +41,20 @@ import TextInput from "@growio/shared/components/TextInput.vue";
 import Button from "@growio/shared/components/Button.vue";
 import { apiMarketplaceTelegramBotCustomerMessagesCreate } from "@growio/shared/api/growio/marketplace_telegram_bot_customer_messages";
 import { useRoute } from "vue-router";
+import { customerMessages } from "~/composables/customerMessagesChannel";
+import { compareDesc } from "date-fns";
 
 const route = useRoute();
 const customerId = computed(() => Number(route.params.customerId));
 const input = ref<string>();
+
+const activeMessages = computed(() =>
+  customerMessages.value
+    .filter((v) => v.customer_id === customerId.value)
+    .sort((a1, a2) =>
+      compareDesc(new Date(a1.inserted_at), new Date(a2.inserted_at))
+    )
+);
 
 const sendMessage = () => {
   if (!input.value) {
@@ -57,8 +79,11 @@ const sendMessage = () => {
 }
 
 .chat {
-  height: calc(100vh - 400px);
+  height: calc(100vh - 300px);
   overflow: auto;
+  display: flex;
+  flex-flow: column-reverse;
+  gap: 8px;
 }
 
 .inputWrapper {
@@ -79,5 +104,18 @@ const sendMessage = () => {
 
 .send svg {
   color: var(--color-gray-500);
+}
+
+.message {
+  display: flex;
+  height: max-content;
+  width: max-content;
+  padding: 8px 16px;
+  background-color: var(--color-gray-50);
+  border-radius: 16px;
+}
+
+.message.customer {
+  background-color: var(--color-primary);
 }
 </style>

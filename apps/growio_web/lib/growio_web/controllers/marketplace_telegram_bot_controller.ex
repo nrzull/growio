@@ -8,6 +8,8 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
   alias Growio.Marketplaces.MarketplaceTelegramBot
   alias GrowioWeb.Views.MarketplaceTelegramBotJSON
   alias GrowioWeb.Views.MarketplaceTelegramBotCustomerJSON
+  alias GrowioWeb.Channels.CustomerChannel
+  alias GrowioWeb.Interface
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -122,9 +124,8 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
     bot = Marketplaces.get_telegram_bot(marketplace_account)
     customer = Marketplaces.get_telegram_bot_customer(message.customer_id)
 
-    GrowioWeb.Interface.telegram_cast(
-      {:send_message, bot, text: message.text, chat_id: customer.chat_id}
-    )
+    Interface.telegram_cast({:send_message, bot, text: message.text, chat_id: customer.chat_id})
+    CustomerChannel.new_message(message)
 
     Conn.ok(conn)
   end

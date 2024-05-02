@@ -7,6 +7,7 @@ defmodule GrowioTelegram.MarketBot do
   alias GrowioTelegram.MarketBotRegistry
   alias Growio.Marketplaces.MarketplaceTelegramBot
   alias Growio.Marketplaces.MarketplaceTelegramBotCustomer
+  alias GrowioTelegram.Interface
 
   @session_ttl 60 * 1_000 * 10
   @max_bot_concurrency 999_999
@@ -121,8 +122,10 @@ defmodule GrowioTelegram.MarketBot do
     with %{"message" => %{"text" => text, "chat" => %{"id" => chat_id}}} <- update,
          bot = %MarketplaceTelegramBot{} <- Marketplaces.get_telegram_bot(:token, token),
          customer = %MarketplaceTelegramBotCustomer{} <-
-           Marketplaces.get_telegram_bot_customer(bot, chat_id) do
-      Marketplaces.create_telegram_bot_customer_message(customer, %{text: text})
+           Marketplaces.get_telegram_bot_customer(bot, chat_id),
+         {:ok, message} <-
+           Marketplaces.create_telegram_bot_customer_message(customer, %{text: text}) do
+      Interface.web_cast({GrowioWeb.Channels.CustomerChannel, :new_message, [message]})
     end
 
     {:ok, state, @session_ttl}
