@@ -29,7 +29,7 @@
       >
         <Icon :class="$style.icon" :value="icon" />
         <div>{{ text }}</div>
-        <Tag v-if="badge.value">{{ badge.value }}</Tag>
+        <Badge :model-value="badge?.value" />
       </Button>
     </template>
   </div>
@@ -39,7 +39,7 @@
 import Icon, { Icons } from "@growio/shared/components/Icon.vue";
 import Button from "@growio/shared/components/Button.vue";
 import { showChat } from "~/composables/customerMessages";
-import Tag from "@growio/shared/components/Tag.vue";
+import Badge from "@growio/shared/components/Badge.vue";
 import { unreadMessagesCount } from "~/composables/customerMessages";
 import { Ref, ComputedRef } from "vue";
 

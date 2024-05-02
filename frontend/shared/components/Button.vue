@@ -52,6 +52,7 @@ defineProps({
   gap: 8px;
   transition: all 0.2s ease;
   font-weight: 500;
+  position: relative;
 }
 
 .button:not(:disabled) {
