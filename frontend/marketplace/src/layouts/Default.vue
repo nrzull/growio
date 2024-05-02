@@ -1,4 +1,6 @@
 <template>
+  <Support />
+
   <div :class="$style.default">
     <Top :class="$style.top" />
     <Sidebar :class="$style.sidebar" />
@@ -13,11 +15,12 @@
 import Top from "~/layouts/Default/Top.vue";
 import Sidebar from "~/layouts/Default/Sidebar.vue";
 import { onMounted, ref } from "vue";
-import { useCustomerMessagesChannel } from "~/composables/customerMessagesChannel";
+import { useCustomerMessages } from "~/composables/customerMessages";
+import Support from "~/components/Support.vue";
 
 const isMounted = ref(false);
 
-useCustomerMessagesChannel();
+useCustomerMessages();
 onMounted(() => (isMounted.value = true));
 </script>
 

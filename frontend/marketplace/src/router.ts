@@ -134,18 +134,6 @@ export const router = createRouter({
         },
 
         {
-          path: "support",
-          component: () => import("~/pages/support.vue"),
-          children: [
-            {
-              path: "telegram/:customerId",
-              component: () =>
-                import("~/pages/support/telegram/_customerId.vue"),
-            },
-          ],
-        },
-
-        {
           path: "",
           redirect: "/staff/users",
         },

@@ -4,9 +4,9 @@ import { IdParam } from "@growio/shared/api/types";
 
 export const apiMarketplaceAccountEmailInvitationsGetAll = () =>
   growio
-    .get<MarketplaceAccountEmailInvitation[]>(
-      "/api/marketplace_account_email_invitations"
-    )
+    .get<
+      MarketplaceAccountEmailInvitation[]
+    >("/api/marketplace_account_email_invitations")
     .then((r) => r.data);
 
 export const apiMarketplaceAccountEmailInvitationsCreate = (params: {

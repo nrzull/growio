@@ -10,9 +10,9 @@ export const apiMarketplaceItemAssetsGetAll = (params: {
   item_id: IdParam;
 }) =>
   growio
-    .get<MarketplaceItemAsset[]>(
-      `/api/marketplace_item_categories/${params.category_id}/marketplace_items/${params.item_id}/marketplace_item_assets`
-    )
+    .get<
+      MarketplaceItemAsset[]
+    >(`/api/marketplace_item_categories/${params.category_id}/marketplace_items/${params.item_id}/marketplace_item_assets`)
     .then((r) => r.data);
 
 export const apiMarketplaceItemAssetsCreate = (params: {

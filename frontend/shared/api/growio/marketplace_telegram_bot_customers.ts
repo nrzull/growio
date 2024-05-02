@@ -11,9 +11,8 @@ export const apiMarketplaceTelegramBotCustomersGetAll = (
   const { filters = {} } = params;
 
   return growio
-    .get<MarketplaceTelegramBotCustomer[]>(
-      "/api/marketplace/telegram_bot/customers",
-      { params: { filters } }
-    )
+    .get<
+      MarketplaceTelegramBotCustomer[]
+    >("/api/marketplace/telegram_bot/customers", { params: { filters } })
     .then((r) => r.data);
 };

@@ -1,7 +1,10 @@
 <template>
   <Shape full-height :class="$style.shape">
-    <div v-if="['tools', 'heading', 'subheading'].some(v => v in $slots)" :class="$style.head">
-      <div v-if="['heading', 'subheading'].some(v => v in $slots)">
+    <div
+      v-if="['tools', 'heading', 'subheading'].some((v) => v in $slots)"
+      :class="$style.head"
+    >
+      <div v-if="['heading', 'subheading'].some((v) => v in $slots)">
         <div :class="$style.heading">
           <slot name="heading" />
         </div>

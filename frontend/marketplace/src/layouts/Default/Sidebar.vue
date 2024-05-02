@@ -1,31 +1,55 @@
 <template>
   <div :class="$style.sidebar">
-    <RouterLink
-      v-for="{ icon, text, to } in buttons"
-      :key="text"
-      v-slot="{ isActive, navigate }"
-      custom
-      :to="to"
-    >
+    <template v-for="{ icon, text, to, action, badge } in buttons">
+      <RouterLink
+        v-if="to"
+        :key="text"
+        v-slot="{ isActive, navigate }"
+        custom
+        :to="to"
+      >
+        <Button
+          :class="$style.button"
+          type="neutral"
+          size="md"
+          :active="isActive"
+          @click="navigate"
+        >
+          <Icon :class="$style.icon" :value="icon" />
+          <div>{{ text }}</div>
+        </Button>
+      </RouterLink>
       <Button
+        v-else
+        :key="`btn-${text}`"
         :class="$style.button"
         type="neutral"
         size="md"
-        :active="isActive"
-        @click="navigate"
+        @click="action?.()"
       >
         <Icon :class="$style.icon" :value="icon" />
         <div>{{ text }}</div>
+        <Tag v-if="badge.value">{{ badge.value }}</Tag>
       </Button>
-    </RouterLink>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import Icon, { Icons } from "@growio/shared/components/Icon.vue";
 import Button from "@growio/shared/components/Button.vue";
+import { showChat } from "~/composables/customerMessages";
+import Tag from "@growio/shared/components/Tag.vue";
+import { unreadMessagesCount } from "~/composables/customerMessages";
+import { Ref, ComputedRef } from "vue";
 
-const buttons: Array<{ icon: Icons; text: string; to: string }> = [
+const buttons: Array<{
+  icon: Icons;
+  text: string;
+  to?: string;
+  action?: () => void;
+  badge?: Ref | ComputedRef<number>;
+}> = [
   {
     icon: "users",
     text: "Staff",
@@ -47,7 +71,8 @@ const buttons: Array<{ icon: Icons; text: string; to: string }> = [
   {
     icon: "support",
     text: "Support",
-    to: "/support",
+    action: () => (showChat.value = true),
+    badge: unreadMessagesCount,
   },
 
   {

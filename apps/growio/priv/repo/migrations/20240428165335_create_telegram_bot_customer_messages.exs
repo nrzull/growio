@@ -4,6 +4,7 @@ defmodule Growio.Repo.Migrations.CreateTelegramBotCustomerMessages do
   def change do
     create table(:marketplace_telegram_bot_customer_messages) do
       add(:text, :text, null: false)
+      add(:read, :boolean)
       add(:marketplace_account_id, references(:marketplace_accounts))
       add(:customer_id, references(:marketplace_telegram_bot_customers), null: false)
       timestamps()

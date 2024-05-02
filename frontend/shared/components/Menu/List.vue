@@ -2,7 +2,7 @@
   <div :class="[$style.list, { [$style.child]: child }]">
     <Dropdown
       v-for="(item, i) in items"
-      :ref="(r: any) => dropdownRefs[getKey(item, trackBy, i)] = r"
+      :ref="(r: any) => (dropdownRefs[getKey(item, trackBy, i)] = r)"
       :key="getKey(item, trackBy, i)"
     >
       <template #trigger>

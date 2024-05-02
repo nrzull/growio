@@ -39,8 +39,8 @@ const props = defineProps({
 
   floatingClass: {
     type: String,
-    default: undefined
-  }
+    default: undefined,
+  },
 });
 
 defineEmits({ "click:trigger": (_v: boolean) => true });

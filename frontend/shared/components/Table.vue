@@ -161,7 +161,8 @@ defineEmits({
 }
 
 .table.clickable .body tr:hover td {
-  box-shadow: inset 0 1px 0 var(--color-primary-300),
+  box-shadow:
+    inset 0 1px 0 var(--color-primary-300),
     inset 0 -1px 0 var(--color-primary-300);
   background-color: var(--color-primary-100);
 }

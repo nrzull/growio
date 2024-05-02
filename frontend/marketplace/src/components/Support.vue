@@ -1,7 +1,10 @@
 <template>
-  <PageLoader :loading="isLoading" />
-
-  <PageShape>
+  <Modal
+    v-if="showChat"
+    size="lg"
+    :loading="isLoading"
+    @close="showChat = false"
+  >
     <template #heading>Support</template>
 
     <div
@@ -20,7 +23,7 @@
           type="neutral"
           :class="$style.customer"
           :active="customerId === customer.id"
-          @click="$router.push(`/support/telegram/${customer.id}`)"
+          @click="setChat('TelegramCustomer', customer.id)"
         >
           Чат №{{ customer.id }}
         </Button>
@@ -33,9 +36,9 @@
         Select a chat to start messaging
       </div>
 
-      <RouterView v-else :key="customerId" />
+      <component :is="activeChat" :key="customerId" :customer-id="customerId" />
     </div>
-  </PageShape>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -43,14 +46,21 @@ import { ref, computed } from "vue";
 import { apiMarketplaceTelegramBotCustomersGetAll } from "@growio/shared/api/growio/marketplace_telegram_bot_customers";
 import { MarketplaceTelegramBotCustomer } from "@growio/shared/api/growio/marketplace_telegram_bot_customers/types";
 import { wait, Wait } from "@growio/shared/composables/wait";
-import PageLoader from "@growio/shared/components/PageLoader.vue";
-import PageShape from "@growio/shared/components/PageShape.vue";
-import { useRoute } from "vue-router";
 import Button from "@growio/shared/components/Button.vue";
 import Shape from "@growio/shared/components/Shape.vue";
+import Modal from "@growio/shared/components/Modal.vue";
+import TelegramCustomer from "~/components/Support/TelegramCustomer.vue";
+import { showChat } from "~/composables/customerMessages";
 
-const route = useRoute();
-const customerId = computed(() => Number(route.params.customerId));
+defineOptions({ components: { TelegramCustomer } });
+
+const customerId = ref<number>();
+const activeChat = ref<"TelegramCustomer">();
+
+const setChat = (component: "TelegramCustomer", id: number) => {
+  customerId.value = id;
+  activeChat.value = component;
+};
 
 const telegramCustomers = ref<MarketplaceTelegramBotCustomer[]>([]);
 

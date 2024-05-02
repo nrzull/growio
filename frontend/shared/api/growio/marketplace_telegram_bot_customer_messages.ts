@@ -8,6 +8,6 @@ export const apiMarketplaceTelegramBotCustomerMessagesCreate = (params: {
   growio
     .post(
       `/api/marketplace/telegram_bot/customers/${params.customer_id}/messages`,
-      params,
+      params
     )
     .then((r) => r.data);

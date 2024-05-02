@@ -7,6 +7,7 @@ defmodule GrowioWeb.Views.MarketplaceTelegramBotCustomerMessageJSON do
     %{
       id: value.id,
       text: value.text,
+      read: value.read,
       customer_id: value.customer_id,
       inserted_at: value.inserted_at,
       marketplace_account_id: value.marketplace_account_id

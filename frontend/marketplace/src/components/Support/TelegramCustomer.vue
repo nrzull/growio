@@ -9,7 +9,6 @@
           { [$style.customer]: !message.marketplace_account_id },
         ]"
       >
-        {{ message.marketplace_account_id ? "" : "Клиент:" }}
         {{ message.text }}
       </div>
     </div>
@@ -40,17 +39,21 @@ import { computed, ref } from "vue";
 import TextInput from "@growio/shared/components/TextInput.vue";
 import Button from "@growio/shared/components/Button.vue";
 import { apiMarketplaceTelegramBotCustomerMessagesCreate } from "@growio/shared/api/growio/marketplace_telegram_bot_customer_messages";
-import { useRoute } from "vue-router";
-import { customerMessages } from "~/composables/customerMessagesChannel";
+import { customerMessages } from "~/composables/customerMessages";
 import { compareDesc } from "date-fns";
 
-const route = useRoute();
-const customerId = computed(() => Number(route.params.customerId));
 const input = ref<string>();
+
+const props = defineProps({
+  customerId: {
+    type: Number,
+    required: true,
+  },
+});
 
 const activeMessages = computed(() =>
   customerMessages.value
-    .filter((v) => v.customer_id === customerId.value)
+    .filter((v) => v.customer_id === props.customerId)
     .sort((a1, a2) =>
       compareDesc(new Date(a1.inserted_at), new Date(a2.inserted_at))
     )
@@ -64,7 +67,7 @@ const sendMessage = () => {
   const text = input.value;
 
   apiMarketplaceTelegramBotCustomerMessagesCreate({
-    customer_id: customerId.value,
+    customer_id: props.customerId,
     text,
   }).then(() => (input.value === text ? (input.value = undefined) : null));
 };
@@ -84,6 +87,7 @@ const sendMessage = () => {
   display: flex;
   flex-flow: column-reverse;
   gap: 8px;
+  margin-bottom: 24px;
 }
 
 .inputWrapper {

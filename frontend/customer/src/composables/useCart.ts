@@ -68,7 +68,10 @@ export const useCart = (params: {
   const addItem = (item: MarketplaceTreeItem) => {
     const sourceItem = findItem(item.id);
 
-    if (isSelected(sourceItem) || sourceItem.quantity < 1) {
+    if (
+      isSelected(sourceItem) ||
+      (!sourceItem.infinity && sourceItem.quantity < 1)
+    ) {
       return;
     }
 

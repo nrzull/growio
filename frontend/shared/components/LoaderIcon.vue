@@ -35,7 +35,9 @@ defineProps({
   height: 14px;
   border-radius: 50%;
   background: v-bind(color);
-  animation: loader_fade 1.2s linear infinite, loader_scale 1.2s linear infinite;
+  animation:
+    loader_fade 1.2s linear infinite,
+    loader_scale 1.2s linear infinite;
 }
 
 .loader div:nth-child(1) {

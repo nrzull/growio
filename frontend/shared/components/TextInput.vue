@@ -93,11 +93,11 @@ const setFocus = (v: boolean) => {
 };
 
 const wrapperAttrs = computed(() =>
-  pick(attrs, ["class", "style"]),
+  pick(attrs, ["class", "style"])
 ) as unknown as typeof attrs;
 
 const inputAttrs = computed(() =>
-  omit(attrs, ["class", "style", "placeholder"]),
+  omit(attrs, ["class", "style", "placeholder"])
 );
 
 const isInvalid = computed(() =>
@@ -105,7 +105,7 @@ const isInvalid = computed(() =>
     ? !!props.errors.length
     : ["string", "boolean"].includes(typeof props.errors)
       ? props.errors
-      : false,
+      : false
 );
 </script>
 
