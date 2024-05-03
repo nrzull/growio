@@ -8,6 +8,7 @@ defmodule Growio.Permissions do
   alias Growio.Marketplaces.MarketplaceItemCategory
   alias Growio.Marketplaces.MarketplaceItem
   alias Growio.Marketplaces.MarketplaceItemAsset
+  alias Growio.Marketplaces.MarketplaceTelegramBot
 
   @all_cache_ttl :timer.minutes(10)
 
@@ -55,6 +56,12 @@ defmodule Growio.Permissions do
     with true <- initiator.marketplace_id === role.marketplace_id,
          initiator = Repo.preload(initiator, [:role]),
          true <- initiator.role.priority <= role.priority do
+      true
+    end
+  end
+
+  def ok?(%MarketplaceAccount{} = initiator, %MarketplaceTelegramBot{} = bot) do
+    with true <- initiator.marketplace_id === bot.marketplace_id do
       true
     end
   end

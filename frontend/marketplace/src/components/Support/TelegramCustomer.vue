@@ -39,7 +39,10 @@ import { computed, ref } from "vue";
 import TextInput from "@growio/shared/components/TextInput.vue";
 import Button from "@growio/shared/components/Button.vue";
 import { apiMarketplaceTelegramBotCustomerMessagesCreate } from "@growio/shared/api/growio/marketplace_telegram_bot_customer_messages";
-import { customerMessages } from "~/composables/customerMessages";
+import {
+  customerMessages,
+  telegramCustomers,
+} from "~/composables/customerMessages";
 import { compareDesc } from "date-fns";
 
 const input = ref<string>();
@@ -51,12 +54,18 @@ const props = defineProps({
   },
 });
 
-const activeMessages = computed(() =>
-  customerMessages.value
-    .filter((v) => v.customer_id === props.customerId)
-    .sort((a1, a2) =>
-      compareDesc(new Date(a1.inserted_at), new Date(a2.inserted_at))
-    )
+const customer = computed(
+  () => telegramCustomers.value.find((v) => v.id === props.customerId)!
+);
+
+const activeMessages = computed(
+  () =>
+    customerMessages.value
+      .get(customer.value)
+      ?.slice()
+      .sort((a1, a2) =>
+        compareDesc(new Date(a1.inserted_at), new Date(a2.inserted_at))
+      ) || []
 );
 
 const sendMessage = () => {

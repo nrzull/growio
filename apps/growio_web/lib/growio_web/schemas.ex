@@ -295,6 +295,13 @@ defmodule GrowioWeb.Schemas do
     })
   end
 
+  defmodule MarketplaceTelegramBotCustomers do
+    schema(%{
+      type: :array,
+      items: MarketplaceTelegramBotCustomer
+    })
+  end
+
   defmodule MarketplaceOrder do
     schema(%{
       type: :object,
@@ -347,6 +354,13 @@ defmodule GrowioWeb.Schemas do
         marketplace_account_id: %Schema{type: :integer, nullable: true},
         customer_id: %Schema{type: :integer}
       }
+    })
+  end
+
+  defmodule MarketplaceTelegramBotCustomerMessages do
+    schema(%{
+      type: :array,
+      items: MarketplaceTelegramBotCustomerMessage
     })
   end
 

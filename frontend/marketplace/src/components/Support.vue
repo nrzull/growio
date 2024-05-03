@@ -42,14 +42,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { apiMarketplaceTelegramBotCustomersGetAll } from "@growio/shared/api/growio/marketplace_telegram_bot_customers";
-import { MarketplaceTelegramBotCustomer } from "@growio/shared/api/growio/marketplace_telegram_bot_customers/types";
 import { wait, Wait } from "@growio/shared/composables/wait";
 import Button from "@growio/shared/components/Button.vue";
 import Shape from "@growio/shared/components/Shape.vue";
 import Modal from "@growio/shared/components/Modal.vue";
 import TelegramCustomer from "~/components/Support/TelegramCustomer.vue";
-import { showChat } from "~/composables/customerMessages";
+import { showChat, telegramCustomers } from "~/composables/customerMessages";
 
 defineOptions({ components: { TelegramCustomer } });
 
@@ -61,27 +59,9 @@ const setChat = (component: "TelegramCustomer", id: number) => {
   activeChat.value = component;
 };
 
-const telegramCustomers = ref<MarketplaceTelegramBotCustomer[]>([]);
-
 const isLoading = computed(() =>
   wait.some([Wait.MARKETPLACE_TELEGRAM_BOT_CUSTOMERS_FETCH])
 );
-
-const fetchCustomers = async () => {
-  try {
-    wait.start(Wait.MARKETPLACE_TELEGRAM_BOT_CUSTOMERS_FETCH);
-
-    telegramCustomers.value = await apiMarketplaceTelegramBotCustomersGetAll({
-      filters: { conversation: true },
-    });
-  } catch (e) {
-    console.error(e);
-  } finally {
-    wait.end(Wait.MARKETPLACE_TELEGRAM_BOT_CUSTOMERS_FETCH);
-  }
-};
-
-fetchCustomers();
 </script>
 
 <style module>

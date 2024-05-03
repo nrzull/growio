@@ -1391,16 +1391,43 @@ defmodule Growio.Marketplaces do
     end
   end
 
-  def get_telegram_bot_customer(%MarketplaceTelegramBot{} = bot, chat_id)
+  def get_telegram_bot_customer(id, opts) do
+    MarketplaceTelegramBotCustomer
+    |> where([customer], customer.id == ^id)
+    |> query_get_telegram_bot_customer(opts)
+    |> Repo.one()
+  end
+
+  def get_telegram_bot_customer(%MarketplaceTelegramBot{} = bot, chat_id, opts)
       when is_integer(chat_id) do
     MarketplaceTelegramBotCustomer
     |> where([customer], customer.chat_id == ^chat_id)
     |> where([customer], customer.bot_id == ^bot.id)
+    |> query_get_telegram_bot_customer(opts)
     |> Repo.one()
   end
 
-  def get_telegram_bot_customer(id) do
-    Repo.get(MarketplaceTelegramBotCustomer, id)
+  def get_telegram_bot_customer(%MarketplaceAccount{} = initiator, id, opts) do
+    with bot = %MarketplaceTelegramBot{} <- get_telegram_bot(initiator),
+         customer = %MarketplaceTelegramBotCustomer{} <- get_telegram_bot_customer(id, opts),
+         true <- customer.bot_id == bot.id do
+      customer
+    else
+      _ -> {:error, "cannot get telegram bot customer"}
+    end
+  end
+
+  defp query_get_telegram_bot_customer(query, opts) do
+    filters = Keyword.get(opts, :filters, %{})
+
+    Enum.reduce(filters, query, fn
+      {"conversation", v}, acc ->
+        acc
+        |> where([customer], customer.conversation == ^v)
+
+      _, acc ->
+        acc
+    end)
   end
 
   def all_telegram_bot_customers(%MarketplaceAccount{} = initiator, opts) do
@@ -1471,6 +1498,21 @@ defmodule Growio.Marketplaces do
   def update_order(%MarketplaceOrder{} = order, %{} = params) do
     MarketplaceOrder.changeset(order, params)
     |> Repo.update()
+  end
+
+  def all_telegram_bot_customer_messages(
+        %MarketplaceAccount{} = initiator,
+        customer_id
+      ) do
+    with true <- Permissions.ok?(initiator, marketplaces__telegram_bot__read()),
+         customer = %MarketplaceTelegramBotCustomer{} <-
+           get_telegram_bot_customer(initiator, customer_id, []) do
+      MarketplaceTelegramBotCustomerMessage
+      |> where([message], message.customer_id == ^customer.id)
+      |> Repo.all()
+    else
+      _ -> {:error, "cannot get telegram bot customer messages"}
+    end
   end
 
   def create_telegram_bot_customer_message(%MarketplaceAccount{} = initiator, %{} = params) do

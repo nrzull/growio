@@ -3,11 +3,12 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
   use OpenApiSpex.ControllerSpecs
   alias GrowioWeb.Conn
   alias GrowioWeb.Schemas
-  alias GrowioWeb.Views.MarketplaceTelegramBot
   alias Growio.Marketplaces
   alias Growio.Marketplaces.MarketplaceTelegramBot
+  alias Growio.Marketplaces.MarketplaceTelegramBotCustomer
   alias GrowioWeb.Views.MarketplaceTelegramBotJSON
   alias GrowioWeb.Views.MarketplaceTelegramBotCustomerJSON
+  alias GrowioWeb.Views.MarketplaceTelegramBotCustomerMessageJSON
   alias GrowioWeb.Channels.CustomerChannel
   alias GrowioWeb.Interface
 
@@ -95,7 +96,7 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
 
   operation(:index_self_customers,
     summary: "get self marketplace telegram bot customers",
-    responses: [ok: {"", "application/json", Schemas.MarketplaceTelegramBotCustomer}]
+    responses: [ok: {"", "application/json", Schemas.MarketplaceTelegramBotCustomers}]
   )
 
   def index_self_customers(
@@ -107,6 +108,44 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
     with values when is_list(values) <-
            Marketplaces.all_telegram_bot_customers(marketplace_account, opts) do
       Conn.ok(conn, MarketplaceTelegramBotCustomerJSON.render(values))
+    end
+  end
+
+  operation(:show_self_customer,
+    summary: "show self marketplace telegram bot customer",
+    responses: [ok: {"", "application/json", Schemas.MarketplaceTelegramBotCustomer}]
+  )
+
+  def show_self_customer(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"customer_id" => customer_id}
+      ) do
+    opts = GrowioWeb.QueryParams.into_keyword(conn.query_params)
+
+    with customer_id when is_integer(customer_id) <- String.to_integer(customer_id),
+         customer = %MarketplaceTelegramBotCustomer{} <-
+           Marketplaces.get_telegram_bot_customer(marketplace_account, customer_id, opts) do
+      Conn.ok(conn, MarketplaceTelegramBotCustomerJSON.render(customer))
+    end
+  end
+
+  operation(:all_messages,
+    parameters: [
+      customer_id: [in: :path, type: :integer]
+    ],
+    responses: [
+      ok: {"", "application/json", Schemas.MarketplaceTelegramBotCustomerMessages}
+    ]
+  )
+
+  def all_messages(
+        %{assigns: %{marketplace_account: marketplace_account}} = conn,
+        %{"customer_id" => customer_id}
+      ) do
+    with customer_id when is_integer(customer_id) <- String.to_integer(customer_id),
+         messages when is_list(messages) <-
+           Marketplaces.all_telegram_bot_customer_messages(marketplace_account, customer_id) do
+      Conn.ok(conn, MarketplaceTelegramBotCustomerMessageJSON.render(messages))
     end
   end
 
@@ -122,7 +161,7 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
       Marketplaces.create_telegram_bot_customer_message(marketplace_account, params)
 
     bot = Marketplaces.get_telegram_bot(marketplace_account)
-    customer = Marketplaces.get_telegram_bot_customer(message.customer_id)
+    customer = Marketplaces.get_telegram_bot_customer(message.customer_id, [])
 
     Interface.telegram_cast({:send_message, bot, text: message.text, chat_id: customer.chat_id})
     CustomerChannel.new_message(message)

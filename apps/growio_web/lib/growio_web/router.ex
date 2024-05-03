@@ -116,6 +116,18 @@ defmodule GrowioWeb.Router do
       :index_self_customers
     )
 
+    get(
+      "/telegram_bot/customers/:customer_id",
+      MarketplaceTelegramBotController,
+      :show_self_customer
+    )
+
+    get(
+      "/telegram_bot/customers/:customer_id/messages",
+      MarketplaceTelegramBotController,
+      :all_messages
+    )
+
     post(
       "/telegram_bot/customers/:customer_id/messages",
       MarketplaceTelegramBotController,

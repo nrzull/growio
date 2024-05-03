@@ -94,7 +94,7 @@ defmodule GrowioTelegram.MarketBot do
       end
 
       with customer = %MarketplaceTelegramBotCustomer{} <-
-             Marketplaces.get_telegram_bot_customer(bot, chat_id),
+             Marketplaces.get_telegram_bot_customer(bot, chat_id, []),
            {:ok, order} = Marketplaces.create_order(customer) do
         url =
           URI.parse(@market_url)
@@ -122,7 +122,7 @@ defmodule GrowioTelegram.MarketBot do
     with %{"message" => %{"text" => text, "chat" => %{"id" => chat_id}}} <- update,
          bot = %MarketplaceTelegramBot{} <- Marketplaces.get_telegram_bot(:token, token),
          customer = %MarketplaceTelegramBotCustomer{} <-
-           Marketplaces.get_telegram_bot_customer(bot, chat_id),
+           Marketplaces.get_telegram_bot_customer(bot, chat_id, []),
          {:ok, message} <-
            Marketplaces.create_telegram_bot_customer_message(customer, %{text: text}) do
       Interface.web_cast({GrowioWeb.Channels.CustomerChannel, :new_message, [message]})
