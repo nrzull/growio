@@ -15,16 +15,33 @@
         :class="$style.customers"
       >
         <Button
-          v-for="customer in telegramCustomers"
+          v-for="customer in sortedTelegramCustomers"
           :key="customer.id"
           icon="telegramFilled"
           size="md"
           type="neutral"
-          :class="$style.customer"
+          :class="$style.chatButton"
           :active="customerId === customer.id"
           @click="setChat('TelegramCustomer', customer.id)"
         >
-          Чат №{{ customer.id }}
+          <div :class="$style.chatButtonInner">
+            <div :class="$style.chatButtonTitle">
+              <span>Чат №{{ customer.id }}</span>
+              <span :class="$style.chatButtonDate">
+                {{ formatHHMM(new Date(latestMessage(customer).inserted_at)) }}
+              </span>
+            </div>
+
+            <div :class="$style.chatButtonMessage">
+              <span :class="$style.chatButtonText">
+                {{ latestMessage(customer).text }}
+              </span>
+              <Badge
+                :class="$style.chatButtonBadge"
+                :model-value="unreadMessagesCountByCustomer(customer)"
+              ></Badge>
+            </div>
+          </div>
         </Button>
       </Shape>
 
@@ -47,12 +64,32 @@ import Button from "@growio/shared/components/Button.vue";
 import Shape from "@growio/shared/components/Shape.vue";
 import Modal from "@growio/shared/components/Modal.vue";
 import TelegramCustomer from "~/components/Support/TelegramCustomer.vue";
-import { showChat, telegramCustomers } from "~/composables/customerMessages";
+import {
+  showChat,
+  telegramCustomers,
+  unreadMessagesCountByCustomer,
+  customerMessages,
+} from "~/composables/customerMessages";
+import Badge from "@growio/shared/components/Badge.vue";
+import { compareDesc } from "date-fns";
+import { MarketplaceTelegramBotCustomer } from "@growio/shared/api/growio/marketplace_telegram_bot_customers/types";
+import { formatHHMM } from "@growio/shared/utils/datetime";
 
 defineOptions({ components: { TelegramCustomer } });
 
 const customerId = ref<number>();
 const activeChat = ref<"TelegramCustomer">();
+
+const sortedTelegramCustomers = computed(() =>
+  telegramCustomers.value.slice().sort((c1, c2) => {
+    const m1 = latestMessage(c1);
+    const m2 = latestMessage(c2);
+    return compareDesc(new Date(m1.inserted_at), new Date(m2.inserted_at));
+  })
+);
+
+const latestMessage = (v: MarketplaceTelegramBotCustomer) =>
+  customerMessages.value.get(v)?.at(-1);
 
 const setChat = (component: "TelegramCustomer", id: number) => {
   customerId.value = id;
@@ -67,7 +104,7 @@ const isLoading = computed(() =>
 <style module>
 .support {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 320px calc(100% - 320px);
   height: 100%;
   overflow: auto;
 }
@@ -95,6 +132,7 @@ const isLoading = computed(() =>
   display: flex;
   flex-flow: column;
   padding: 8px;
+  gap: 8px;
   border-top-right-radius: 0%;
   border-bottom-right-radius: 0%;
   min-height: calc(100vh - 200px);
@@ -103,8 +141,37 @@ const isLoading = computed(() =>
   border-bottom-color: transparent;
 }
 
-.customer {
-  height: max-content;
-  padding: 8px;
+.chatButtonInner {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+}
+
+.chatButtonTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chatButtonDate {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-gray-500);
+}
+
+.chatButtonMessage {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  overflow: hidden;
+  gap: 8px;
+}
+
+.chatButtonText {
+  color: var(--color-gray-500);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 </style>

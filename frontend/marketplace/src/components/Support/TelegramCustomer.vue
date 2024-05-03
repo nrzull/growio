@@ -139,7 +139,8 @@ watch(
 
 .chat {
   height: calc(100vh - 300px);
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   margin-bottom: 24px;
 }
 
@@ -170,13 +171,14 @@ watch(
 }
 
 .message {
-  display: flex;
-  height: max-content;
-  width: max-content;
+  display: inline-flex;
+  width: fit-content;
+  max-width: 75%;
   padding: 8px 12px;
   background-color: var(--color-gray-50);
   border-radius: 6px 24px 24px 6px;
   align-items: flex-end;
+  justify-content: space-between;
   gap: 8px;
 }
 
@@ -198,5 +200,9 @@ watch(
 
 .message.customer .datetime {
   color: var(--color-primary-800);
+}
+
+.text {
+  overflow-wrap: anywhere;
 }
 </style>
