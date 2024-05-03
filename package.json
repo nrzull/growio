@@ -14,7 +14,7 @@
     "lint:customer": "concurrently 'npm run lint -w @growio/customer' 'npm run vue-tsc -w @growio/customer'",
     "lint:customer:fix": "concurrently 'npm run lint:fix -w @growio/customer'",
     "lint:shared": "concurrently 'npm run lint -w @growio/shared' 'npm run vue-tsc -w @growio/shared'",
-    "lint:shared:fix": "concurrently 'npm run lint:fix -w @growio/customer'"
+    "lint:shared:fix": "concurrently 'npm run lint:fix -w @growio/shared'"
   },
   "dependencies": {
     "@floating-ui/vue": "1.0.6",

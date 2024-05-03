@@ -3,7 +3,6 @@
     <div :class="$style.textInputWrapper">
       <label
         v-if="$attrs.placeholder"
-        @click="setFocus(true)"
         :class="[
           $style.placeholder,
           {
@@ -16,6 +15,7 @@
               !inputAttrs.disabled,
           },
         ]"
+        @click="setFocus(true)"
       >
         {{ $attrs.placeholder }}
       </label>

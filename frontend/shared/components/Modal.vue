@@ -1,17 +1,20 @@
 <template>
   <div :class="$style.wrapper" @mousedown.self="$emit('close')">
-    <Shape :class="[$style.shape, $style[size]]">
+    <Shape
+      v-bind="{ ...$attrs, ...shapeProps }"
+      :class="[$style.shape, $style[size]]"
+    >
       <slot name="loader">
         <ElementLoader :loading="loading" />
       </slot>
 
-      <div :class="$style.heading">
+      <div v-if="'heading' in $slots" :class="$style.heading">
         <slot name="heading"></slot>
       </div>
 
       <slot></slot>
 
-      <div :class="$style.footer">
+      <div v-if="'footer' in $slots" :class="$style.footer">
         <slot name="footer"></slot>
       </div>
     </Shape>
@@ -26,6 +29,8 @@ import { useModal } from "@growio/shared/components/Modal/useModal";
 
 defineEmits(["close"]);
 
+defineOptions({ inheritAttrs: false });
+
 defineProps({
   size: {
     type: String as PropType<"md" | "lg">,
@@ -35,6 +40,11 @@ defineProps({
   loading: {
     type: Boolean,
     default: false,
+  },
+
+  shapeProps: {
+    type: Object as PropType<InstanceType<typeof Shape>["$props"]>,
+    default: () => ({}),
   },
 });
 

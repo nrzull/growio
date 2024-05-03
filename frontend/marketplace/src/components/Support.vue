@@ -2,11 +2,10 @@
   <Modal
     v-if="showChat"
     size="lg"
+    :shape-props="{ paddingless: true }"
     :loading="isLoading"
     @close="showChat = false"
   >
-    <template #heading>Support</template>
-
     <div
       :class="[$style.support, { [$style.empty]: !telegramCustomers.length }]"
     >
@@ -90,7 +89,6 @@ fetchCustomers();
   display: grid;
   grid-template-columns: 320px 1fr;
   height: 100%;
-  gap: 12px;
   overflow: auto;
 }
 
@@ -114,11 +112,19 @@ fetchCustomers();
 }
 
 .customers {
-  display: grid;
+  display: flex;
+  flex-flow: column;
   padding: 8px;
+  border-top-right-radius: 0%;
+  border-bottom-right-radius: 0%;
+  min-height: calc(100vh - 200px);
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-bottom-color: transparent;
 }
 
 .customer {
   height: max-content;
+  padding: 8px;
 }
 </style>
