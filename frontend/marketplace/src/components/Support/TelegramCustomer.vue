@@ -150,6 +150,10 @@ watch(
   gap: 8px;
 }
 
+.chatFrame:not(:first-child) {
+  margin-top: 8px;
+}
+
 .inputWrapper {
   position: relative;
 }
@@ -196,6 +200,7 @@ watch(
   font-size: 10px;
   font-weight: 500;
   color: var(--color-gray-500);
+  user-select: none;
 }
 
 .message.customer .datetime {

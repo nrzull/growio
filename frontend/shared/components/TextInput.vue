@@ -6,7 +6,8 @@
         :class="[
           $style.placeholder,
           {
-            [$style.focused]: focused || modelValue,
+            [$style.focused]:
+              focused || typeof modelValue === 'number' ? true : modelValue,
             [$style.invalid]: isInvalid,
             [$style.textable]:
               !focused &&
