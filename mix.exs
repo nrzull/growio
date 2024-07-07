@@ -3,7 +3,7 @@ defmodule Growio.Umbrella.MixProject do
 
   def project do
     [
-      apps_path: "apps",
+      apps_path: "backend",
       version: "0.1.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -22,7 +22,7 @@ defmodule Growio.Umbrella.MixProject do
   # Type "mix help deps" for more examples and options.
   #
   # Dependencies listed here are available only for this project
-  # and cannot be accessed from applications inside the apps/ folder.
+  # and cannot be accessed from applications inside the backend/ folder.
   defp deps do
     [
       {:dotenvy, "0.8.0"}
@@ -37,7 +37,7 @@ defmodule Growio.Umbrella.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   #
   # Aliases listed here are available only for this project
-  # and cannot be accessed from applications inside the apps/ folder.
+  # and cannot be accessed from applications inside the backend/ folder.
   defp aliases do
     [
       # run `mix setup` in all child apps
