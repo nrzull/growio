@@ -16,7 +16,7 @@ config :growio, Growio.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :growio_web, GrowioWeb.Endpoint,
+config :growio, GrowioWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
@@ -50,7 +50,7 @@ config :growio_web, GrowioWeb.Endpoint,
 # different ports.
 
 # Enable dev routes for dashboard and mailbox
-config :growio_web, dev_routes: true
+config :growio, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
@@ -66,4 +66,4 @@ config :swoosh, :api_client, false
 config :phoenix, :stacktrace_depth, 20
 
 config :open_api_spex, :cache_adapter, OpenApiSpex.Plug.NoneCache
-config :growio_web, swaggerui_routes: true
+config :growio, swaggerui_routes: true

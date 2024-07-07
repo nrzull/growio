@@ -15,7 +15,7 @@ config :growio, Growio.Repo,
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :growio_web, GrowioWeb.Endpoint,
+config :growio, GrowioWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "ODSHwf2cpSzfPRibU/C9U8Q2ZM2U8ayD3SzAh4JqJslG043YTJyiIFl3wnEKh8uM",
   server: false

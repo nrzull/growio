@@ -22,14 +22,14 @@ config :growio,
 # at the `config/runtime.exs`.
 config :growio, Growio.Mailer, adapter: Swoosh.Adapters.Local
 
-config :growio_web,
+config :growio,
   ecto_repos: [Growio.Repo],
   generators: [context_app: :growio],
   jwt_secret: "jwt_secret",
   ws_secret: "ws_secret"
 
 # Configures the endpoint
-config :growio_web, GrowioWeb.Endpoint,
+config :growio, GrowioWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
@@ -48,7 +48,7 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :growio_web, :cors,
+config :growio, :cors,
   origins: [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -65,7 +65,7 @@ config :growio, Growio.Cache,
 
 config :tesla, adapter: {Tesla.Adapter.Hackney, [recv_timeout: 40_000]}
 
-config :growio_telegram, market_url: "http://localhost:3001"
+config :growio, telegram_market_url: "http://localhost:3001"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

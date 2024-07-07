@@ -38,14 +38,14 @@ defmodule GrowioWeb.Router do
     plug(MarketplaceAccountPlug)
   end
 
-  if Application.compile_env(:growio_web, :dev_routes) do
+  if Application.compile_env(:growio, :dev_routes) do
     scope "/dev" do
       pipe_through([:fetch_session, :protect_from_forgery])
       forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 
-  if Application.compile_env(:growio_web, :swaggerui_routes) do
+  if Application.compile_env(:growio, :swaggerui_routes) do
     scope "/swaggerui" do
       pipe_through([:browser])
       get("/", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi")

@@ -65,7 +65,7 @@ defmodule GrowioWeb.Controllers.AuthController do
     access_cookie = conn.req_cookies[Conn.access_cookie_name()]
     refresh_cookie = conn.req_cookies[Conn.refresh_cookie_name()]
 
-    ws_secret = Application.fetch_env!(:growio_web, :ws_secret)
+    ws_secret = Application.fetch_env!(:growio, :ws_secret)
 
     ws_token =
       Plug.Crypto.encrypt(ws_secret, "ws_token", [access_cookie, refresh_cookie])

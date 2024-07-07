@@ -45,7 +45,18 @@ defmodule Growio.MixProject do
       {:finch, "0.18.0"},
       {:nebulex, "2.6.1"},
       {:shards, "1.1.0"},
-      {:decimal, "2.1.1"}
+      {:decimal, "2.1.1"},
+      {:phoenix, "1.7.12"},
+      {:phoenix_ecto, "4.5.1"},
+      {:telemetry_metrics, "0.6.2"},
+      {:telemetry_poller, "1.0.0"},
+      {:gettext, "0.24.0"},
+      {:plug_cowboy, "2.7.1"},
+      {:bandit, "1.5.0"},
+      {:open_api_spex, "3.18.3"},
+      {:corsica, "2.1.3"},
+      {:hackney, "1.20.1"},
+      {:telegram, github: "visciang/telegram", tag: "1.2.1"}
     ]
   end
 

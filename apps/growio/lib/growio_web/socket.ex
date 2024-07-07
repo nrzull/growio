@@ -5,7 +5,7 @@ defmodule GrowioWeb.Socket do
   channel("customer:*", GrowioWeb.Channels.CustomerChannel)
 
   def connect(%{"ws_token" => ws_token}, socket) do
-    ws_secret = Application.fetch_env!(:growio_web, :ws_secret)
+    ws_secret = Application.fetch_env!(:growio, :ws_secret)
 
     with {:ok, [access_cookie, refresh_cookie]} <-
            Plug.Crypto.decrypt(ws_secret, "ws_token", ws_token),

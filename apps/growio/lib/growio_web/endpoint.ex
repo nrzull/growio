@@ -1,5 +1,5 @@
 defmodule GrowioWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :growio_web
+  use Phoenix.Endpoint, otp_app: :growio
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -24,7 +24,7 @@ defmodule GrowioWeb.Endpoint do
   # when deploying your static files in production.
   plug(Plug.Static,
     at: "/",
-    from: :growio_web,
+    from: :growio,
     gzip: false,
     only: GrowioWeb.static_paths()
   )
@@ -33,7 +33,7 @@ defmodule GrowioWeb.Endpoint do
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
     plug(Phoenix.CodeReloader)
-    plug(Phoenix.Ecto.CheckRepoStatus, otp_app: :growio_web)
+    plug(Phoenix.Ecto.CheckRepoStatus, otp_app: :growio)
   end
 
   plug(Plug.RequestId)
@@ -48,6 +48,6 @@ defmodule GrowioWeb.Endpoint do
   plug(Plug.MethodOverride)
   plug(Plug.Head)
   plug(Plug.Session, @session_options)
-  plug(Corsica, Application.compile_env(:growio_web, :cors))
+  plug(Corsica, Application.compile_env(:growio, :cors))
   plug(GrowioWeb.Router)
 end

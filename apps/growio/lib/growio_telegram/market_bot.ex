@@ -11,7 +11,7 @@ defmodule GrowioTelegram.MarketBot do
 
   @session_ttl 60 * 1_000 * 10
   @max_bot_concurrency 999_999
-  @market_url Application.compile_env!(:growio_telegram, :market_url)
+  @market_url Application.compile_env!(:growio, :telegram_market_url)
 
   def update_bot(%MarketplaceTelegramBot{token: token} = bot) do
     if is_bitstring(bot.description) do
