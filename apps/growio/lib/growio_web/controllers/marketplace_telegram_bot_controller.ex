@@ -10,7 +10,7 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
   alias GrowioWeb.Views.MarketplaceTelegramBotCustomerJSON
   alias GrowioWeb.Views.MarketplaceTelegramBotCustomerMessageJSON
   alias GrowioWeb.Channels.CustomerChannel
-  alias GrowioWeb.Interface
+  alias GrowioTelegram.MarketBot
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -48,10 +48,10 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
          {:ok, updated_bot} <-
            Marketplaces.update_telegram_bot(marketplace_account, bot, params) do
       if bot.token === updated_bot.token do
-        GrowioWeb.Interface.telegram_cast({:update_bot, updated_bot})
+        MarketBot.update_bot(updated_bot)
       else
-        GrowioWeb.Interface.telegram_call({:reconnect_bot, bot.token, updated_bot.token})
-        GrowioWeb.Interface.telegram_cast({:update_bot, updated_bot})
+        MarketBot.restart_bot(bot.token, updated_bot.token)
+        MarketBot.update_bot(updated_bot)
       end
 
       Conn.ok(conn, MarketplaceTelegramBotJSON.render(updated_bot))
@@ -70,7 +70,7 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
       ) do
     with {:ok, %MarketplaceTelegramBot{} = bot} <-
            Marketplaces.create_telegram_bot(marketplace_account, params) do
-      GrowioWeb.Interface.telegram_cast({:connect_bot, bot.token})
+      MarketBot.start_bot(bot.token)
       Conn.ok(conn, MarketplaceTelegramBotJSON.render(bot))
     end
   end
@@ -163,7 +163,7 @@ defmodule GrowioWeb.Controllers.MarketplaceTelegramBotController do
     bot = Marketplaces.get_telegram_bot(marketplace_account)
     customer = Marketplaces.get_telegram_bot_customer(message.customer_id, [])
 
-    Interface.telegram_cast({:send_message, bot, text: message.text, chat_id: customer.chat_id})
+    MarketBot.send_message(bot, text: message.text, chat_id: customer.chat_id)
     CustomerChannel.new_message(message)
 
     Conn.ok(conn)

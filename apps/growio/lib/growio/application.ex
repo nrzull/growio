@@ -23,10 +23,8 @@ defmodule Growio.Application do
       # {GrowioWeb.Worker, arg},
       # Start to serve requests, typically the last entry
       GrowioWeb.Endpoint,
-      {GrowioWeb.Interface, nil},
       {DynamicSupervisor, strategy: :one_for_one, name: GrowioTelegram.DynamicSupervisor},
-      {MarketBotRegistry, nil},
-      {GrowioTelegram.Interface, nil}
+      {MarketBotRegistry, nil}
       # Start a worker by calling: Growio.Worker.start_link(arg)
       # {Growio.Worker, arg}
     ]

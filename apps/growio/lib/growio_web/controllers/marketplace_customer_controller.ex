@@ -10,6 +10,7 @@ defmodule GrowioWeb.Controllers.MarketplaceCustomerController do
   alias GrowioWeb.Views.MarketplaceTelegramBotJSON
   alias Growio.Marketplaces.MarketplaceTelegramBot
   alias Growio.Marketplaces.MarketplaceTelegramBotCustomer
+  alias GrowioTelegram.MarketBot
 
   plug(OpenApiSpex.Plug.CastAndValidate,
     render_error: GrowioWeb.Plugs.ErrorPlug,
@@ -115,13 +116,10 @@ defmodule GrowioWeb.Controllers.MarketplaceCustomerController do
                   "You've just created an order! Here are some details:\n\nProducts: `#{Jason.encode!(payload.items)}`"
                   |> String.trim()
 
-                GrowioWeb.Interface.telegram_cast(
-                  {:send_message, bot,
-                   [
-                     chat_id: chat_id,
-                     text: text,
-                     parse_mode: "Markdown"
-                   ]}
+                MarketBot.send_message(bot,
+                  chat_id: chat_id,
+                  text: text,
+                  parse_mode: "Markdown"
                 )
               end
             end
